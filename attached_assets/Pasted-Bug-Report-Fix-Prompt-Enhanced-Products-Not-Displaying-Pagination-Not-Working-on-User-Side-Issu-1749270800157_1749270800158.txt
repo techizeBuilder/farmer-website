@@ -1,0 +1,67 @@
+Bug Report & Fix Prompt: Enhanced Products Not Displaying + Pagination Not Working on User Side
+Issue Summary:
+Newly created enhanced products are not appearing on the user-facing Products page, and pagination is not functioning properly.
+
+🔍 Check & Troubleshoot:
+1. Verify Product Fetching on User Side
+Confirm that all real enhanced products are properly saved in the database.
+
+Ensure each enhanced product:
+
+Has status = active or is_published = true (if applicable).
+
+Is not restricted by any admin-only flag or filter.
+
+Check the API or controller used to fetch user-side product listings:
+
+Is it filtering incorrectly?
+
+Does it exclude enhanced = true by mistake?
+
+Test whether non-enhanced products appear, but enhanced do not.
+
+2. Fix Product Query Logic
+Ensure the query fetching products on user side includes enhanced products.
+
+Confirm there are no hard-coded filters excluding type = enhanced or similar.
+
+If products are added recently, verify there is no cache or delay in propagation.
+
+📄 Pagination Issue
+Test pagination buttons (next, previous, page numbers).
+
+Check API/controller logic handling pagination:
+
+Verify limit and offset or page parameters are correctly passed and processed.
+
+Confirm the frontend is rendering pagination links dynamically.
+
+Test:
+
+Products per page setting (e.g., 10 or 20).
+
+Load next page and validate new results are loaded (not repeating or blank).
+
+Ensure pagination works with both:
+
+Mixed products (normal + enhanced)
+
+Enhanced products alone (if filter used)
+
+✅ Expected Outcome
+All real enhanced products are correctly fetched and shown on the user-side Products page.
+
+Pagination:
+
+Works correctly and loads correct product sets.
+
+Supports both manual click and URL query (e.g., ?page=2).
+
+No missing or duplicated products across pages.
+
+📌 Additional Suggestions
+Add a console log or backend log temporarily to confirm data being fetched.
+
+Check for caching issues (Redis, frontend, or API response).
+
+Run manual query in DB to confirm enhanced product presence and visibility flags.
