@@ -182,6 +182,7 @@ export const orders = pgTable("orders", {
   paymentMethod: text("payment_method").notNull().default("razorpay"),
   discountId: integer("discount_id").references(() => discounts.id),
   cancellationReason: text("cancellation_reason"),
+  trackingId: text("tracking_id"),  
   deliveredAt: timestamp("delivered_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

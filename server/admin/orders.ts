@@ -41,6 +41,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
         cancellationReason: orders.cancellationReason,
         deliveredAt: orders.deliveredAt,
         createdAt: orders.createdAt,
+        trackingId: orders.trackingId,
         updatedAt: orders.updatedAt,
         userName: users.name,
         userEmail: users.email,
@@ -426,6 +427,7 @@ export const exportOrders = async (req: Request, res: Response) => {
       .json({ message: "Failed to export orders", error: String(error) });
   }
 };
+
 export const updateOrderTracking = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;

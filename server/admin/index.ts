@@ -17,7 +17,7 @@ const adminRouter = Router();
 const authenticateAdmin = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     // Get token from header
@@ -31,7 +31,7 @@ const authenticateAdmin = async (
     // Verify token
     const decodedToken = jwt.verify(
       token,
-      process.env.JWT_SECRET || "secret-key",
+      process.env.JWT_SECRET || "secret-key"
     ) as { userId: number };
 
     // Check if user exists and is an admin
@@ -77,7 +77,7 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET || "secret-key",
-      { expiresIn: "24h" },
+      { expiresIn: "24h" }
     );
 
     // Return user info and token
@@ -128,54 +128,54 @@ adminRouter.get(
         error: String(error),
       });
     }
-  },
+  }
 );
 
 // Product routes
 adminRouter.get(
   "/products",
   authenticateAdmin,
-  productController.getAllProducts,
+  productController.getAllProducts
 );
 adminRouter.get(
   "/products/:id",
   authenticateAdmin,
-  productController.getProductById,
+  productController.getProductById
 );
 adminRouter.post(
   "/products",
   authenticateAdmin,
-  productController.createProduct,
+  productController.createProduct
 );
 adminRouter.put(
   "/products/:id",
   authenticateAdmin,
-  productController.updateProduct,
+  productController.updateProduct
 );
 adminRouter.patch(
   "/products/:id/featured",
   authenticateAdmin,
-  productController.toggleProductFeatured,
+  productController.toggleProductFeatured
 );
 adminRouter.delete(
   "/products/:id",
   authenticateAdmin,
-  productController.deleteProduct,
+  productController.deleteProduct
 );
 adminRouter.get(
   "/product-categories",
   authenticateAdmin,
-  productController.getProductCategories,
+  productController.getProductCategories
 );
 adminRouter.get(
   "/product-stock",
   authenticateAdmin,
-  productController.getProductStock,
+  productController.getProductStock
 );
 adminRouter.patch(
   "/products/:id/stock",
   authenticateAdmin,
-  productController.updateProductStock,
+  productController.updateProductStock
 );
 
 // Order routes
@@ -183,25 +183,29 @@ adminRouter.get("/orders", authenticateAdmin, orderController.getAllOrders);
 adminRouter.get(
   "/orders/export",
   authenticateAdmin,
-  orderController.exportOrders,
+  orderController.exportOrders
 );
 adminRouter.get("/orders/:id", authenticateAdmin, orderController.getOrderById);
 adminRouter.patch(
   "/orders/:id/status",
   authenticateAdmin,
-  orderController.updateOrderStatus,
+  orderController.updateOrderStatus
 );
 adminRouter.delete(
   "/orders/:id",
   authenticateAdmin,
-  orderController.deleteOrder,
+  orderController.deleteOrder
 );
 adminRouter.get(
   "/order-statistics",
   authenticateAdmin,
-  orderController.getOrderStatistics,
+  orderController.getOrderStatistics
 );
-
+adminRouter.put(
+  `/orders/:orderId/update-tracking`,
+  authenticateAdmin,
+  orderController.updateOrderTracking
+);
 // User routes
 adminRouter.get("/users", authenticateAdmin, userController.getAllUsers);
 adminRouter.get("/users/:id", authenticateAdmin, userController.getUserById);
@@ -210,51 +214,51 @@ adminRouter.put("/users/:id", authenticateAdmin, userController.updateUser);
 adminRouter.patch(
   "/users/:id/password",
   authenticateAdmin,
-  userController.changeUserPassword,
+  userController.changeUserPassword
 );
 adminRouter.patch(
   "/users/:id/cod-access",
   authenticateAdmin,
-  userController.toggleCodAccess,
+  userController.toggleCodAccess
 );
 adminRouter.delete("/users/:id", authenticateAdmin, userController.deleteUser);
 adminRouter.get(
   "/user-statistics",
   authenticateAdmin,
-  userController.getUserStatistics,
+  userController.getUserStatistics
 );
 adminRouter.put(
   `/orders/:orderId/update-tracking`,
   authenticateAdmin,
-  orderController.updateOrderTracking,
+  orderController.updateOrderTracking
 );
 // Farmer routes
 adminRouter.get("/farmers", authenticateAdmin, farmerController.getAllFarmers);
 adminRouter.get(
   "/farmers/:id",
   authenticateAdmin,
-  farmerController.getFarmerById,
+  farmerController.getFarmerById
 );
 adminRouter.post("/farmers", authenticateAdmin, farmerController.createFarmer);
 adminRouter.put(
   "/farmers/:id",
   authenticateAdmin,
-  farmerController.updateFarmer,
+  farmerController.updateFarmer
 );
 adminRouter.patch(
   "/farmers/:id/featured",
   authenticateAdmin,
-  farmerController.toggleFarmerFeatured,
+  farmerController.toggleFarmerFeatured
 );
 adminRouter.delete(
   "/farmers/:id",
   authenticateAdmin,
-  farmerController.deleteFarmer,
+  farmerController.deleteFarmer
 );
 adminRouter.get(
   "/featured-farmers",
   authenticateAdmin,
-  farmerController.getFeaturedFarmers,
+  farmerController.getFeaturedFarmers
 );
 
 // Newsletter routes
@@ -271,7 +275,7 @@ adminRouter.get(
         .status(500)
         .json({ message: "Failed to fetch newsletter subscriptions" });
     }
-  },
+  }
 );
 
 adminRouter.delete(
@@ -293,7 +297,7 @@ adminRouter.delete(
         .status(500)
         .json({ message: "Failed to delete newsletter subscription" });
     }
-  },
+  }
 );
 
 // Contact Messages routes
@@ -308,7 +312,7 @@ adminRouter.get(
       console.error("Error fetching contact messages:", error);
       res.status(500).json({ message: "Failed to fetch contact messages" });
     }
-  },
+  }
 );
 
 adminRouter.patch(
@@ -321,7 +325,7 @@ adminRouter.patch(
 
       const updatedMessage = await storage.updateContactMessageStatus(
         parseInt(id),
-        status,
+        status
       );
       res.json(updatedMessage);
     } catch (error) {
@@ -330,7 +334,7 @@ adminRouter.patch(
         .status(500)
         .json({ message: "Failed to update contact message status" });
     }
-  },
+  }
 );
 
 export default adminRouter;

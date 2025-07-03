@@ -963,12 +963,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stockValidationPromises = cart.items.map(async (item) => {
         const isAvailable = await storage.validateStockAvailability(
           item.product.id,
-          item.quantity,
+          item.quantity
         );
         if (!isAvailable) {
           const product = await storage.getProductById(item.product.id);
           throw new Error(
-            `Insufficient stock for ${item.product.name}. Available: ${product?.stockQuantity || 0}, Requested: ${item.quantity}`,
+            `Insufficient stock for ${item.product.name}. Available: ${
+              product?.stockQuantity || 0
+            }, Requested: ${item.quantity}`
           );
         }
         return true;
@@ -977,18 +979,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         await Promise.all(stockValidationPromises);
       } catch (stockError) {
-        return res
-          .status(400)
-          .json({
-            message:
-              stockError instanceof Error
-                ? stockError.message
-                : "Stock validation failed",
-          });
+        return res.status(400).json({
+          message:
+            stockError instanceof Error
+              ? stockError.message
+              : "Stock validation failed",
+        });
       }
 
       console.log("Starting order creation process...");
-
       // Create the order
       console.log("Creating order with data:", {
         userId: user.id,
@@ -1000,14 +999,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentMethod: "razorpay",
       });
 
+      const generateRandomId = () => {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const numbers = "0123456789";
+
+        let result = "";
+        for (let i = 0; i < 3; i++) {
+          result += letters.charAt(Math.floor(Math.random() * letters.length));
+        }
+
+        for (let i = 0; i < 3; i++) {
+          result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        }
+
+        return result;
+      };
+
+      const randomId = generateRandomId();
       const order = await storage.createOrder({
         userId: user.id,
         sessionId,
         paymentId: razorpayPaymentId,
-        total: amount / 100, // Convert back to main currency unit
+        total: amount / 100,
         status: "confirmed",
         shippingAddress: shippingAddress || "No address provided",
         paymentMethod: "razorpay",
+        trackingId: randomId,
       });
 
       console.log("Order created successfully:", order);
@@ -1055,7 +1072,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ...item,
               product: product,
             };
-          }),
+          })
         );
 
         // Debug: Log actual user data being sent in email

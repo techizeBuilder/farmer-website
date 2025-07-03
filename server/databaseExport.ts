@@ -137,6 +137,7 @@ function generateCreateTableSQL(tableName: string, schema: any): string {
   "discount_id" INTEGER,
   "cancellation_reason" TEXT,
   "delivered_at" TIMESTAMP,
+  "trackingId" TEXT,
   "created_at" TIMESTAMP NOT NULL DEFAULT NOW(),
   "updated_at" TIMESTAMP NOT NULL DEFAULT NOW()`;
       break;
