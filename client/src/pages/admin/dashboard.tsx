@@ -2,18 +2,20 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import AdminNav from '../../components/admin/AdminNav';
-import AdminAuthWrapper from '../../components/admin/AdminAuthWrapper';
-import { 
-  BarChart, 
-  LineChart, 
-  Bar, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+import AdminAuthWrapper from "@/components/admin/AdminAuthWrapper";
+
+import AdminLayout from "@/components/admin/AdminLayout";
+import {
+  BarChart,
+  LineChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 
 interface DashboardStats {
@@ -56,8 +58,8 @@ export default function AdminDashboard() {
         if (!token) {
           throw new Error('No authentication token found');
         }
-        
-        const response = await fetch('/api/admin/dashboard', {
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/dashboard`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -122,7 +124,7 @@ export default function AdminDashboard() {
         </div>
       );
     }
-    
+
     if (error) {
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -135,36 +137,36 @@ export default function AdminDashboard() {
         </div>
       );
     }
-    
+
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        
+
         <div className="container mx-auto px-4 py-16 mt-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            
+
             <div className="flex space-x-3">
-              <button 
-                onClick={() => setLocation('/admin/products')} 
+              <button
+                onClick={() => setLocation('/admin/enhanced-products')}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
               >
                 Products
               </button>
-              <button 
-                onClick={() => setLocation('/admin/orders')} 
+              <button
+                onClick={() => setLocation('/admin/orders')}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
               >
                 Orders
               </button>
-              <button 
-                onClick={() => setLocation('/admin/users')} 
+              <button
+                onClick={() => setLocation('/admin/users')}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
               >
                 Users
               </button>
             </div>
           </div>
-          
+
           {/* Stats Overview */}
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -190,7 +192,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Order Stats */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold mb-4">Order Statistics</h2>
@@ -213,7 +215,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Product Stats */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold mb-4">Product Statistics</h2>
@@ -238,7 +240,7 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
-          
+
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Order Status Chart */}
@@ -250,11 +252,11 @@ export default function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                        borderColor: '#ccc' 
-                      }} 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        borderColor: '#ccc'
+                      }}
                     />
                     <Legend />
                     <Bar dataKey="value" fill="#4f46e5" />
@@ -262,7 +264,7 @@ export default function AdminDashboard() {
                 </ResponsiveContainer>
               </div>
             </div>
-            
+
             {/* Product Stock Chart */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold mb-4">Product Inventory Status</h2>
@@ -272,11 +274,11 @@ export default function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                        borderColor: '#ccc' 
-                      }} 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        borderColor: '#ccc'
+                      }}
                     />
                     <Legend />
                     <Bar dataKey="value" fill="#10b981" />
@@ -284,7 +286,7 @@ export default function AdminDashboard() {
                 </ResponsiveContainer>
               </div>
             </div>
-            
+
             {/* Monthly Sales Chart */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 lg:col-span-2">
               <h2 className="text-lg font-semibold mb-4">Monthly Sales</h2>
@@ -294,11 +296,11 @@ export default function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                        borderColor: '#ccc' 
-                      }} 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        borderColor: '#ccc'
+                      }}
                     />
                     <Legend />
                     <Line type="monotone" dataKey="sales" stroke="#4f46e5" activeDot={{ r: 8 }} />
@@ -307,26 +309,26 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-          
+
           {/* Quick Links */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div 
+            <div
               className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => setLocation('/admin/products')}
             >
               <h3 className="text-lg font-semibold mb-2">Manage Products</h3>
               <p className="text-gray-600 dark:text-gray-400">Add, edit, or remove products from your inventory</p>
             </div>
-            
-            <div 
+
+            <div
               className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => setLocation('/admin/orders')}
             >
               <h3 className="text-lg font-semibold mb-2">Manage Orders</h3>
               <p className="text-gray-600 dark:text-gray-400">View and update order status, process refunds</p>
             </div>
-            
-            <div 
+
+            <div
               className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => setLocation('/admin/users')}
             >
@@ -341,7 +343,10 @@ export default function AdminDashboard() {
 
   return (
     <AdminAuthWrapper>
-      {renderDashboard()}
+      <AdminLayout>
+        {renderDashboard()}
+      </AdminLayout>
+
     </AdminAuthWrapper>
   );
 }
