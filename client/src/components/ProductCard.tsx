@@ -7,7 +7,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Leaf, Shield, Crown } from "lucide-react";
-
+import placeholderImnage from "../../../placeholder.svg"
 interface ProductCardProps {
   product: Product;
 }
@@ -46,9 +46,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.5 }}
               src={product.imageUrl.startsWith('http') ? product.imageUrl : `/api/images/serve/${product.imageUrl.replace(/^\/+/, '')}`} 
-              onError={(e) => {
-                e.currentTarget.src = '/api/images/placeholder.png';
-              }}
+              // onError={(e) => {
+              //   e.currentTarget.src = '/api/images/placeholder.png';
+              // }}
               alt={product.name} 
               className="w-full h-full object-cover transition-transform duration-500"
             />

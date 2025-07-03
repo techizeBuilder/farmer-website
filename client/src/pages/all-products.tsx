@@ -20,6 +20,7 @@ import { useAnimations } from "@/hooks/use-animations";
 import { cn, debounce } from "@/lib/utils";
 import { useSearchParams as queryfinder } from "react-router-dom";
 import { useCategory } from "@/hooks/store";
+
 // Custom hook for URL search params with navigation
 const useSearchParams = () => {
   const [location, navigate] = useLocation();
