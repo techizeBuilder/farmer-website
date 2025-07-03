@@ -695,7 +695,7 @@ export default function AdminOrders() {
                               </TableCell>
                               <TableCell className="text-nowrap">
                                 <Link
-                                  href={trackingId}
+                                  href=""
                                   className="underline"
                                   onClick={() => handleTrackingIdClick(order)}
                                 >
