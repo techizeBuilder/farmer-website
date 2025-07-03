@@ -2,6 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./initDb";
+import cors from "cors";
+import morgan from "morgan";
 import dotenv from "dotenv";
 dotenv.config();
 const app = express();
@@ -37,25 +39,46 @@ app.use((req, res, next) => {
 
   next();
 });
+const allowedOrigins = [
+  "http://localhost:5000",
+  "https://new-farmer.onrender.com",
+  // "https://farmfresh.techizebuilder.com",
+];
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  })
+);
+app.use(morgan("dev"));
 (async () => {
   // Test database connection first
-  const { testDatabaseConnection } = await import('./db');
+  const { testDatabaseConnection } = await import("./db");
   const dbConnected = await testDatabaseConnection();
-  
+
   if (dbConnected) {
     // Initialize database with seed data
     try {
       await initializeDatabase();
-      log('Database initialized successfully with seed data');
+      log("Database initialized successfully with seed data");
     } catch (error) {
-      log('Error initializing database: ' + error);
+      log("Error initializing database: " + error);
       // Continue without database initialization if it fails
     }
   } else {
-    log('Warning: Database connection failed, continuing without database initialization');
+    log(
+      "Warning: Database connection failed, continuing without database initialization"
+    );
   }
-  
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -79,9 +102,12 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  server.listen(
+    {
+      port,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    }
+  );
 })();

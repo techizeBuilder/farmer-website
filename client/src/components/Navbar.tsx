@@ -66,6 +66,7 @@ export default function Navbar() {
   };
 
   const navLinks = [
+    { href: "/", label: "Home" },
     { href: "/our-story", label: "Our Story" },
     { href: "/products", label: "Products" },
     { href: "/farmers", label: "Our Farmers" },

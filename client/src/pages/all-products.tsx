@@ -149,6 +149,7 @@ export default function AllProducts() {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/products?${queryString}`
       );
+      console.log(response,"nidhi")
       if (!response.ok) {
         throw new Error(`Failed to fetch products: ${response.status}`);
       }
