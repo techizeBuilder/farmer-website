@@ -19,9 +19,21 @@ import {
   insertTeamMemberSchema,
   insertDiscountSchema,
   products,
+  discountUsage,
+  productReviews,
+  orderItems,
+  orders,
+  payments,
+  subscriptions,
+  carts,
+  cartItems,
+  contactMessages,
+  newsletterSubscriptions,
+  smsVerifications,
+  users,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, asc } from "drizzle-orm";
+import { eq, sql, desc, asc, inArray } from "drizzle-orm";
 import adminRouter from "./admin";
 import imageRouter from "./imageRoutes";
 import { exportDatabase, exportTable } from "./databaseExport";
@@ -42,7 +54,7 @@ let transporter: nodemailer.Transporter;
 const authenticate = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const authHeader = req.headers.authorization;
@@ -94,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded images statically
   app.use(
     "/uploads",
-    express.static(path.join(process.cwd(), "public/uploads")),
+    express.static(path.join(process.cwd(), "public/uploads"))
   );
 
   // Register admin routes
@@ -180,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const offset = (pageNumber - 1) * limitNumber;
       const paginatedProducts = filteredProducts.slice(
         offset,
-        offset + limitNumber,
+        offset + limitNumber
       );
 
       res.json({
@@ -314,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         res.status(500).json({ message: "Failed to fetch subcategories" });
       }
-    },
+    }
   );
 
   app.get(`${apiPrefix}/categories/:id`, async (req, res) => {
@@ -466,10 +478,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiPrefix}/newsletter/subscribe`, async (req, res) => {
     try {
       const subscriptionData = insertNewsletterSubscriptionSchema.parse(
-        req.body,
+        req.body
       );
-      const subscription =
-        await storage.addNewsletterSubscription(subscriptionData);
+      const subscription = await storage.addNewsletterSubscription(
+        subscriptionData
+      );
       res.json({ message: "Subscription successful", subscription });
     } catch (error) {
       if (error instanceof Error) {
@@ -486,14 +499,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiPrefix}/auth/send-otp`, async (req, res) => {
     try {
       const { mobile, purpose } = req.body;
-console.log("nisdhi",mobile,purpose)
+      console.log("nisdhi", mobile, purpose);
       if (!mobile || !purpose) {
         return res
           .status(400)
           .json({ message: "Mobile number and purpose are required" });
       }
 
-      if (purpose !== "registration" && purpose !== "password_reset") {
+      if (
+        purpose !== "registration" &&
+        purpose !== "password_reset" &&
+        purpose !== "account_deletion"
+      ) {
         return res.status(400).json({ message: "Invalid purpose" });
       }
 
@@ -664,7 +681,9 @@ console.log("nisdhi",mobile,purpose)
 
       if (success && transporter) {
         const user = await storage.getUserByEmail(email);
-        const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${user?.resetToken}`;
+        const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${
+          user?.resetToken
+        }`;
 
         await transporter.sendMail({
           from: "noreply@yourstore.com",
@@ -731,7 +750,7 @@ console.log("nisdhi",mobile,purpose)
       const updatedUser = await storage.updateUser(user.id, { name });
       const { password, ...userWithoutPassword } = updatedUser;
 
-      res.json({
+      res.status(200).json({
         message: "Profile updated successfully",
         user: userWithoutPassword,
       });
@@ -750,17 +769,15 @@ console.log("nisdhi",mobile,purpose)
         const { currentPassword, newPassword, otp } = req.body;
 
         if (!currentPassword || !newPassword || !otp) {
-          return res
-            .status(400)
-            .json({
-              message: "Current password, new password, and OTP are required",
-            });
+          return res.status(400).json({
+            message: "Current password, new password, and OTP are required",
+          });
         }
 
         // Verify current password
         const isCurrentPasswordValid = await bcrypt.compare(
           currentPassword,
-          user.password,
+          user.password
         );
         if (!isCurrentPasswordValid) {
           return res
@@ -772,7 +789,7 @@ console.log("nisdhi",mobile,purpose)
         const otpResult = await smsService.verifyOTP(
           user.mobile,
           otp,
-          "password_reset",
+          "password_reset"
         );
         if (!otpResult.success) {
           return res.status(400).json({ message: otpResult.message });
@@ -790,9 +807,96 @@ console.log("nisdhi",mobile,purpose)
         console.error("Change password error:", error);
         res.status(500).json({ message: "Failed to change password" });
       }
-    },
+    }
   );
+  // delete user with OTP verification
 
+  // abhi
+  app.delete(
+    `${apiPrefix}/user/delete-account`,
+    authenticate,
+    async (req, res) => {
+      try {
+        const user = (req as any).user;
+
+        // Optional: verify OTP for safety
+        const { otp } = req.body;
+        if (otp) {
+          const result = await smsService.verifyOTP(
+            user.mobile,
+            otp,
+            "account_deletion"
+          );
+          if (!result.success) {
+            return res.status(400).json({ message: result.message });
+          }
+        }
+
+        // 1. Delete discount usage
+        await db.delete(discountUsage).where(eq(discountUsage.userId, user.id));
+
+        // 2. Delete product reviews
+        await db
+          .delete(productReviews)
+          .where(eq(productReviews.userId, user.id));
+
+        // 3. Delete orders (optional)
+        await db
+          .delete(orderItems)
+          .where(
+            inArray(
+              orderItems.orderId,
+              db
+                .select({ id: orders.id })
+                .from(orders)
+                .where(eq(orders.userId, user.id))
+            )
+          );
+        await db.delete(orders).where(eq(orders.userId, user.id));
+
+        // 4. Delete payments
+        await db.delete(payments).where(eq(payments.userId, user.id));
+
+        // 5. Delete subscriptions
+        await db.delete(subscriptions).where(eq(subscriptions.userId, user.id));
+
+        // 6. Delete carts and items
+        const userCarts = await db
+          .select()
+          .from(carts)
+          .where(eq(carts.sessionId, user.mobile));
+        for (const cart of userCarts) {
+          await db.delete(cartItems).where(eq(cartItems.cartId, cart.id));
+          await db.delete(carts).where(eq(carts.id, cart.id));
+        }
+
+        // 7. Delete contact messages (if matched by email)
+        await db
+          .delete(contactMessages)
+          .where(eq(contactMessages.email, user.email));
+
+        // 8. Delete newsletter subscriptions
+        await db
+          .delete(newsletterSubscriptions)
+          .where(eq(newsletterSubscriptions.email, user.email));
+
+        // 9. Delete SMS verifications
+        await db
+          .delete(smsVerifications)
+          .where(eq(smsVerifications.mobile, user.mobile));
+
+        // 10. Finally, delete the user
+        await db.delete(users).where(eq(users.id, user.id));
+
+        res.json({ message: "Account and related data deleted successfully" });
+      } catch (error) {
+        console.error("Delete account error:", error);
+        res
+          .status(500)
+          .json({ message: "Failed to delete account", error: String(error) });
+      }
+    }
+  );
   // Check user's COD access status
   app.get(`${apiPrefix}/user/cod-access`, authenticate, async (req, res) => {
     try {
@@ -841,12 +945,10 @@ console.log("nisdhi",mobile,purpose)
             console.log("Razorpay initialized successfully for payment");
           } catch (initError) {
             console.error("Failed to initialize Razorpay instance:", initError);
-            return res
-              .status(500)
-              .json({
-                message: "Failed to initialize payment gateway",
-                error: String(initError),
-              });
+            return res.status(500).json({
+              message: "Failed to initialize payment gateway",
+              error: String(initError),
+            });
           }
         }
 
@@ -854,12 +956,10 @@ console.log("nisdhi",mobile,purpose)
         const { amount, currency = "INR" } = req.body;
 
         if (!amount || isNaN(amount) || amount <= 0) {
-          return res
-            .status(400)
-            .json({
-              message: "Invalid amount specified",
-              error: "Amount must be a positive number",
-            });
+          return res.status(400).json({
+            message: "Invalid amount specified",
+            error: "Amount must be a positive number",
+          });
         }
 
         // Create Razorpay order
@@ -884,23 +984,19 @@ console.log("nisdhi",mobile,purpose)
           });
         } catch (orderError) {
           console.error("Failed to create Razorpay order:", orderError);
-          return res
-            .status(500)
-            .json({
-              message: "Failed to create payment order",
-              error: String(orderError),
-            });
+          return res.status(500).json({
+            message: "Failed to create payment order",
+            error: String(orderError),
+          });
         }
       } catch (error) {
         console.error("Payment initialization error:", error);
-        res
-          .status(500)
-          .json({
-            message: "Failed to initialize payment",
-            error: error instanceof Error ? error.message : String(error),
-          });
+        res.status(500).json({
+          message: "Failed to initialize payment",
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
-    },
+    }
   );
 
   // Verify payment and create order
@@ -1134,17 +1230,17 @@ console.log("nisdhi",mobile,purpose)
   // Forgot password - Send reset email
   app.post(`${apiPrefix}/auth/forgot-password`, async (req, res) => {
     try {
-      const { email,number } = req.body;
+      const { email, number } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
-      if (!number || typeof number !== 'string' || number.length < 10) {
+      if (!number || typeof number !== "string" || number.length < 10) {
         return res.status(400).json({ message: "Valid number is required" });
       }
 
       // Find user by email
-      const user = await storage.getUserByEmail(email,number);
+      const user = await storage.getUserByEmail(email, number);
       if (!user) {
         // Don't reveal if email exists for security
         return res.json({
@@ -1218,7 +1314,7 @@ console.log("nisdhi",mobile,purpose)
       } catch (emailError) {
         console.error(
           "Failed to send password reset confirmation email:",
-          emailError,
+          emailError
         );
         // Don't fail the password reset if email fails
       }
@@ -1302,7 +1398,7 @@ console.log("nisdhi",mobile,purpose)
       } catch (error) {
         res.status(500).json({ message: "Failed to create subscription" });
       }
-    },
+    }
   );
 
   // Get user subscriptions
@@ -1345,7 +1441,7 @@ console.log("nisdhi",mobile,purpose)
                     }
                   : null,
               };
-            }),
+            })
           );
 
           // Get payment details
@@ -1395,7 +1491,7 @@ console.log("nisdhi",mobile,purpose)
               order.shippingAddress ||
               "Default address",
           };
-        }),
+        })
       );
 
       res.json({ orders: ordersWithDetails });
@@ -1450,7 +1546,7 @@ console.log("nisdhi",mobile,purpose)
       // Get delivered orders from database
       const deliveredOrders = await storage.getOrdersByUserId(user.id);
       const filteredDeliveredOrders = deliveredOrders.filter(
-        (order) => order.status === "delivered",
+        (order) => order.status === "delivered"
       );
 
       // Fetch order items for each delivered order with rating status
@@ -1463,7 +1559,7 @@ console.log("nisdhi",mobile,purpose)
             items.map(async (item) => {
               const canRate = await storage.canUserReviewProduct(
                 user.id,
-                item.productId,
+                item.productId
               );
               const hasRated = !canRate; // If can't rate, means already rated
               return {
@@ -1471,14 +1567,14 @@ console.log("nisdhi",mobile,purpose)
                 canRate,
                 hasRated,
               };
-            }),
+            })
           );
 
           return {
             ...order,
             items: itemsWithRatingStatus,
           };
-        }),
+        })
       );
 
       res.json({ orders: ordersWithItems });
@@ -1541,7 +1637,7 @@ console.log("nisdhi",mobile,purpose)
         console.error("Rating submission error:", error);
         res.status(500).json({ message: "Failed to submit rating" });
       }
-    },
+    }
   );
 
   // Cancel subscription
@@ -1564,14 +1660,14 @@ console.log("nisdhi",mobile,purpose)
         // Cancel in Razorpay
         if (razorpay) {
           await razorpay.subscriptions.cancel(
-            subscription.razorpaySubscriptionId,
+            subscription.razorpaySubscriptionId
           );
         }
 
         // Update status in our database
         const updatedSubscription = await storage.updateSubscriptionStatus(
           subscriptionId,
-          "canceled",
+          "canceled"
         );
 
         res.json({
@@ -1581,7 +1677,7 @@ console.log("nisdhi",mobile,purpose)
       } catch (error) {
         res.status(500).json({ message: "Failed to cancel subscription" });
       }
-    },
+    }
   );
 
   // Product Review System for Delivered Orders
@@ -1610,7 +1706,7 @@ console.log("nisdhi",mobile,purpose)
       } catch (error) {
         res.status(500).json({ message: "Failed to check review eligibility" });
       }
-    },
+    }
   );
 
   // Add product review
@@ -1713,7 +1809,7 @@ console.log("nisdhi",mobile,purpose)
 
       const updatedTeamMember = await storage.updateTeamMember(
         id,
-        validatedData,
+        validatedData
       );
       res.json(updatedTeamMember);
     } catch (error) {
@@ -1745,7 +1841,7 @@ console.log("nisdhi",mobile,purpose)
 
       const updatedProduct = await storage.updateProductStock(
         productId,
-        stockQuantity,
+        stockQuantity
       );
       res.json({
         message: "Stock updated successfully",
@@ -1770,7 +1866,7 @@ console.log("nisdhi",mobile,purpose)
 
       const isAvailable = await storage.validateStockAvailability(
         productId,
-        quantity,
+        quantity
       );
       const product = await storage.getProductById(productId);
 
@@ -1791,7 +1887,7 @@ console.log("nisdhi",mobile,purpose)
       const threshold = parseInt(req.query.threshold as string) || 10;
       const allProducts = await storage.getAllProducts();
       const lowStockProducts = allProducts.filter(
-        (product) => product.stockQuantity <= threshold,
+        (product) => product.stockQuantity <= threshold
       );
 
       res.json({
@@ -1870,7 +1966,7 @@ console.log("nisdhi",mobile,purpose)
                   }
                 : null,
             };
-          }),
+          })
         ),
       };
 
@@ -1905,14 +2001,12 @@ console.log("nisdhi",mobile,purpose)
       if (!validationResult.success) {
         console.error(
           "Discount validation error:",
-          validationResult.error.issues,
+          validationResult.error.issues
         );
-        return res
-          .status(400)
-          .json({
-            message: "Invalid discount data",
-            errors: validationResult.error.issues,
-          });
+        return res.status(400).json({
+          message: "Invalid discount data",
+          errors: validationResult.error.issues,
+        });
       }
 
       const discount = await storage.createDiscount(validationResult.data);
@@ -1940,19 +2034,17 @@ console.log("nisdhi",mobile,purpose)
       if (!validationResult.success) {
         console.error(
           "Discount update validation error:",
-          validationResult.error.issues,
+          validationResult.error.issues
         );
-        return res
-          .status(400)
-          .json({
-            message: "Invalid discount data",
-            errors: validationResult.error.issues,
-          });
+        return res.status(400).json({
+          message: "Invalid discount data",
+          errors: validationResult.error.issues,
+        });
       }
 
       const discount = await storage.updateDiscount(
         parseInt(id),
-        validationResult.data,
+        validationResult.data
       );
       res.json(discount);
     } catch (error) {
@@ -2053,7 +2145,7 @@ console.log("nisdhi",mobile,purpose)
         discountId,
         userId,
         sessionId,
-        orderId,
+        orderId
       );
       res.json(usage);
     } catch (error) {
@@ -2157,7 +2249,7 @@ console.log("nisdhi",mobile,purpose)
 
       const updatedCategory = await storage.updateCategory(
         categoryId,
-        updateData,
+        updateData
       );
       res.json(updatedCategory);
     } catch (error) {
@@ -2184,7 +2276,7 @@ console.log("nisdhi",mobile,purpose)
       }
 
       const productsUsingCategory = allProducts.filter(
-        (product) => product.category === category.name,
+        (product) => product.category === category.name
       );
 
       if (productsUsingCategory.length > 0) {
@@ -2214,14 +2306,15 @@ console.log("nisdhi",mobile,purpose)
           return res.status(400).json({ message: "Invalid category ID" });
         }
 
-        const subcategories =
-          await storage.getSubcategoriesByParent(categoryId);
+        const subcategories = await storage.getSubcategoriesByParent(
+          categoryId
+        );
         res.json(subcategories);
       } catch (error) {
         console.error("Get subcategories error:", error);
         res.status(500).json({ message: "Failed to fetch subcategories" });
       }
-    },
+    }
   );
 
   // Create a new subcategory
@@ -2266,7 +2359,7 @@ console.log("nisdhi",mobile,purpose)
         console.error("Create subcategory error:", error);
         res.status(500).json({ message: "Failed to create subcategory" });
       }
-    },
+    }
   );
 
   // Update a subcategory
@@ -2286,7 +2379,7 @@ console.log("nisdhi",mobile,purpose)
 
       const updatedSubcategory = await storage.updateCategory(
         subcategoryId,
-        updateData,
+        updateData
       );
       res.json(updatedSubcategory);
     } catch (error) {
@@ -2313,7 +2406,7 @@ console.log("nisdhi",mobile,purpose)
       }
 
       const productsUsingSubcategory = allProducts.filter(
-        (product) => product.subcategory === subcategory.name,
+        (product) => product.subcategory === subcategory.name
       );
 
       if (productsUsingSubcategory.length > 0) {
@@ -2340,7 +2433,9 @@ console.log("nisdhi",mobile,purpose)
       res.json({
         message: "Database exported successfully",
         filePath: exportPath,
-        downloadUrl: `/api/admin/database/download/${path.basename(exportPath)}`,
+        downloadUrl: `/api/admin/database/download/${path.basename(
+          exportPath
+        )}`,
       });
     } catch (error) {
       console.error("Database export error:", error);
@@ -2385,7 +2480,9 @@ console.log("nisdhi",mobile,purpose)
       res.json({
         message: `Table ${tableName} exported successfully`,
         filePath: exportPath,
-        downloadUrl: `/api/admin/database/download/${path.basename(exportPath)}`,
+        downloadUrl: `/api/admin/database/download/${path.basename(
+          exportPath
+        )}`,
       });
     } catch (error) {
       console.error(`Table export error for ${req.params.tableName}:`, error);

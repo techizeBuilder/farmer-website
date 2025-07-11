@@ -76,7 +76,7 @@ export interface IStorage {
   updateProductStock(productId: number, quantity: number): Promise<Product>;
   validateStockAvailability(
     productId: number,
-    requestedQuantity: number,
+    requestedQuantity: number
   ): Promise<boolean>;
 
   // Enhanced Products
@@ -92,12 +92,12 @@ export interface IStorage {
   addToCart(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems>;
   updateCartItem(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems>;
   removeFromCart(sessionId: string, productId: number): Promise<CartWithItems>;
   clearCart(sessionId: string): Promise<void>;
@@ -107,11 +107,11 @@ export interface IStorage {
 
   // Newsletter
   addNewsletterSubscription(
-    subscription: InsertNewsletterSubscription,
+    subscription: InsertNewsletterSubscription
   ): Promise<NewsletterSubscription>;
   getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
   getNewsletterSubscriptionById(
-    id: number,
+    id: number
   ): Promise<NewsletterSubscription | undefined>;
   deleteNewsletterSubscription(id: number): Promise<boolean>;
 
@@ -127,7 +127,7 @@ export interface IStorage {
   getContactMessageById(id: number): Promise<ContactMessage | undefined>;
   updateContactMessageStatus(
     id: number,
-    status: string,
+    status: string
   ): Promise<ContactMessage>;
 
   // User Authentication
@@ -143,14 +143,14 @@ export interface IStorage {
   updateUserResetToken(
     userId: number,
     resetToken: string,
-    resetTokenExpiry: Date,
+    resetTokenExpiry: Date
   ): Promise<void>;
   getUserByResetToken(token: string): Promise<User | undefined>;
   updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
   createUserToken(
     userId: number,
     resetToken: string,
-    resetTokenExpiry: Date,
+    resetTokenExpiry: Date
   ): Promise<void>;
   clearUserResetToken(userId: number): Promise<void>;
 
@@ -180,7 +180,7 @@ export interface IStorage {
   createTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
   updateTeamMember(
     id: number,
-    teamMember: Partial<InsertTeamMember>,
+    teamMember: Partial<InsertTeamMember>
   ): Promise<TeamMember>;
   deleteTeamMember(id: number): Promise<void>;
 
@@ -192,24 +192,24 @@ export interface IStorage {
   createDiscount(discount: InsertDiscount): Promise<Discount>;
   updateDiscount(
     id: number,
-    discount: Partial<InsertDiscount>,
+    discount: Partial<InsertDiscount>
   ): Promise<Discount>;
   deleteDiscount(id: number): Promise<void>;
   validateDiscount(
     code: string,
     userId?: number,
-    cartTotal?: number,
+    cartTotal?: number
   ): Promise<{ valid: boolean; discount?: Discount; error?: string }>;
   validateDiscountById(
     id: number,
     userId?: number,
-    cartTotal?: number,
+    cartTotal?: number
   ): Promise<{ valid: boolean; discount?: Discount; error?: string }>;
   applyDiscount(
     discountId: number,
     userId?: number,
     sessionId?: string,
-    orderId?: number,
+    orderId?: number
   ): Promise<DiscountUsage>;
   getDiscountUsage(discountId: number, userId?: number): Promise<number>;
 
@@ -221,7 +221,7 @@ export interface IStorage {
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(
     id: number,
-    category: Partial<InsertCategory>,
+    category: Partial<InsertCategory>
   ): Promise<Category>;
   deleteCategory(id: number): Promise<void>;
 
@@ -348,19 +348,19 @@ export class MemStorage implements IStorage {
 
   async getProductsByCategory(category: string): Promise<Product[]> {
     return Array.from(this.products.values()).filter(
-      (product) => product.category === category,
+      (product) => product.category === category
     );
   }
 
   async getFeaturedProducts(): Promise<Product[]> {
     return Array.from(this.products.values()).filter(
-      (product) => product.featured,
+      (product) => product.featured
     );
   }
 
   async updateProductStock(
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<Product> {
     const product = this.products.get(productId);
     if (!product) {
@@ -379,7 +379,7 @@ export class MemStorage implements IStorage {
 
   async validateStockAvailability(
     productId: number,
-    requestedQuantity: number,
+    requestedQuantity: number
   ): Promise<boolean> {
     const product = this.products.get(productId);
     if (!product) {
@@ -404,7 +404,7 @@ export class MemStorage implements IStorage {
 
   async getFeaturedFarmers(): Promise<Farmer[]> {
     return Array.from(this.farmers.values()).filter(
-      (farmer) => farmer.featured,
+      (farmer) => farmer.featured
     );
   }
 
@@ -428,7 +428,7 @@ export class MemStorage implements IStorage {
   async addToCart(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems> {
     let cart = this.carts.get(sessionId);
 
@@ -444,7 +444,7 @@ export class MemStorage implements IStorage {
 
     // Check if item already exists in cart
     const existingCartItems = Array.from(this.cartItems.values()).filter(
-      (item) => item.cartId === cart!.id && item.productId === productId,
+      (item) => item.cartId === cart!.id && item.productId === productId
     );
 
     if (existingCartItems.length > 0) {
@@ -471,7 +471,7 @@ export class MemStorage implements IStorage {
   async updateCartItem(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems> {
     const cart = this.carts.get(sessionId);
 
@@ -480,7 +480,7 @@ export class MemStorage implements IStorage {
     }
 
     const cartItems = Array.from(this.cartItems.values()).filter(
-      (item) => item.cartId === cart.id && item.productId === productId,
+      (item) => item.cartId === cart.id && item.productId === productId
     );
 
     if (cartItems.length === 0) {
@@ -506,7 +506,7 @@ export class MemStorage implements IStorage {
 
   async removeFromCart(
     sessionId: string,
-    productId: number,
+    productId: number
   ): Promise<CartWithItems> {
     const cart = this.carts.get(sessionId);
 
@@ -515,7 +515,7 @@ export class MemStorage implements IStorage {
     }
 
     const cartItems = Array.from(this.cartItems.values()).filter(
-      (item) => item.cartId === cart.id && item.productId === productId,
+      (item) => item.cartId === cart.id && item.productId === productId
     );
 
     if (cartItems.length === 0) {
@@ -547,7 +547,7 @@ export class MemStorage implements IStorage {
 
     const subtotal = items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
-      0,
+      0
     );
     const shipping = subtotal > 0 ? 4.99 : 0;
     const total = subtotal + shipping;
@@ -570,11 +570,11 @@ export class MemStorage implements IStorage {
 
   // Newsletter methods
   async addNewsletterSubscription(
-    subscription: InsertNewsletterSubscription,
+    subscription: InsertNewsletterSubscription
   ): Promise<NewsletterSubscription> {
     // Check if email already exists
     const existingSubscription = Array.from(
-      this.newsletterSubscriptions.values(),
+      this.newsletterSubscriptions.values()
     ).find((sub) => sub.email === subscription.email);
 
     if (existingSubscription) {
@@ -594,12 +594,12 @@ export class MemStorage implements IStorage {
   async getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
     return Array.from(this.newsletterSubscriptions.values()).sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }
 
   async getNewsletterSubscriptionById(
-    id: number,
+    id: number
   ): Promise<NewsletterSubscription | undefined> {
     return this.newsletterSubscriptions.get(id);
   }
@@ -611,7 +611,7 @@ export class MemStorage implements IStorage {
   // Product Review methods
   async getProductReviews(productId: number): Promise<ProductReview[]> {
     return Array.from(this.productReviews.values()).filter(
-      (review) => review.productId === productId,
+      (review) => review.productId === productId
     );
   }
 
@@ -634,11 +634,11 @@ export class MemStorage implements IStorage {
 
   async canUserReviewProduct(
     userId: number,
-    productId: number,
+    productId: number
   ): Promise<boolean> {
     // Check if user has already reviewed this product
     const hasReviewed = Array.from(this.productReviews.values()).some(
-      (review) => review.userId === userId && review.productId === productId,
+      (review) => review.userId === userId && review.productId === productId
     );
 
     if (hasReviewed) {
@@ -648,7 +648,7 @@ export class MemStorage implements IStorage {
     // In a real app, we would check if the user has purchased this product
     // and if the order status is "delivered" - here we'll simulate this logic
     const userOrders = Array.from(this.payments.values()).filter(
-      (payment) => payment.userId === userId && payment.status === "completed",
+      (payment) => payment.userId === userId && payment.status === "completed"
     );
 
     // For demo purposes, if the user has any completed payment, they can review any product
@@ -657,12 +657,12 @@ export class MemStorage implements IStorage {
 
   async getUserProductReviews(userId: number): Promise<ProductReview[]> {
     return Array.from(this.productReviews.values()).filter(
-      (review) => review.userId === userId,
+      (review) => review.userId === userId
     );
   }
 
   async addContactMessage(
-    message: InsertContactMessage,
+    message: InsertContactMessage
   ): Promise<ContactMessage> {
     const newMessage: ContactMessage = {
       id: this.currentContactMessageId++,
@@ -682,7 +682,7 @@ export class MemStorage implements IStorage {
 
   async getAllContactMessages(): Promise<ContactMessage[]> {
     return Array.from(this.contactMessages.values()).sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
     );
   }
 
@@ -692,7 +692,7 @@ export class MemStorage implements IStorage {
 
   async updateContactMessageStatus(
     id: number,
-    status: string,
+    status: string
   ): Promise<ContactMessage> {
     const message = this.contactMessages.get(id);
     if (!message) {
@@ -713,7 +713,7 @@ export class MemStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     // Check if email already exists
     const existingUser = Array.from(this.users.values()).find(
-      (u) => u.email === user.email,
+      (u) => u.email === user.email
     );
 
     if (existingUser) {
@@ -765,7 +765,7 @@ export class MemStorage implements IStorage {
   async createUserToken(
     userId: number,
     resetToken: string,
-    resetTokenExpiry: Date,
+    resetTokenExpiry: Date
   ): Promise<void> {
     await db
       .update(users)
@@ -778,7 +778,7 @@ export class MemStorage implements IStorage {
   }
   async verifyUserEmail(token: string): Promise<boolean> {
     const user = Array.from(this.users.values()).find(
-      (u) => u.verificationToken === token,
+      (u) => u.verificationToken === token
     );
 
     if (!user) {
@@ -822,9 +822,7 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const user = Array.from(this.users.values()).find(
       (u) =>
-        u.resetToken === token &&
-        u.resetTokenExpiry &&
-        u.resetTokenExpiry > now,
+        u.resetToken === token && u.resetTokenExpiry && u.resetTokenExpiry > now
     );
 
     if (!user) {
@@ -863,7 +861,7 @@ export class MemStorage implements IStorage {
 
   async getPaymentsByUserId(userId: number): Promise<Payment[]> {
     return Array.from(this.payments.values()).filter(
-      (payment) => payment.userId === userId,
+      (payment) => payment.userId === userId
     );
   }
 
@@ -873,7 +871,7 @@ export class MemStorage implements IStorage {
 
   // Subscription methods
   async createSubscription(
-    subscription: InsertSubscription,
+    subscription: InsertSubscription
   ): Promise<Subscription> {
     const newSubscription: Subscription = {
       id: this.currentSubscriptionId++,
@@ -893,7 +891,7 @@ export class MemStorage implements IStorage {
 
   async getSubscriptionsByUserId(userId: number): Promise<Subscription[]> {
     return Array.from(this.subscriptions.values()).filter(
-      (subscription) => subscription.userId === userId,
+      (subscription) => subscription.userId === userId
     );
   }
 
@@ -903,7 +901,7 @@ export class MemStorage implements IStorage {
 
   async updateSubscriptionStatus(
     id: number,
-    status: string,
+    status: string
   ): Promise<Subscription> {
     const subscription = this.subscriptions.get(id);
 
@@ -983,7 +981,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateProductStock(
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<Product> {
     const [updatedProduct] = await db
       .update(products)
@@ -1003,7 +1001,7 @@ export class DatabaseStorage implements IStorage {
 
   async validateStockAvailability(
     productId: number,
-    requestedQuantity: number,
+    requestedQuantity: number
   ): Promise<boolean> {
     const [product] = await db
       .select()
@@ -1058,7 +1056,7 @@ export class DatabaseStorage implements IStorage {
 
   async canUserReviewProduct(
     userId: number,
-    productId: number,
+    productId: number
   ): Promise<boolean> {
     // User can review a product if they have an order with status "delivered" containing this product
     // and they haven't already reviewed it
@@ -1070,8 +1068,8 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(productReviews.userId, userId),
-          eq(productReviews.productId, productId),
-        ),
+          eq(productReviews.productId, productId)
+        )
       );
 
     if (existingReviews.length > 0) {
@@ -1089,8 +1087,8 @@ export class DatabaseStorage implements IStorage {
         and(
           eq(orders.userId, userId),
           eq(orderItems.productId, productId),
-          eq(orders.status, "delivered"), // Only delivered orders qualify for review
-        ),
+          eq(orders.status, "delivered") // Only delivered orders qualify for review
+        )
       );
 
     return deliveredOrders.length > 0;
@@ -1105,7 +1103,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addContactMessage(
-    message: InsertContactMessage,
+    message: InsertContactMessage
   ): Promise<ContactMessage> {
     const [newMessage] = await db
       .insert(contactMessages)
@@ -1132,7 +1130,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateContactMessageStatus(
     id: number,
-    status: string,
+    status: string
   ): Promise<ContactMessage> {
     const [updatedMessage] = await db
       .update(contactMessages)
@@ -1164,7 +1162,7 @@ export class DatabaseStorage implements IStorage {
   async addToCart(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems> {
     // Get cart or create if not exists
     let [cart] = await db
@@ -1181,7 +1179,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(cartItems)
       .where(
-        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId)),
+        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId))
       );
 
     if (existingItem) {
@@ -1211,7 +1209,7 @@ export class DatabaseStorage implements IStorage {
   async updateCartItem(
     sessionId: string,
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<CartWithItems> {
     // Get cart
     const [cart] = await db
@@ -1228,7 +1226,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(cartItems)
       .where(
-        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId)),
+        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId))
       );
 
     if (!cartItem) {
@@ -1257,7 +1255,7 @@ export class DatabaseStorage implements IStorage {
 
   async removeFromCart(
     sessionId: string,
-    productId: number,
+    productId: number
   ): Promise<CartWithItems> {
     // Get cart
     const [cart] = await db
@@ -1273,7 +1271,7 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(cartItems)
       .where(
-        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId)),
+        and(eq(cartItems.cartId, cart.id), eq(cartItems.productId, productId))
       );
 
     // Update cart's updatedAt timestamp
@@ -1320,7 +1318,7 @@ export class DatabaseStorage implements IStorage {
 
     const subtotal = items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
-      0,
+      0
     );
     const shipping = subtotal > 0 ? 4.99 : 0;
     const total = subtotal + shipping;
@@ -1342,7 +1340,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addNewsletterSubscription(
-    subscription: InsertNewsletterSubscription,
+    subscription: InsertNewsletterSubscription
   ): Promise<NewsletterSubscription> {
     // Check if email already exists
     const [existingSubscription] = await db
@@ -1371,7 +1369,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNewsletterSubscriptionById(
-    id: number,
+    id: number
   ): Promise<NewsletterSubscription | undefined> {
     const [subscription] = await db
       .select()
@@ -1404,20 +1402,25 @@ export class DatabaseStorage implements IStorage {
     return newUser;
   }
 
-  async getUserByEmail(email: string, number: number): Promise<User | undefined> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(
-        and(
-          eq(users.email, email),
-          eq(users.mobile, number)
-        )
-      );
-  
+  // async getUserByEmail(email: string, number: number): Promise<User | undefined> {
+  //   const [user] = await db
+  //     .select()
+  //     .from(users)
+  //     .where(
+  //       and(
+  //         eq(users.email, email),
+  //         eq(users.mobile, number)
+  //       )
+  //     );
+
+  //   return user;
+  // }
+  // abhi
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+
     return user;
   }
-
   async getUserById(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
 
@@ -1488,7 +1491,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(users)
       .where(
-        and(eq(users.resetToken, token), isNotNull(users.resetTokenExpiry)),
+        and(eq(users.resetToken, token), isNotNull(users.resetTokenExpiry))
       );
 
     if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < now) {
@@ -1511,7 +1514,7 @@ export class DatabaseStorage implements IStorage {
   async updateUserResetToken(
     userId: number,
     resetToken: string,
-    resetTokenExpiry: Date,
+    resetTokenExpiry: Date
   ): Promise<void> {
     await db
       .update(users)
@@ -1533,7 +1536,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserPassword(
     userId: number,
-    hashedPassword: string,
+    hashedPassword: string
   ): Promise<void> {
     await db
       .update(users)
@@ -1582,7 +1585,7 @@ export class DatabaseStorage implements IStorage {
 
   // Subscription methods
   async createSubscription(
-    subscription: InsertSubscription,
+    subscription: InsertSubscription
   ): Promise<Subscription> {
     const [newSubscription] = await db
       .insert(subscriptions)
@@ -1612,7 +1615,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateSubscriptionStatus(
     id: number,
-    status: string,
+    status: string
   ): Promise<Subscription> {
     const [updatedSubscription] = await db
       .update(subscriptions)
@@ -1637,12 +1640,12 @@ export class DatabaseStorage implements IStorage {
     // Validate stock availability before creating order item
     const isStockAvailable = await this.validateStockAvailability(
       orderItem.productId,
-      orderItem.quantity,
+      orderItem.quantity
     );
 
     if (!isStockAvailable) {
       throw new Error(
-        `Insufficient stock for product ID ${orderItem.productId}. Requested: ${orderItem.quantity}`,
+        `Insufficient stock for product ID ${orderItem.productId}. Requested: ${orderItem.quantity}`
       );
     }
 
@@ -1661,7 +1664,7 @@ export class DatabaseStorage implements IStorage {
   // Helper method to deduct stock from product inventory
   private async deductProductStock(
     productId: number,
-    quantity: number,
+    quantity: number
   ): Promise<void> {
     const [currentProduct] = await db
       .select()
@@ -1677,7 +1680,7 @@ export class DatabaseStorage implements IStorage {
     // Prevent negative stock
     if (newStockQuantity < 0) {
       throw new Error(
-        `Cannot deduct ${quantity} items from product ${productId}. Available stock: ${currentProduct.stockQuantity}`,
+        `Cannot deduct ${quantity} items from product ${productId}. Available stock: ${currentProduct.stockQuantity}`
       );
     }
 
@@ -1772,7 +1775,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateTeamMember(
     id: number,
-    teamMemberData: Partial<InsertTeamMember>,
+    teamMemberData: Partial<InsertTeamMember>
   ): Promise<TeamMember> {
     const [updatedMember] = await db
       .update(teamMembers)
@@ -1812,8 +1815,8 @@ export class DatabaseStorage implements IStorage {
         and(
           eq(discounts.status, "active"),
           sql`${discounts.startDate} <= ${now}`,
-          sql`${discounts.endDate} >= ${now}`,
-        ),
+          sql`${discounts.endDate} >= ${now}`
+        )
       )
       .orderBy(desc(discounts.createdAt));
     return activeDiscounts;
@@ -1848,7 +1851,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateDiscount(
     id: number,
-    discountData: Partial<InsertDiscount>,
+    discountData: Partial<InsertDiscount>
   ): Promise<Discount> {
     const [updatedDiscount] = await db
       .update(discounts)
@@ -1873,7 +1876,7 @@ export class DatabaseStorage implements IStorage {
   async validateDiscount(
     code: string,
     userId?: number,
-    cartTotal?: number,
+    cartTotal?: number
   ): Promise<{ valid: boolean; discount?: Discount; error?: string }> {
     const discount = await this.getDiscountByCode(code);
 
@@ -1925,7 +1928,7 @@ export class DatabaseStorage implements IStorage {
   async validateDiscountById(
     id: number,
     userId?: number,
-    cartTotal?: number,
+    cartTotal?: number
   ): Promise<{ valid: boolean; discount?: Discount; error?: string }> {
     const discount = await this.getDiscountById(id);
 
@@ -1978,7 +1981,7 @@ export class DatabaseStorage implements IStorage {
     discountId: number,
     userId?: number,
     sessionId?: string,
-    orderId?: number,
+    orderId?: number
   ): Promise<DiscountUsage> {
     // Record discount usage
     const [usage] = await db
@@ -2008,8 +2011,8 @@ export class DatabaseStorage implements IStorage {
         .where(
           and(
             eq(discountUsage.discountId, discountId),
-            eq(discountUsage.userId, userId),
-          ),
+            eq(discountUsage.userId, userId)
+          )
         );
       return result?.count || 0;
     } else {
@@ -2073,7 +2076,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(categories)
       .where(
-        and(sql`${categories.parentId} IS NULL`, eq(categories.isActive, true)),
+        and(sql`${categories.parentId} IS NULL`, eq(categories.isActive, true))
       )
       .orderBy(categories.sortOrder, categories.name);
   }
@@ -2083,7 +2086,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(categories)
       .where(
-        and(eq(categories.parentId, parentId), eq(categories.isActive, true)),
+        and(eq(categories.parentId, parentId), eq(categories.isActive, true))
       )
       .orderBy(categories.sortOrder, categories.name);
   }
@@ -2106,7 +2109,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateCategory(
     id: number,
-    categoryData: Partial<InsertCategory>,
+    categoryData: Partial<InsertCategory>
   ): Promise<Category> {
     const [updatedCategory] = await db
       .update(categories)
