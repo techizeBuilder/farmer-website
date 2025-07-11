@@ -1,75 +1,100 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { OTPInput } from '@/components/ui/otp-input';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { OTPInput } from "@/components/ui/otp-input";
+import { useToast } from "@/hooks/use-toast";
 
-const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  mobile: z.string()
-    .regex(/^[6-9]\d{9}$/, { message: 'Please enter a valid 10-digit Indian mobile number starting with 6-9' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine(val => val === true, {
-    message: 'You must agree to the terms and conditions'
+const registerSchema = z
+  .object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+    email: z.string().email({ message: "Please enter a valid email address" }),
+    mobile: z
+      .string()
+      .regex(/^[6-9]\d{9}$/, {
+        message:
+          "Please enter a valid 10-digit Indian mobile number starting with 6-9",
+      }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+    confirmPassword: z.string(),
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the terms and conditions",
+    }),
   })
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const [, navigate] = useLocation();
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<'form' | 'otp'>('form');
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
   const { toast } = useToast();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      mobile: '',
-      password: '',
-      confirmPassword: '',
-      terms: false
+      name: "",
+      email: "",
+      mobile: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
     },
   });
 
   // Send OTP mutation
   const sendOtpMutation = useMutation({
     mutationFn: async (mobile: string) => {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobile, purpose: 'registration' })
-      });
-      
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/send-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mobile, purpose: "registration" }),
+        }
+      );
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to send OTP');
+        throw new Error(error.message || "Failed to send OTP");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      setStep('otp');
+      setStep("otp");
       toast({
         title: "OTP Sent",
         description: "Please check your mobile for the verification code.",
@@ -81,25 +106,25 @@ export default function Register() {
         title: "Error",
         description: error.message || "Failed to send OTP",
       });
-    }
+    },
   });
 
   // Verify OTP and complete registration
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterFormData & { otp: string }) => {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        throw new Error(error.message || "Registration failed");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -107,7 +132,7 @@ export default function Register() {
         title: "Registration Successful",
         description: "Your account has been created. You can now log in.",
       });
-      navigate('/login');
+      navigate("/login");
     },
     onError: (error: any) => {
       toast({
@@ -115,8 +140,8 @@ export default function Register() {
         title: "Registration Failed",
         description: error.message || "Failed to register",
       });
-      setStep('form'); // Go back to form on error
-    }
+      setStep("form"); // Go back to form on error
+    },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -148,18 +173,21 @@ export default function Register() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">
-            {step === 'form' ? 'Create an Account' : 'Verify Mobile Number'}
+            {step === "form" ? "Create an Account" : "Verify Mobile Number"}
           </CardTitle>
           <CardDescription>
-            {step === 'form' 
-              ? 'Sign up to get started with our service'
+            {step === "form"
+              ? "Sign up to get started with our service"
               : `Enter the 6-digit code sent to ${mobile}`}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {step === 'form' ? (
+          {step === "form" ? (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -209,7 +237,11 @@ export default function Register() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -222,7 +254,11 @@ export default function Register() {
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -241,7 +277,7 @@ export default function Register() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          I agree to the{' '}
+                          I agree to the{" "}
                           <span className="underline cursor-pointer">
                             Terms and Conditions
                           </span>
@@ -251,17 +287,15 @@ export default function Register() {
                     </FormItem>
                   )}
                 />
-                
-                {error && (
-                  <div className="text-red-500 text-sm">{error}</div>
-                )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+
+                {error && <div className="text-red-500 text-sm">{error}</div>}
+
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={sendOtpMutation.isPending}
                 >
-                  {sendOtpMutation.isPending ? 'Sending OTP...' : 'Send OTP'}
+                  {sendOtpMutation.isPending ? "Sending OTP..." : "Send OTP"}
                 </Button>
               </form>
             </Form>
@@ -279,16 +313,18 @@ export default function Register() {
                   disabled={registerMutation.isPending}
                 />
               </div>
-              
+
               <div className="space-y-3">
-                <Button 
+                <Button
                   onClick={handleOtpSubmit}
-                  className="w-full" 
+                  className="w-full"
                   disabled={registerMutation.isPending || otp.length !== 6}
                 >
-                  {registerMutation.isPending ? 'Verifying...' : 'Verify & Register'}
+                  {registerMutation.isPending
+                    ? "Verifying..."
+                    : "Verify & Register"}
                 </Button>
-                
+
                 <div className="text-center">
                   <Button
                     variant="ghost"
@@ -296,14 +332,14 @@ export default function Register() {
                     disabled={sendOtpMutation.isPending}
                     className="text-sm"
                   >
-                    {sendOtpMutation.isPending ? 'Resending...' : 'Resend OTP'}
+                    {sendOtpMutation.isPending ? "Resending..." : "Resend OTP"}
                   </Button>
                 </div>
-                
+
                 <div className="text-center">
                   <Button
                     variant="ghost"
-                    onClick={() => setStep('form')}
+                    onClick={() => setStep("form")}
                     className="text-sm"
                   >
                     ← Back to Registration
@@ -315,10 +351,10 @@ export default function Register() {
         </CardContent>
         <CardFooter className="text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <span 
+            Already have an account?{" "}
+            <span
               className="text-primary hover:underline cursor-pointer"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               Sign in
             </span>

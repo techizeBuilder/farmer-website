@@ -270,6 +270,8 @@ export const deleteOrder = async (req: Request, res: Response) => {
       return deletedOrder;
     });
 
+
+    
     if (!deletedOrder) {
       return res.status(404).json({ message: "Order not found" });
     }

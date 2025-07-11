@@ -486,7 +486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiPrefix}/auth/send-otp`, async (req, res) => {
     try {
       const { mobile, purpose } = req.body;
-
+console.log("nisdhi",mobile,purpose)
       if (!mobile || !purpose) {
         return res
           .status(400)
@@ -1134,14 +1134,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Forgot password - Send reset email
   app.post(`${apiPrefix}/auth/forgot-password`, async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email,number } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
+      if (!number || typeof number !== 'string' || number.length < 10) {
+        return res.status(400).json({ message: "Valid number is required" });
+      }
 
       // Find user by email
-      const user = await storage.getUserByEmail(email);
+      const user = await storage.getUserByEmail(email,number);
       if (!user) {
         // Don't reveal if email exists for security
         return res.json({

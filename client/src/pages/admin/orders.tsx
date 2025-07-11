@@ -141,7 +141,9 @@ export default function AdminOrders() {
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/admin/orders/${orderId}/details`,
+
         {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -172,6 +174,7 @@ export default function AdminOrders() {
     setSelectedOrder(orderId);
     await fetchOrderDetails(orderId);
   };
+
 
   // Fetch orders from API
   const fetchOrders = async (page = 1, search = "", status = "") => {
@@ -314,7 +317,6 @@ export default function AdminOrders() {
     setIsExporting(true);
     try {
       const data = await fetchAllOrdersForExport();
-
       // Prepare CSV data
       const csvData = data.orders.map((order: any) => ({
         "Order ID": `ORD-${order.id}`,

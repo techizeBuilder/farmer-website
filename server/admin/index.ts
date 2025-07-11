@@ -61,12 +61,13 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
 
     // Find user by email
     const [user] = await db.select().from(users).where(eq(users.email, email));
+    console.log(user,"nidhi")
 
     // Check if user exists and is an admin
-    if (!user || user.role !== "admin") {
+    if (!user || user.role !== 'admin') {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-
+console.log("user2")
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
