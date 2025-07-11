@@ -5,15 +5,15 @@ services:
     env: node
     plan: free
     region: oregon
-    
-  # Web Service (Backend + Frontend)
+
+  # Backend Service (Node + Express + Drizzle)
   - type: web
-    name: harvest-direct-app
+    name: harvest-direct-backend
     env: node
-    region: oregon
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    region: oregon
+    buildCommand: cd server && npm install && npm run build
+    startCommand: cd server && npm run start
     envVars:
       - key: NODE_ENV
         value: production
@@ -27,3 +27,19 @@ services:
         sync: false
       - key: RAZORPAY_KEY_SECRET
         sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+
+  # Frontend (React + Vite static site)
+  - type: web
+    name: harvest-direct-frontend
+    env: static
+    region: oregon
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
