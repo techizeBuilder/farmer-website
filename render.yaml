@@ -1,11 +1,5 @@
 services:
-  # ✅ PostgreSQL Database
-  - type: postgres
-    name: harvest-direct-db
-    plan: free
-    region: oregon
-
-  # ✅ Backend Service
+  # ✅ Backend Service (Node.js + Express)
   - type: web
     name: harvest-direct-backend
     env: node
@@ -17,9 +11,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: harvest-direct-db
-          property: connectionString
+        value: "" # You will set this manually after DB is created
       - key: JWT_SECRET
         generateValue: true
       - key: RAZORPAY_KEY_ID
@@ -35,7 +27,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
 
-  # ✅ Frontend (Static Site)
+  # ✅ Frontend (React + Vite static site)
   - type: web
     name: harvest-direct-frontend
     env: static
