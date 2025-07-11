@@ -292,8 +292,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
 // SMS Verification Schema
 export const smsVerifications = pgTable("sms_verifications", {
   id: serial("id").primaryKey(),
-  mobile: text("mobile"), // now optional abhi
-  email: text("email"), // new field for email OTP abhi
+  mobile: text("mobile").notNull(),
   otp: text("otp").notNull(),
   purpose: text("purpose").notNull(), // 'registration' or 'password_reset'
   verified: boolean("verified").default(false),

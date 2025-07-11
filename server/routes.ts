@@ -546,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid purpose" });
       }
 
-      const result = await smsService.verifyOTP("mobile", mobile, otp, purpose);
+      const result = await smsService.verifyOTP(mobile, otp, purpose);
 
       if (result.success) {
         res.json({ message: result.message, verified: true });
@@ -575,12 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify OTP first
-      const otpResult = await smsService.verifyOTP(
-        "mobile",
-        mobile,
-        otp,
-        "registration"
-      );
+      const otpResult = await smsService.verifyOTP(mobile, otp, "registration");
       if (!otpResult.success) {
         return res.status(400).json({ message: otpResult.message });
       }
@@ -796,7 +791,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Verify OTP
         const otpResult = await smsService.verifyOTP(
-          "mobile",
           user.mobile,
           otp,
           "password_reset"
@@ -820,55 +814,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  // change email and number with otp verification
+  // change email  with otp verification
+  // abhi
+
+  app.post(`${apiPrefix}/auth/change-email`, authenticate, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const { value, otp } = req.body;
+
+      if (!value || !otp) {
+        return res
+          .status(400)
+          .json({ message: "New email and OTP are required" });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // ✅ Verify OTP sent to user's mobile, not email
+      const otpResult = await smsService.verifyOTP(
+        user.mobile,
+        otp,
+        "change_email"
+      );
+
+      if (!otpResult.success) {
+        return res.status(400).json({ message: otpResult.message });
+      }
+
+      // Check if email already in use
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, value));
+
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+
+      // ✅ Correct variable usage
+      await db.update(users).set({ email: value }).where(eq(users.id, user.id));
+
+      res.json({ message: "Email updated successfully" });
+    } catch (error) {
+      console.error("Change email error:", error);
+      res.status(500).json({ message: "Failed to update email" });
+    }
+  });
+
+  // change number with otp  verification
   // abhi
   app.post(
-    `${apiPrefix}/auth/change-contact`,
+    `${apiPrefix}/auth/change-number`,
     authenticate,
     async (req, res) => {
       try {
         const user = (req as any).user;
-        const { type, value, otp } = req.body;
+        const { value, otp } = req.body;
 
-        if (!type || !value || !otp) {
+        if (!value || !otp) {
           return res
             .status(400)
-            .json({ message: "Type, value, and OTP are required" });
+            .json({ message: "New mobile number and OTP are required" });
         }
 
-        if (!["email", "mobile"].includes(type)) {
+        // Validate mobile format (must be 10-digit number)
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(value)) {
           return res
             .status(400)
-            .json({ message: "Invalid type. Use 'email' or 'mobile'" });
+            .json({ message: "Invalid mobile number format" });
         }
 
-        // Choose appropriate service and purpose
-        const service = type === "mobile" ? "mobile" : "email";
-        const purpose = type === "email" ? "change_email" : "change_number";
-
+        // ✅ Verify OTP sent to new mobile number
         const otpResult = await smsService.verifyOTP(
-          service,
           value,
           otp,
-          purpose
+          "change_number"
         );
+
         if (!otpResult.success) {
           return res.status(400).json({ message: otpResult.message });
         }
 
-        // Update in DB
-        const fieldToUpdate =
-          type === "email" ? { email: value } : { mobile: value };
-        await storage.updateUser(user.id, fieldToUpdate);
+        // Check if mobile already in use
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.mobile, value));
 
-        res.json({
-          message: `${
-            type === "email" ? "Email" : "Mobile number"
-          } updated successfully`,
-        });
+        if (existingUser.length > 0) {
+          return res
+            .status(400)
+            .json({ message: "Mobile number already in use" });
+        }
+
+        // ✅ Update mobile in users table
+        await db
+          .update(users)
+          .set({ mobile: value })
+          .where(eq(users.id, user.id));
+
+        res.json({ message: "Mobile number updated successfully" });
       } catch (error) {
-        console.error("Change contact error:", error);
-        res.status(500).json({ message: "Failed to update contact info" });
+        console.error("Change number error:", error);
+        res.status(500).json({ message: "Failed to update mobile number" });
       }
     }
   );
@@ -887,7 +940,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { otp } = req.body;
         if (otp) {
           const result = await smsService.verifyOTP(
-            "mobile",
             user.mobile,
             otp,
             "account_deletion"

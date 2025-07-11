@@ -15,33 +15,36 @@ import { OTPInput } from "@/components/ui/otp-input";
 import { Input } from "@/components/ui/input";
 
 export default function ChangeNumberUser() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { toast } = useToast();
   const [showChangeFlow, setShowChangeFlow] = useState(false);
-  const [step, setStep] = useState<"input" | "verify">("input");
+  const [step, setStep] = useState<"input" | "otp">("input");
   const [newNumber, setNewNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSendOtp = async () => {
+    if (!user || !token) return;
+
     try {
       setLoading(true);
-      await apiRequest("/api/auth/change-contact", {
+      const res = await apiRequest("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "mobile",
-          mobile: newNumber,
+          mobile: user?.mobile,
           purpose: "change_number",
         }),
       });
 
+      // const data = await res.json();
+      // if (!res.ok) throw new Error(data.message);
+
       toast({
         title: "OTP Sent",
-        description: `OTP sent to ${newNumber}`,
+        description: "Check your mobile number.",
       });
-
-      setStep("verify");
+      setStep("otp");
     } catch (error: any) {
       toast({
         title: "OTP Error",
@@ -56,13 +59,13 @@ export default function ChangeNumberUser() {
   const handleVerifyAndChange = async () => {
     try {
       setLoading(true);
-      await apiRequest("/api/user/change-number", {
+      const res = await apiRequest("/api/auth/change-number", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ otp, newNumber }),
+        body: JSON.stringify({ otp, value: newNumber }),
       });
 
       toast({
@@ -91,7 +94,7 @@ export default function ChangeNumberUser() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Phone className="h-5 w-5" />
-          Change Mobile Number
+          Change Number
         </CardTitle>
         <CardDescription>
           Update the mobile number associated with your account.

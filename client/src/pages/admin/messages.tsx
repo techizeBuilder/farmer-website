@@ -3,9 +3,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
@@ -23,11 +35,17 @@ interface ContactMessage {
 }
 
 function AdminMessages() {
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(
+    null
+  );
   const queryClient = useQueryClient();
 
   // Fetch all contact messages
-  const { data: messages = [], isLoading, error } = useQuery({
+  const {
+    data: messages = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["/api/admin/contact-messages"],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
@@ -44,7 +62,9 @@ function AdminMessages() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-messages"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/admin/contact-messages"],
+      });
       toast({
         title: "Status Updated",
         description: "Message status has been updated successfully.",
@@ -103,22 +123,28 @@ function AdminMessages() {
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           <p className="font-medium">Error loading messages</p>
-          <p className="text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+          <p className="text-sm">
+            Please try refreshing the page or contact support if the problem
+            persists.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Contact Messages</h1>
-          <p className="text-gray-600">Manage customer inquiries and support requests</p>
+          <p className="text-gray-600">
+            Manage customer inquiries and support requests
+          </p>
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-500">
-            Total Messages: <span className="font-medium text-gray-900">{messages.length}</span>
+            Total Messages:{" "}
+            <span className="font-medium text-gray-900">{messages.length}</span>
           </div>
         </div>
       </div>
@@ -128,15 +154,22 @@ function AdminMessages() {
           <CardContent className="py-16">
             <div className="text-center">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
-              <p className="text-gray-600">When customers submit contact forms, they'll appear here.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No messages yet
+              </h3>
+              <p className="text-gray-600">
+                When customers submit contact forms, they'll appear here.
+              </p>
             </div>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
           {messages.map((message: ContactMessage) => (
-            <Card key={message.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={message.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -152,7 +185,9 @@ function AdminMessages() {
                       </div>
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{formatDistanceToNow(new Date(message.createdAt))} ago</span>
+                        <span>
+                          {formatDistanceToNow(new Date(message.createdAt))} ago
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -190,20 +225,34 @@ function AdminMessages() {
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-sm font-medium text-gray-700">Name</label>
-                                <p className="text-gray-900">{selectedMessage.name}</p>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Name
+                                </label>
+                                <p className="text-gray-900">
+                                  {selectedMessage.name}
+                                </p>
                               </div>
                               <div>
-                                <label className="text-sm font-medium text-gray-700">Email</label>
-                                <p className="text-gray-900">{selectedMessage.email}</p>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Email
+                                </label>
+                                <p className="text-gray-900">
+                                  {selectedMessage.email}
+                                </p>
                               </div>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Subject</label>
-                              <p className="text-gray-900">{selectedMessage.subject}</p>
+                              <label className="text-sm font-medium text-gray-700">
+                                Subject
+                              </label>
+                              <p className="text-gray-900">
+                                {selectedMessage.subject}
+                              </p>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Message</label>
+                              <label className="text-sm font-medium text-gray-700">
+                                Message
+                              </label>
                               <Textarea
                                 value={selectedMessage.message}
                                 readOnly
@@ -213,13 +262,19 @@ function AdminMessages() {
                             </div>
                             <div className="flex items-center justify-between">
                               <div>
-                                <label className="text-sm font-medium text-gray-700">Received</label>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Received
+                                </label>
                                 <p className="text-gray-900">
-                                  {new Date(selectedMessage.createdAt).toLocaleString()}
+                                  {new Date(
+                                    selectedMessage.createdAt
+                                  ).toLocaleString()}
                                 </p>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <label className="text-sm font-medium text-gray-700">Status</label>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Status
+                                </label>
                                 <Select
                                   value={selectedMessage.status}
                                   onValueChange={(status) => {
@@ -227,7 +282,10 @@ function AdminMessages() {
                                       id: selectedMessage.id,
                                       status,
                                     });
-                                    setSelectedMessage({ ...selectedMessage, status });
+                                    setSelectedMessage({
+                                      ...selectedMessage,
+                                      status,
+                                    });
                                   }}
                                 >
                                   <SelectTrigger className="w-32">
@@ -235,8 +293,12 @@ function AdminMessages() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="new">New</SelectItem>
-                                    <SelectItem value="in_progress">In Progress</SelectItem>
-                                    <SelectItem value="resolved">Resolved</SelectItem>
+                                    <SelectItem value="in_progress">
+                                      In Progress
+                                    </SelectItem>
+                                    <SelectItem value="resolved">
+                                      Resolved
+                                    </SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>

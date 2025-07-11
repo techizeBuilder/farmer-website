@@ -3,13 +3,37 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertTeamMemberSchema, type TeamMember, type InsertTeamMember } from "@shared/schema";
+import {
+  insertTeamMemberSchema,
+  type TeamMember,
+  type InsertTeamMember,
+} from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -76,7 +100,13 @@ function TeamMembersAdmin() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertTeamMember> }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<InsertTeamMember>;
+    }) => {
       return await apiRequest(`/api/admin/team-members/${id}`, {
         method: "PUT",
         body: JSON.stringify(data),
@@ -165,7 +195,7 @@ function TeamMembersAdmin() {
   }
 
   return (
-    <div className="p-8">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <Users className="h-6 w-6" />
@@ -182,11 +212,15 @@ function TeamMembersAdmin() {
             <DialogHeader>
               <DialogTitle>Add New Team Member</DialogTitle>
               <DialogDescription>
-                Create a new team member profile that will appear on your website.
+                Create a new team member profile that will appear on your
+                website.
               </DialogDescription>
             </DialogHeader>
             <Form {...createForm}>
-              <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
+              <form
+                onSubmit={createForm.handleSubmit(onCreateSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={createForm.control}
                   name="name"
@@ -220,7 +254,10 @@ function TeamMembersAdmin() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enter bio description" {...field} />
+                        <Textarea
+                          placeholder="Enter bio description"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -246,11 +283,13 @@ function TeamMembersAdmin() {
                     <FormItem>
                       <FormLabel>Display Order</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="0" 
-                          {...field} 
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -269,7 +308,10 @@ function TeamMembersAdmin() {
                         </div>
                       </div>
                       <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -306,11 +348,13 @@ function TeamMembersAdmin() {
                   <CardTitle className="text-lg">{member.name}</CardTitle>
                   <CardDescription>{member.jobTitle}</CardDescription>
                   <div className="flex items-center space-x-2 mt-2">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      member.isActive 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-gray-100 text-gray-800"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        member.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {member.isActive ? "Active" : "Inactive"}
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -346,7 +390,10 @@ function TeamMembersAdmin() {
       </div>
 
       {/* Edit Dialog */}
-      <Dialog open={!!editingMember} onOpenChange={() => setEditingMember(null)}>
+      <Dialog
+        open={!!editingMember}
+        onOpenChange={() => setEditingMember(null)}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Team Member</DialogTitle>
@@ -355,7 +402,10 @@ function TeamMembersAdmin() {
             </DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+            <form
+              onSubmit={editForm.handleSubmit(onEditSubmit)}
+              className="space-y-4"
+            >
               <FormField
                 control={editForm.control}
                 name="name"
@@ -389,7 +439,10 @@ function TeamMembersAdmin() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enter bio description" {...field} />
+                      <Textarea
+                        placeholder="Enter bio description"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -415,11 +468,13 @@ function TeamMembersAdmin() {
                   <FormItem>
                     <FormLabel>Display Order</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="0" 
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      <Input
+                        type="number"
+                        placeholder="0"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -438,7 +493,10 @@ function TeamMembersAdmin() {
                       </div>
                     </div>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -463,7 +521,9 @@ function TeamMembersAdmin() {
       {teamMembers?.length === 0 && (
         <div className="text-center py-12">
           <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground mb-2">No team members</h3>
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">
+            No team members
+          </h3>
           <p className="text-muted-foreground mb-4">
             Get started by adding your first team member.
           </p>

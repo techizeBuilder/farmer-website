@@ -59,15 +59,14 @@ export default function ChangeEmailUser() {
   const handleVerifyAndChange = async () => {
     try {
       setLoading(true);
-      await apiRequest("/api/auth/change-contact", {
+      await apiRequest("/api/auth/change-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          type: "email", // or "mobile"
-          value: newEmail, // or newNumber
+          value: newEmail,
           otp,
         }),
       });

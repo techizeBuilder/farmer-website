@@ -6,42 +6,42 @@
   /* Base colors */
   --background: 47 36% 94%; /* #FEFAE0 cream */
   --foreground: 84 42% 15%; /* #283618 forest */
-  
+
   /* Card & UI element colors */
   --card: 0 0% 100%; /* white */
   --card-foreground: 84 42% 15%; /* #283618 forest */
-  
+
   --popover: 0 0% 100%; /* white */
   --popover-foreground: 84 42% 15%; /* #283618 forest */
-  
+
   /* Brand colors */
   --primary: 92 26% 35%; /* #5A6F43 primary */
   --primary-foreground: 211 100% 99%; /* white text */
-  
+
   --secondary: 35 65% 52%; /* Darker #C08A41 secondary for better contrast */
   --secondary-foreground: 24 9.8% 10%; /* dark text */
-  
+
   --accent: 359 45% 46%; /* Darker #A93C3E accent for better contrast */
   --accent-foreground: 60 9.1% 97.8%; /* light text */
-  
+
   /* UI element colors */
   --muted: 47 36% 94%; /* #FEFAE0 cream */
   --muted-foreground: 84 23% 22%; /* Darker #404828 olive for better contrast */
-  
+
   --destructive: 359 45% 51%; /* #BC4749 error */
   --destructive-foreground: 60 9.1% 97.8%; /* light text */
-  
+
   --border: 84 23% 32%; /* #606C38 olive with opacity */
   --input: 84 23% 32%; /* #606C38 olive with opacity */
   --ring: 92 26% 35%; /* #5A6F43 primary */
-  
+
   /* Chart colors */
   --chart-1: 92 26% 35%; /* primary */
   --chart-2: 35 65% 62%; /* secondary */
   --chart-3: 84 23% 32%; /* olive */
   --chart-4: 359 45% 51%; /* accent */
   --chart-5: 84 42% 25%; /* forest-light */
-  
+
   /* Sidebar colors */
   --sidebar-background: 84 42% 15%; /* #283618 forest */
   --sidebar-foreground: 47 36% 94%; /* #FEFAE0 cream */
@@ -51,35 +51,35 @@
   --sidebar-accent-foreground: 211 100% 99%; /* white text */
   --sidebar-border: 84 23% 32%; /* #606C38 olive */
   --sidebar-ring: 35 65% 62%; /* #DDA15E secondary */
-  
+
   --radius: 0.5rem;
 }
 
 .dark {
   --background: 84 42% 15%; /* #283618 forest */
   --foreground: 47 36% 97%; /* #FFFDF0 brighter cream for better contrast */
-  
+
   --card: 84 42% 20%; /* darker forest */
   --card-foreground: 47 36% 97%; /* #FFFDF0 brighter cream */
-  
+
   --popover: 84 42% 20%; /* darker forest */
   --popover-foreground: 47 36% 97%; /* #FFFDF0 brighter cream */
-  
+
   --primary: 92 26% 40%; /* #657A4D slightly brighter primary for dark mode */
   --primary-foreground: 211 100% 99%; /* white text */
-  
+
   --secondary: 35 65% 52%; /* #C08A41 darker secondary for better contrast */
   --secondary-foreground: 24 9.8% 10%; /* dark text */
-  
+
   --accent: 359 45% 56%; /* #C55355 brighter accent for dark mode */
   --accent-foreground: 60 9.1% 97.8%; /* light text */
-  
+
   --muted: 84 23% 25%; /* darker olive */
   --muted-foreground: 47 36% 90%; /* brighter cream for better contrast */
-  
+
   --destructive: 359 45% 51%; /* #BC4749 error */
   --destructive-foreground: 60 9.1% 97.8%; /* light text */
-  
+
   --border: 84 23% 32%; /* #606C38 olive */
   --input: 84 23% 32%; /* #606C38 olive */
   --ring: 35 65% 62%; /* #DDA15E secondary */
@@ -89,19 +89,24 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     @apply scroll-smooth;
   }
-  
+
   body {
     @apply font-body bg-background text-foreground antialiased;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading;
   }
-  
+
   .font-accent {
     @apply font-['Caveat',_cursive];
   }
@@ -110,19 +115,19 @@
   .bg-forest-dark {
     @apply bg-[#1e2813];
   }
-  
+
   ::-webkit-scrollbar {
     @apply w-2;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-muted;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-primary/60 rounded-full;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-primary;
   }
@@ -132,33 +137,65 @@
   .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
   }
-  
+
   .text-shadow-strong {
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 1), 0 0 16px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 1), 0 0 16px rgba(0, 0, 0, 0.8),
+      0 4px 12px rgba(0, 0, 0, 0.6);
   }
-  
+
   .text-shadow-extra-strong {
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.9),
+      0 4px 16px rgba(0, 0, 0, 0.8);
     color: white !important;
   }
-  
+
   .animate-reveal-down {
     animation: revealDown 1s ease forwards;
     opacity: 0;
   }
-  
+
   .animate-pulse-custom {
     animation: pulse 0.5s ease-in-out;
   }
-  
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: #f5f5f5;
+  }
+
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    height: 100%;
+    width: 150%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -150%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
   .category-btn.active {
     @apply bg-primary text-white;
   }
-  
+
   .category-btn:not(.active) {
     @apply bg-background text-foreground hover:bg-primary hover:text-white;
   }
-  
+
   .parallax {
     background-attachment: fixed;
     background-position: center;
@@ -179,7 +216,13 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

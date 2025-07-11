@@ -126,7 +126,7 @@ export default function AdminDashboard() {
     if (loading) {
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <div className="container mx-auto px-4 py-8 pt-16">
+          <div className="container ">
             <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
     if (error) {
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <div className="container mx-auto px-4 py-8 pt-16">
+          <div className="container ">
             <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-md text-red-600 dark:text-red-400">
               {error}
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
 
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4 py-16 mt-8">
+        <div className="container mx-auto  ">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
 

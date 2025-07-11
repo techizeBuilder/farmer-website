@@ -54,12 +54,85 @@ class SmsService {
   /**
    * Send OTP via SMS
    */
+  // async sendOTP(
+  //   mobile: string,
+  //   purpose:
+  //     | "registration"
+  //     | "password_reset"
+  //     | "account_deletion"
+  //     | "change_email"
+  // ): Promise<{ success: boolean; message: string }> {
+  //   try {
+  //     // Validate mobile number
+  //     if (!this.validateMobileNumber(mobile)) {
+  //       return {
+  //         success: false,
+  //         message:
+  //           "Invalid mobile number format. Please enter a valid 10-digit Indian mobile number.",
+  //       };
+  //     }
+
+  //     // Generate OTP
+  //     const otp = this.generateOTP();
+  //     const expiresAt = new Date();
+  //     expiresAt.setMinutes(expiresAt.getMinutes() + 10); // OTP expires in 10 minutes
+
+  //     // Store OTP in database
+  //     await db.insert(smsVerifications).values({
+  //       mobile,
+  //       otp,
+  //       purpose,
+  //       expiresAt,
+  //       verified: false,
+  //     });
+
+  //     // Format phone number
+  //     const formattedMobile = this.formatMobileNumber(mobile);
+
+  //     // Send SMS
+  //     // const message =
+  //     //   purpose === "registration"
+  //     //     ? `Your Harvest Direct registration OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`
+  //     //     : `Your Harvest Direct password reset OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`;
+  //     // abhi
+  //     const messages: Record<string, string> = {
+  //       registration: `Your Harvest Direct registration OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
+  //       password_reset: `Your Harvest Direct password reset OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
+  //       account_deletion: `Your Harvest Direct account deletion OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
+  //     };
+  //     const message =
+  //       messages[purpose] ||
+  //       `Your Harvest Direct OTP is: ${otp}. Valid for 10 minutes.`;
+  //     await this.client.messages.create({
+  //       body: message,
+  //       from: this.fromPhoneNumber,
+  //       to: formattedMobile,
+  //     });
+
+  //     return {
+  //       success: true,
+  //       message: "OTP sent successfully to your mobile number.",
+  //     };
+  //   } catch (error) {
+  //     console.error("Error sending SMS:", error);
+  //     return {
+  //       success: false,
+  //       message: "Failed to send OTP. Please try again.",
+  //     };
+  //   }
+  // }
+  // abhi
   async sendOTP(
     mobile: string,
-    purpose: "registration" | "password_reset" | "account_deletion"
+    purpose:
+      | "registration"
+      | "password_reset"
+      | "account_deletion"
+      | "change_email"
+      | "change_number"
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Validate mobile number
+      // ✅ Validate mobile
       if (!this.validateMobileNumber(mobile)) {
         return {
           success: false,
@@ -68,12 +141,11 @@ class SmsService {
         };
       }
 
-      // Generate OTP
       const otp = this.generateOTP();
       const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 10); // OTP expires in 10 minutes
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Valid for 10 minutes
 
-      // Store OTP in database
+      // ✅ Store OTP in DB
       await db.insert(smsVerifications).values({
         mobile,
         otp,
@@ -82,27 +154,21 @@ class SmsService {
         verified: false,
       });
 
-      // Format phone number
-      const formattedMobile = this.formatMobileNumber(mobile);
-
-      // Send SMS
-      // const message =
-      //   purpose === "registration"
-      //     ? `Your Harvest Direct registration OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`
-      //     : `Your Harvest Direct password reset OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`;
-      // abhi
+      // ✅ Send SMS
       const messages: Record<string, string> = {
         registration: `Your Harvest Direct registration OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
         password_reset: `Your Harvest Direct password reset OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
         account_deletion: `Your Harvest Direct account deletion OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
+        change_email: `Your Harvest Direct email change OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
+        change_number: `Your Harvest Direct mobile number change OTP is: ${otp}. Valid for 10 minutes. Do not share this code.`,
       };
-      const message =
-        messages[purpose] ||
-        `Your Harvest Direct OTP is: ${otp}. Valid for 10 minutes.`;
+
+      const message = messages[purpose] || `Your OTP is: ${otp}`;
+
       await this.client.messages.create({
         body: message,
         from: this.fromPhoneNumber,
-        to: formattedMobile,
+        to: this.formatMobileNumber(mobile),
       });
 
       return {
@@ -124,7 +190,12 @@ class SmsService {
   async verifyOTP(
     mobile: string,
     otp: string,
-    purpose: "registration" | "password_reset" | "account_deletion"
+    purpose:
+      | "registration"
+      | "password_reset"
+      | "account_deletion"
+      | "change_email"
+      | "change_number"
   ): Promise<{ success: boolean; message: string }> {
     try {
       const now = new Date();

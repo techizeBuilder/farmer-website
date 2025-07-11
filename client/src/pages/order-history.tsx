@@ -142,10 +142,10 @@ export default function OrderHistory() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto py-10  relative top-16">
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="m-4 shimmer">
               <CardHeader>
                 <div className="h-4 bg-gray-200 rounded w-1/4"></div>
                 <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -175,7 +175,7 @@ export default function OrderHistory() {
   const orders = orderHistory?.orders || [];
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container p-16 relative top-16">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/account">
           <Button variant="outline" size="sm">

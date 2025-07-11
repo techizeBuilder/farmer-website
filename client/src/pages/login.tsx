@@ -1,19 +1,35 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuth } from '@/context/AuthContext';
-import Layout from '@/components/Layout';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useAuth } from "@/context/AuthContext";
+import Layout from "@/components/Layout";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -26,26 +42,26 @@ export default function Login() {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
-    console.log('Starting login process...');
+    console.log("Starting login process...");
     const success = await login(data.email, data.password);
-    console.log('Login result:', success);
+    console.log("Login result:", success);
     if (success) {
-      console.log('Login successful, navigating to home page');
-      navigate('/');
+      console.log("Login successful, navigating to home page");
+      navigate("/");
     } else {
-      setError('Login failed. Please check your credentials.');
+      setError("Login failed. Please check your credentials.");
     }
   };
 
   return (
-    <div className="container mx-auto py-10 flex justify-center">
+    <div className="container mx-auto py-10 flex justify-center relative top-14">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -81,7 +97,11 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -89,26 +109,20 @@ export default function Login() {
               />
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center">
-            <a 
-              href="/forgot-password" 
-              className="text-primary hover:underline"
-            >
+            <a href="/forgot-password" className="text-primary hover:underline">
               Forgot your password?
             </a>
           </div>
           <div className="text-sm text-center">
-            Don't have an account?{' '}
-            <a 
-              href="/register" 
-              className="text-primary hover:underline"
-            >
+            Don't have an account?{" "}
+            <a href="/register" className="text-primary hover:underline">
               Register
             </a>
           </div>

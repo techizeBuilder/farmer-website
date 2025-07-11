@@ -5,13 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSiteSettings } from "@/context/SiteContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  ShoppingBasket, 
-  Menu, 
-  X,
-  User
-} from "lucide-react";
+import { Search, ShoppingBasket, Menu, X, User } from "lucide-react";
 
 export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -22,8 +16,11 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettings();
   const [location, navigate] = useLocation();
-  
-  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   // Navbar scroll effect
   useEffect(() => {
@@ -71,12 +68,12 @@ export default function Navbar() {
     { href: "/products", label: "Products" },
     { href: "/farmers", label: "Our Farmers" },
     { href: "/our-process", label: "Our Process" },
-    { href: "/contact", label: "Contact" }
+    { href: "/contact", label: "Contact" },
   ];
 
   return (
     <header>
-      <nav 
+      <nav
         className={`fixed w-full z-50 transition-all duration-300 bg-background/90 backdrop-blur-sm ${
           scrolled ? "py-2 shadow-md" : "py-3 shadow-sm"
         }`}
@@ -84,8 +81,8 @@ export default function Navbar() {
         <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             {settings.siteLogo && (
-              <img 
-                src={settings.siteLogo} 
+              <img
+                src={settings.siteLogo}
                 alt={settings.siteName}
                 className="h-8 w-8 object-contain"
               />
@@ -109,25 +106,28 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSearch} 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSearch}
               className="text-forest hover:text-primary hover:bg-transparent"
             >
               <Search className="h-5 w-5" />
             </Button>
-            
+
             {/* Auth Links - Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
-                  <Link href="/account" className="text-forest hover:text-primary font-medium transition duration-200">
+                  <Link
+                    href="/account"
+                    className="text-forest hover:text-primary font-medium transition duration-200"
+                  >
                     My Account
                   </Link>
-                  <Button 
-                    variant="ghost" 
-                    onClick={logout} 
+                  <Button
+                    variant="ghost"
+                    onClick={logout}
                     className="text-forest hover:text-primary hover:bg-transparent"
                   >
                     Logout
@@ -135,20 +135,26 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-forest hover:text-primary font-medium transition duration-200">
+                  <Link
+                    href="/login"
+                    className="text-forest hover:text-primary font-medium transition duration-200"
+                  >
                     Login
                   </Link>
-                  <Link href="/register" className="text-forest hover:text-primary font-medium transition duration-200">
+                  <Link
+                    href="/register"
+                    className="text-forest hover:text-primary font-medium transition duration-200"
+                  >
                     Register
                   </Link>
                 </>
               )}
             </div>
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={openCart} 
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={openCart}
               className="text-forest hover:text-primary hover:bg-transparent relative"
             >
               <ShoppingBasket className="h-5 w-5" />
@@ -158,14 +164,18 @@ export default function Navbar() {
                 </span>
               )}
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleMobileMenu} 
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMobileMenu}
               className="lg:hidden text-forest hover:text-primary hover:bg-transparent"
             >
-              {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {showMobileMenu ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
@@ -184,7 +194,7 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              
+
               {/* Auth Links - Mobile */}
               <div className="pt-2 border-t border-border/30">
                 {isAuthenticated ? (

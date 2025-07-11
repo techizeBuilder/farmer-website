@@ -31,12 +31,10 @@ const registerSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
     email: z.string().email({ message: "Please enter a valid email address" }),
-    mobile: z
-      .string()
-      .regex(/^[6-9]\d{9}$/, {
-        message:
-          "Please enter a valid 10-digit Indian mobile number starting with 6-9",
-      }),
+    mobile: z.string().regex(/^[6-9]\d{9}$/, {
+      message:
+        "Please enter a valid 10-digit Indian mobile number starting with 6-9",
+    }),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters" }),
@@ -112,13 +110,16 @@ export default function Register() {
   // Verify OTP and complete registration
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterFormData & { otp: string }) => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -169,7 +170,7 @@ export default function Register() {
   };
 
   return (
-    <div className="container mx-auto py-10 flex justify-center">
+    <div className="container mx-auto py-10 flex justify-center relative top-14">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">
