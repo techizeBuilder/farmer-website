@@ -462,9 +462,11 @@ export type Discount = typeof discounts.$inferSelect;
 // Discount Usage Tracking
 export const discountUsage = pgTable("discount_usage", {
   id: serial("id").primaryKey(),
-  discountId: integer("discount_id")
-    .notNull()
-    .references(() => discounts.id),
+  // discountId: integer("discount_id")
+  //   .notNull()
+  //   .references(() => discounts.id),
+  // abhi
+  discountId: integer("discount_id").references(() => discounts.id),
   userId: integer("user_id").references(() => users.id),
   orderId: integer("order_id").references(() => orders.id),
   sessionId: text("session_id"),
