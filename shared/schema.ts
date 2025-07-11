@@ -1,4 +1,13 @@
-import { pgTable, text, serial, integer, boolean, doublePrecision, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  doublePrecision,
+  timestamp,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,10 +16,11 @@ export const ProductCategory = {
   COFFEE_TEA: "Coffee & Tea",
   SPICES: "Spices",
   GRAINS: "Grains",
-  OTHERS: "Others"
+  OTHERS: "Others",
 } as const;
 
-export type ProductCategoryType = typeof ProductCategory[keyof typeof ProductCategory];
+export type ProductCategoryType =
+  (typeof ProductCategory)[keyof typeof ProductCategory];
 
 // Categories table for managing categories and subcategories
 export const categories = pgTable("categories", {
@@ -28,17 +38,22 @@ export const categories = pgTable("categories", {
 export const insertCategorySchema = createInsertSchema(categories).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Category = typeof categories.$inferSelect;
 
 // User Role Enum
-export const userRoleEnum = pgEnum('user_role', ['user', 'admin']);
+export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
 
 // Subscription Status Enum
-export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'canceled', 'expired', 'past_due']);
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "active",
+  "canceled",
+  "expired",
+  "past_due",
+]);
 
 // Product Schema
 export const products = pgTable("products", {
@@ -79,7 +94,7 @@ export const products = pgTable("products", {
 export const insertProductSchema = createInsertSchema(products).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // Farmer Schema
@@ -112,7 +127,7 @@ export const farmers = pgTable("farmers", {
 export const insertFarmerSchema = createInsertSchema(farmers).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // Cart Schema
@@ -126,7 +141,7 @@ export const carts = pgTable("carts", {
 export const insertCartSchema = createInsertSchema(carts).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // Cart Items Schema
@@ -138,7 +153,7 @@ export const cartItems = pgTable("cart_items", {
 });
 
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({
-  id: true
+  id: true,
 });
 
 // Testimonials Schema
@@ -152,7 +167,7 @@ export const testimonials = pgTable("testimonials", {
 });
 
 export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
-  id: true
+  id: true,
 });
 
 // Newsletter Subscription Schema
@@ -164,9 +179,11 @@ export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterSubscriptions).omit({
+export const insertNewsletterSubscriptionSchema = createInsertSchema(
+  newsletterSubscriptions
+).omit({
   id: true,
-  createdAt: true
+  createdAt: true,
 });
 
 // Order Schema
@@ -182,7 +199,7 @@ export const orders = pgTable("orders", {
   paymentMethod: text("payment_method").notNull().default("razorpay"),
   discountId: integer("discount_id").references(() => discounts.id),
   cancellationReason: text("cancellation_reason"),
-  trackingId: text("tracking_id"),  
+  trackingId: text("tracking_id"),
   deliveredAt: timestamp("delivered_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -190,7 +207,7 @@ export const orders = pgTable("orders", {
 
 export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
-  createdAt: true
+  createdAt: true,
 });
 
 // Order Items Schema
@@ -203,7 +220,7 @@ export const orderItems = pgTable("order_items", {
 });
 
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
-  id: true
+  id: true,
 });
 
 // Product Reviews Schema
@@ -219,9 +236,11 @@ export const productReviews = pgTable("product_reviews", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertProductReviewSchema = createInsertSchema(productReviews).omit({
+export const insertProductReviewSchema = createInsertSchema(
+  productReviews
+).omit({
   id: true,
-  createdAt: true
+  createdAt: true,
 });
 
 // Contact Messages Schema
@@ -237,11 +256,13 @@ export const contactMessages = pgTable("contact_messages", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
+export const insertContactMessageSchema = createInsertSchema(
+  contactMessages
+).omit({
   id: true,
   status: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // User Schema
@@ -254,7 +275,7 @@ export const users = pgTable("users", {
   role: userRoleEnum("role").notNull().default("user"),
   emailVerified: boolean("email_verified").default(false),
   mobileVerified: boolean("mobile_verified").default(false),
-  codEnabled: boolean("cod_enabled").default(true), 
+  codEnabled: boolean("cod_enabled").default(true),
   verificationToken: text("verification_token"),
   resetToken: text("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),
@@ -265,13 +286,14 @@ export const users = pgTable("users", {
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // SMS Verification Schema
 export const smsVerifications = pgTable("sms_verifications", {
   id: serial("id").primaryKey(),
-  mobile: text("mobile").notNull(),
+  mobile: text("mobile"), // now optional abhi
+  email: text("email"), // new field for email OTP abhi
   otp: text("otp").notNull(),
   purpose: text("purpose").notNull(), // 'registration' or 'password_reset'
   verified: boolean("verified").default(false),
@@ -279,9 +301,11 @@ export const smsVerifications = pgTable("sms_verifications", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertSmsVerificationSchema = createInsertSchema(smsVerifications).omit({
+export const insertSmsVerificationSchema = createInsertSchema(
+  smsVerifications
+).omit({
   id: true,
-  createdAt: true
+  createdAt: true,
 });
 
 // Payment Schema
@@ -299,7 +323,7 @@ export const payments = pgTable("payments", {
 
 export const insertPaymentSchema = createInsertSchema(payments).omit({
   id: true,
-  createdAt: true
+  createdAt: true,
 });
 
 // Subscription Schema
@@ -318,7 +342,7 @@ export const subscriptions = pgTable("subscriptions", {
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 
 // Export types
@@ -340,8 +364,11 @@ export type CartItem = typeof cartItems.$inferSelect;
 export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
 export type Testimonial = typeof testimonials.$inferSelect;
 
-export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscriptionSchema>;
-export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
+export type InsertNewsletterSubscription = z.infer<
+  typeof insertNewsletterSubscriptionSchema
+>;
+export type NewsletterSubscription =
+  typeof newsletterSubscriptions.$inferSelect;
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
@@ -384,8 +411,17 @@ export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 export type TeamMember = typeof teamMembers.$inferSelect;
 
 // Discounts/Coupons Schema
-export const discountTypeEnum = pgEnum('discount_type', ['percentage', 'fixed', 'shipping']);
-export const discountStatusEnum = pgEnum('discount_status', ['active', 'scheduled', 'expired', 'disabled']);
+export const discountTypeEnum = pgEnum("discount_type", [
+  "percentage",
+  "fixed",
+  "shipping",
+]);
+export const discountStatusEnum = pgEnum("discount_status", [
+  "active",
+  "scheduled",
+  "expired",
+  "disabled",
+]);
 
 export const discounts = pgTable("discounts", {
   id: serial("id").primaryKey(),
@@ -399,22 +435,27 @@ export const discounts = pgTable("discounts", {
   used: integer("used").default(0),
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
-  status: discountStatusEnum("status").notNull().default('active'),
-  applicableProducts: text("applicable_products").default('all'), // 'all', 'selected', or JSON array
-  applicableCategories: text("applicable_categories").default('all'), // 'all' or comma-separated
+  status: discountStatusEnum("status").notNull().default("active"),
+  applicableProducts: text("applicable_products").default("all"), // 'all', 'selected', or JSON array
+  applicableCategories: text("applicable_categories").default("all"), // 'all' or comma-separated
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const insertDiscountSchema = createInsertSchema(discounts).omit({
-  id: true,
-  used: true,
-  createdAt: true,
-  updatedAt: true,
-}).extend({
-  startDate: z.union([z.date(), z.string().transform((str) => new Date(str))]),
-  endDate: z.union([z.date(), z.string().transform((str) => new Date(str))]),
-});
+export const insertDiscountSchema = createInsertSchema(discounts)
+  .omit({
+    id: true,
+    used: true,
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    startDate: z.union([
+      z.date(),
+      z.string().transform((str) => new Date(str)),
+    ]),
+    endDate: z.union([z.date(), z.string().transform((str) => new Date(str))]),
+  });
 
 export type InsertDiscount = z.infer<typeof insertDiscountSchema>;
 export type Discount = typeof discounts.$inferSelect;
@@ -422,17 +463,21 @@ export type Discount = typeof discounts.$inferSelect;
 // Discount Usage Tracking
 export const discountUsage = pgTable("discount_usage", {
   id: serial("id").primaryKey(),
-  discountId: integer("discount_id").notNull().references(() => discounts.id),
+  discountId: integer("discount_id")
+    .notNull()
+    .references(() => discounts.id),
   userId: integer("user_id").references(() => users.id),
   orderId: integer("order_id").references(() => orders.id),
   sessionId: text("session_id"),
   usedAt: timestamp("used_at").notNull().defaultNow(),
 });
 
-export const insertDiscountUsageSchema = createInsertSchema(discountUsage).omit({
-  id: true,
-  usedAt: true,
-});
+export const insertDiscountUsageSchema = createInsertSchema(discountUsage).omit(
+  {
+    id: true,
+    usedAt: true,
+  }
+);
 
 export type InsertDiscountUsage = z.infer<typeof insertDiscountUsageSchema>;
 export type DiscountUsage = typeof discountUsage.$inferSelect;
@@ -454,8 +499,6 @@ export const insertSiteSettingSchema = createInsertSchema(siteSettings).omit({
 
 export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
 export type SiteSetting = typeof siteSettings.$inferSelect;
-
-
 
 // Cart with items
 export interface CartWithItems extends Cart {

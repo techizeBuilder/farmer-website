@@ -507,9 +507,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (
-        purpose !== "registration" &&
-        purpose !== "password_reset" &&
-        purpose !== "account_deletion"
+        ![
+          "registration",
+          "password_reset",
+          "account_deletion",
+          "change_email",
+          "change_number",
+        ].includes(purpose)
       ) {
         return res.status(400).json({ message: "Invalid purpose" });
       }
@@ -542,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid purpose" });
       }
 
-      const result = await smsService.verifyOTP(mobile, otp, purpose);
+      const result = await smsService.verifyOTP("mobile", mobile, otp, purpose);
 
       if (result.success) {
         res.json({ message: result.message, verified: true });
@@ -571,7 +575,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify OTP first
-      const otpResult = await smsService.verifyOTP(mobile, otp, "registration");
+      const otpResult = await smsService.verifyOTP(
+        "mobile",
+        mobile,
+        otp,
+        "registration"
+      );
       if (!otpResult.success) {
         return res.status(400).json({ message: otpResult.message });
       }
@@ -787,6 +796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Verify OTP
         const otpResult = await smsService.verifyOTP(
+          "mobile",
           user.mobile,
           otp,
           "password_reset"
@@ -809,6 +819,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   );
+
+  // change email and number with otp verification
+  // abhi
+  app.post(
+    `${apiPrefix}/auth/change-contact`,
+    authenticate,
+    async (req, res) => {
+      try {
+        const user = (req as any).user;
+        const { type, value, otp } = req.body;
+
+        if (!type || !value || !otp) {
+          return res
+            .status(400)
+            .json({ message: "Type, value, and OTP are required" });
+        }
+
+        if (!["email", "mobile"].includes(type)) {
+          return res
+            .status(400)
+            .json({ message: "Invalid type. Use 'email' or 'mobile'" });
+        }
+
+        // Choose appropriate service and purpose
+        const service = type === "mobile" ? "mobile" : "email";
+        const purpose = type === "email" ? "change_email" : "change_number";
+
+        const otpResult = await smsService.verifyOTP(
+          service,
+          value,
+          otp,
+          purpose
+        );
+        if (!otpResult.success) {
+          return res.status(400).json({ message: otpResult.message });
+        }
+
+        // Update in DB
+        const fieldToUpdate =
+          type === "email" ? { email: value } : { mobile: value };
+        await storage.updateUser(user.id, fieldToUpdate);
+
+        res.json({
+          message: `${
+            type === "email" ? "Email" : "Mobile number"
+          } updated successfully`,
+        });
+      } catch (error) {
+        console.error("Change contact error:", error);
+        res.status(500).json({ message: "Failed to update contact info" });
+      }
+    }
+  );
+
   // delete user with OTP verification
 
   // abhi
@@ -823,6 +887,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { otp } = req.body;
         if (otp) {
           const result = await smsService.verifyOTP(
+            "mobile",
             user.mobile,
             otp,
             "account_deletion"
@@ -1240,7 +1305,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Find user by email
-      const user = await storage.getUserByEmail(email, number);
+
+      const user = await storage.getUserByEmailNumber(email, number);
       if (!user) {
         // Don't reveal if email exists for security
         return res.json({

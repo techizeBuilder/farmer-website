@@ -32,6 +32,8 @@ import { apiRequest } from "@/lib/queryClient";
 import ProductRatingModal from "@/components/ProductRatingModal";
 import { OTPInput } from "@/components/ui/otp-input";
 import DeleteAccount from "./DeleteAccount";
+import ChangeNumberUser from "./ChangeNumberUser";
+import ChangeEmailUser from "./ChangeEmailUser";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -493,7 +495,10 @@ export default function Account() {
                     </Form>
                   </CardContent>
                 </Card>
-
+                {/* change number card  */}
+                <ChangeNumberUser />
+                {/* change email card  */}
+                <ChangeEmailUser />
                 {/* Password Change Card */}
                 <Card>
                   <CardHeader>

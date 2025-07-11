@@ -9,7 +9,48 @@ import {
   Order,
   OrderItem,
 } from "@shared/schema";
-import { eq, like, desc, asc, and, gte, lte, sql } from "drizzle-orm";
+import { eq, like, desc, asc, and, gte, lte, sql, ne } from "drizzle-orm";
+
+// abhi
+// Get monthly sales for current year
+const getMonth = (date: Date) => date.getMonth() + 1;
+
+export const getMonthlySalesData = async () => {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = getMonth(new Date());
+
+  // 1. Get all non-cancelled orders from this year
+  const validOrders = await db
+    .select({
+      total: orders.total,
+      createdAt: orders.createdAt,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, new Date(`${currentYear}-01-01`)),
+        ne(orders.status, "cancelled")
+      )
+    );
+
+  // 2. Aggregate revenue per month
+  const revenueByMonth: Record<number, number> = {};
+
+  validOrders.forEach((order) => {
+    const month = getMonth(new Date(order.createdAt));
+    const total = Number(order.total);
+    revenueByMonth[month] = (revenueByMonth[month] || 0) + total;
+  });
+
+  // 3. Format result for frontend
+  return Array.from({ length: currentMonth }, (_, i) => {
+    const month = i + 1;
+    return {
+      name: new Date(0, i).toLocaleString("en-US", { month: "short" }),
+      sales: revenueByMonth[month] || 0,
+    };
+  });
+};
 
 // GET all orders with pagination, sorting and filtering
 export const getAllOrders = async (req: Request, res: Response) => {
@@ -64,8 +105,8 @@ export const getAllOrders = async (req: Request, res: Response) => {
       query = query.where(
         and(
           gte(orders.createdAt, new Date(startDate)),
-          lte(orders.createdAt, new Date(endDate)),
-        ),
+          lte(orders.createdAt, new Date(endDate))
+        )
       );
     } else if (startDate) {
       query = query.where(gte(orders.createdAt, new Date(startDate)));
@@ -89,8 +130,8 @@ export const getAllOrders = async (req: Request, res: Response) => {
       totalQuery.where(
         and(
           gte(orders.createdAt, new Date(startDate)),
-          lte(orders.createdAt, new Date(endDate)),
-        ),
+          lte(orders.createdAt, new Date(endDate))
+        )
       );
     } else if (startDate) {
       totalQuery.where(gte(orders.createdAt, new Date(startDate)));
@@ -270,8 +311,6 @@ export const deleteOrder = async (req: Request, res: Response) => {
       return deletedOrder;
     });
 
-
-    
     if (!deletedOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -297,19 +336,19 @@ export const getOrderStatisticsData = async (): Promise<any> => {
     // Calculate statistics
     const totalOrders = allOrders.length;
     const pendingOrders = allOrders.filter(
-      (o) => o.status === "pending",
+      (o) => o.status === "pending"
     ).length;
     const processingOrders = allOrders.filter(
-      (o) => o.status === "processing",
+      (o) => o.status === "processing"
     ).length;
     const shippedOrders = allOrders.filter(
-      (o) => o.status === "shipped",
+      (o) => o.status === "shipped"
     ).length;
     const deliveredOrders = allOrders.filter(
-      (o) => o.status === "delivered",
+      (o) => o.status === "delivered"
     ).length;
     const cancelledOrders = allOrders.filter(
-      (o) => o.status === "cancelled",
+      (o) => o.status === "cancelled"
     ).length;
 
     // Calculate total revenue
@@ -322,7 +361,7 @@ export const getOrderStatisticsData = async (): Promise<any> => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const recentOrders = allOrders.filter(
-      (o) => new Date(o.createdAt) >= thirtyDaysAgo,
+      (o) => new Date(o.createdAt) >= thirtyDaysAgo
     ).length;
 
     return {
@@ -348,12 +387,10 @@ export const getOrderStatistics = async (req: Request, res: Response) => {
     res.json(statistics);
   } catch (error) {
     console.error("Error fetching order statistics:", error);
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch order statistics",
-        error: String(error),
-      });
+    res.status(500).json({
+      message: "Failed to fetch order statistics",
+      error: String(error),
+    });
   }
 };
 

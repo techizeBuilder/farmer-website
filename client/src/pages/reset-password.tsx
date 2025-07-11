@@ -1,72 +1,79 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, Eye, EyeOff, Lock } from 'lucide-react';
-import Layout from '@/components/Layout';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle, Eye, EyeOff, Lock } from "lucide-react";
+import Layout from "@/components/Layout";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ResetPassword() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [token, setToken] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Get token from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const tokenParam = urlParams.get('token');
-    
+    const tokenParam = urlParams.get("token");
+
     if (tokenParam) {
       setToken(tokenParam);
     } else {
-      setError('Invalid reset link. Please request a new password reset.');
+      setError("Invalid reset link. Please request a new password reset.");
     }
   }, []);
 
   const validateForm = () => {
     if (!password) {
-      setError('Password is required');
+      setError("Password is required");
       return false;
     }
-    
+
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       return false;
     }
-    
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           token,
@@ -79,14 +86,14 @@ export default function ResetPassword() {
       if (response.ok) {
         setIsSuccess(true);
         toast({
-          title: 'Password Reset Successful',
-          description: 'Your password has been updated successfully.',
+          title: "Password Reset Successful",
+          description: "Your password has been updated successfully.",
         });
       } else {
-        setError(data.message || 'Failed to reset password');
+        setError(data.message || "Failed to reset password");
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -115,16 +122,16 @@ export default function ResetPassword() {
               <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Password Reset Complete</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                Password Reset Complete
+              </CardTitle>
               <CardDescription className="mt-2 text-sm text-gray-600">
-                Your password has been successfully updated. You can now log in with your new password.
+                Your password has been successfully updated. You can now log in
+                with your new password.
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button
-                onClick={() => navigate('/login')}
-                className="w-full bg-forest hover:bg-forest/90"
-              >
+              <Button onClick={() => navigate("/login")} className="w-full">
                 Continue to Login
               </Button>
             </CardFooter>
@@ -142,7 +149,9 @@ export default function ResetPassword() {
             <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-forest/10 mb-4">
               <Lock className="h-6 w-6 text-forest" />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">Reset Your Password</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Reset Your Password
+            </CardTitle>
             <CardDescription className="mt-2 text-sm text-gray-600">
               Enter your new password below
             </CardDescription>
@@ -154,13 +163,13 @@ export default function ResetPassword() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">New Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter new password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -191,7 +200,7 @@ export default function ResetPassword() {
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -217,15 +226,16 @@ export default function ResetPassword() {
             <CardFooter className="flex flex-col space-y-3">
               <Button
                 type="submit"
-                className="w-full bg-forest hover:bg-forest/90"
+                variant={"default"}
+                className="w-full"
                 disabled={isLoading || !token}
               >
-                {isLoading ? 'Updating Password...' : 'Update Password'}
+                {isLoading ? "Updating Password..." : "Update Password"}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate("/login")}
                 className="w-full text-sm"
               >
                 Back to Login

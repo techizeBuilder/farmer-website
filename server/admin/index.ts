@@ -61,13 +61,13 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
 
     // Find user by email
     const [user] = await db.select().from(users).where(eq(users.email, email));
-    console.log(user,"nidhi")
+    console.log(user, "nidhi");
 
     // Check if user exists and is an admin
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== "admin") {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-console.log("user2")
+    console.log("user2");
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -115,12 +115,15 @@ adminRouter.get(
 
       // Get product stock statistics without sending response
       const productStats = await productController.getProductStockData();
-
+      // Get year chart data of sales without sending response
+      // abhi
+      const monthlySalesStats = await orderController.getMonthlySalesData();
       // Combine all stats into a single response
       res.json({
         users: userStats,
         orders: orderStats,
         products: productStats,
+        monthlySalesStats,
       });
     } catch (error) {
       console.error("Dashboard error:", error);

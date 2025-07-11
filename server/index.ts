@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 });
 const allowedOrigins = [
   "http://localhost:5000",
-  "https://new-farmer.onrender.com",
+  // "https://new-farmer.onrender.com",
   // "https://farmfresh.techizebuilder.com",
 ];
 

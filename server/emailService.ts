@@ -50,12 +50,20 @@ class EmailService {
       .map(
         (item) => `
       <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.product.name}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toFixed(2)}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${(item.quantity * item.price).toFixed(2)}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">${
+          item.product.name
+        }</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${
+          item.quantity
+        }</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toFixed(
+          2
+        )}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${(
+          item.quantity * item.price
+        ).toFixed(2)}</td>
       </tr>
-    `,
+    `
       )
       .join("");
 
@@ -90,7 +98,7 @@ class EmailService {
               <h2>Order Details</h2>
               <p><strong>Order ID:</strong> #${order.id}</p>
               <p><strong>Order Date:</strong> ${new Date(
-                order.createdAt,
+                order.createdAt
               ).toLocaleString("en-IN", {
                 timeZone: "Asia/Kolkata",
                 dateStyle: "full",
@@ -105,7 +113,11 @@ class EmailService {
               <p><strong>Name:</strong> ${customerName}</p>
               <p><strong>Email:</strong> ${customerEmail}</p>
               <p><strong>Shipping Address:</strong> ${order.shippingAddress}</p>
-              ${order.billingAddress ? `<p><strong>Billing Address:</strong> ${order.billingAddress}</p>` : ""}
+              ${
+                order.billingAddress
+                  ? `<p><strong>Billing Address:</strong> ${order.billingAddress}</p>`
+                  : ""
+              }
             </div>
 
             <h3>Order Items</h3>
@@ -122,7 +134,9 @@ class EmailService {
                 ${orderItemsHtml}
                 <tr class="total-row">
                   <td colspan="3" style="padding: 15px; text-align: right;">Total Amount:</td>
-                  <td style="padding: 15px; text-align: right;">₹${totalAmount.toFixed(2)}</td>
+                  <td style="padding: 15px; text-align: right;">₹${totalAmount.toFixed(
+                    2
+                  )}</td>
                 </tr>
               </tbody>
             </table>
@@ -146,7 +160,9 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(user: User, resetToken: string): Promise<void> {
-    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5000"}/reset-password?token=${resetToken}`;
+    const resetUrl = `${
+      process.env.FRONTEND_URL || "http://localhost:5000"
+    }/reset-password?token=${resetToken}`;
 
     const html = `
       <!DOCTYPE html>
@@ -245,7 +261,9 @@ class EmailService {
             <p>Your Harvest Direct account password has been updated. You can now log in with your new password.</p>
             
             <div style="text-align: center;">
-              <a href="${process.env.FRONTEND_URL || "http://localhost:5000"}/login" class="login-button">Login to Your Account</a>
+              <a href="${
+                process.env.FRONTEND_URL || "http://localhost:5000"
+              }/login" class="login-button">Login to Your Account</a>
             </div>
             
             <p><strong>Security tip:</strong> If you didn't make this change, please contact our support team immediately.</p>
