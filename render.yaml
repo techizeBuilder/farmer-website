@@ -1,12 +1,11 @@
 services:
-  # PostgreSQL Database
-  - type: pserv
+  # ✅ PostgreSQL Database
+  - type: postgres
     name: harvest-direct-db
-    env: node
     plan: free
     region: oregon
 
-  # Backend Service (Node + Express + Drizzle)
+  # ✅ Backend Service
   - type: web
     name: harvest-direct-backend
     env: node
@@ -36,10 +35,9 @@ services:
       - key: SESSION_SECRET
         generateValue: true
 
-  # Frontend (React + Vite static site)
+  # ✅ Frontend (Static Site)
   - type: web
     name: harvest-direct-frontend
     env: static
-    region: oregon
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: client/dist
