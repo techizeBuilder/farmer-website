@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ export default function AllProducts() {
   const { category } = useCategory();
   // Ensure page always starts at top on any navigation
 
-  window.scrollTo(0, 0);
+  // window.scrollTo(0, 0);
 
   // State for filters and pagination - initialize from URL parameters
   const [searchQuery, setSearchQuery] = useState(searchParam || "");
@@ -357,7 +357,7 @@ export default function AllProducts() {
 
   const handleCategoryChange = (categoryName: string | null) => {
     // Immediate scroll to top
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     setSelectedCategory(categoryName);
     setSelectedSubcategory(null); // Reset subcategory when category changes
@@ -392,7 +392,7 @@ export default function AllProducts() {
   // Handle subcategory change
   const handleSubcategoryChange = (subcategoryName: string | null) => {
     // Immediate scroll to top
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     setSelectedSubcategory(subcategoryName);
     setCurrentPage(1);
@@ -412,7 +412,7 @@ export default function AllProducts() {
 
   // Handle search change
   const handleSearchChange = (query: string) => {
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     setSearchQuery(query);
     setCurrentPage(1);
@@ -431,28 +431,77 @@ export default function AllProducts() {
   };
 
   // Handle price range change
-  const handlePriceRangeChange = (newRange: [number, number]) => {
-    window.scrollTo(0, 0);
+  // const handlePriceRangeChange = (newRange: [number, number]) => {
+  //   window.scrollTo(0, 0);
 
-    setPriceRange(newRange);
-    setCurrentPage(1);
+  //   setPriceRange(newRange);
+  //   setCurrentPage(1);
 
-    // Update URL with all current filters
-    updateURL({
-      category: selectedCategory,
-      subcategory: selectedSubcategory,
-      search: searchQuery || null,
-      minPrice: newRange[0] > 0 ? newRange[0].toString() : null,
-      maxPrice: newRange[1] < 1000 ? newRange[1].toString() : null,
-      page: "1",
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-    });
-  };
+  //   // Update URL with all current filters
+  //   updateURL({
+  //     category: selectedCategory,
+  //     subcategory: selectedSubcategory,
+  //     search: searchQuery || null,
+  //     minPrice: newRange[0] > 0 ? newRange[0].toString() : null,
+  //     maxPrice: newRange[1] < 1000 ? newRange[1].toString() : null,
+  //     page: "1",
+  //     sortBy: sortBy,
+  //     sortOrder: sortOrder,
+  //   });
+  // };
+  // State for temporary values during slider interaction
+  const [tempRange, setTempRange] = useState<[number, number]>(priceRange);
+  const [isDragging, setIsDragging] = useState(false);
 
+  // Sync tempRange when priceRange changes externally
+  useEffect(() => {
+    if (!isDragging) {
+      setTempRange(priceRange);
+    }
+  }, [priceRange, isDragging]);
+
+  // Handler for live changes during slider interaction
+  const handleSliderChange = useCallback((newRange: [number, number]) => {
+    setTempRange(newRange);
+  }, []);
+
+  // Handler for when user starts dragging
+  const handleDragStart = useCallback(() => {
+    setIsDragging(true);
+  }, []);
+
+  // Handler for when user releases slider
+  const handleDragEnd = useCallback(
+    (newRange: [number, number]) => {
+      // window.scrollTo(0, 0);
+      setPriceRange(newRange);
+      setCurrentPage(1);
+      setIsDragging(false);
+
+      updateURL({
+        category: selectedCategory,
+        subcategory: selectedSubcategory,
+        search: searchQuery || null,
+        minPrice: newRange[0] > 0 ? newRange[0].toString() : null,
+        maxPrice: newRange[1] < 1000 ? newRange[1].toString() : null,
+        page: "1",
+        sortBy,
+        sortOrder,
+      });
+    },
+    [
+      selectedCategory,
+      selectedSubcategory,
+      searchQuery,
+      sortBy,
+      sortOrder,
+      updateURL,
+      setCurrentPage,
+    ]
+  );
   // Handle sort change
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
@@ -502,7 +551,7 @@ export default function AllProducts() {
 
   // Always scroll to top when URL changes (navigation from footer/anywhere)
   useEffect(() => {
-    window.scrollTo(0, 0); // Immediate scroll to top, no smooth behavior
+    // window.scrollTo(0, 0); // Immediate scroll to top, no smooth behavior
   }, [categoryParam, subcategoryParam, searchParam]); // Trigger on any URL filter change
 
   // Handle pagination
@@ -710,7 +759,7 @@ export default function AllProducts() {
                               "w-full justify-start font-normal",
                               selectedSubcategory === subcategory.name
                                 ? "bg-secondary/10 text-secondary font-medium"
-                                : "text-foreground hover:bg-muted"
+                                : "text-foreground hover:bg-muted hover:text-black"
                             )}
                             onClick={() =>
                               handleSubcategoryChange(subcategory.name)
@@ -725,20 +774,39 @@ export default function AllProducts() {
 
                   {/* Price Range */}
                   <div className="mb-8">
-                    <Label className="text-foreground font-medium mb-4 block">
-                      Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
+                    <Label
+                      className={cn(
+                        "text-foreground font-medium mb-4 block transition-colors",
+                        isDragging ? "text-primary" : ""
+                      )}
+                    >
+                      Price Range: ₹{tempRange[0]} - ₹{tempRange[1]}
+                      {isDragging && (
+                        <span className="ml-2 text-xs text-muted-foreground animate-pulse">
+                          (releasing updates results)
+                        </span>
+                      )}
                     </Label>
+
                     <Slider
-                      value={priceRange}
-                      onValueChange={handlePriceRangeChange}
+                      value={tempRange}
+                      onValueChange={handleSliderChange}
+                      onValueCommit={handleDragEnd}
+                      onPointerDown={handleDragStart}
                       max={1000}
                       min={0}
                       step={10}
-                      className="w-full"
+                      className="w-full cursor-grab active:cursor-grabbing"
                     />
+
                     <div className="flex justify-between text-sm text-muted-foreground mt-2">
                       <span>₹0</span>
-                      <span>₹1000+</span>
+                      <span className="flex items-center gap-1">
+                        ₹1000+
+                        {priceRange[1] >= 1000 && (
+                          <span className="text-xs text-primary">(max)</span>
+                        )}
+                      </span>
                     </div>
                   </div>
 
