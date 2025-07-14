@@ -25,20 +25,6 @@ import PrivacyPolicy from "@/pages/privacy-policy";
 
 // Admin Pages
 import AdminLogin from "@/pages/admin/login";
-import AdminDashboard from "@/pages/admin/dashboard";
-
-import AdminEnhancedProducts from "@/pages/admin/enhanced-products";
-import AdminOrders from "@/pages/admin/orders";
-import AdminUsers from "@/pages/admin/users";
-import AdminFarmers from "@/pages/admin/farmers";
-import AdminInventory from "@/pages/admin/inventory";
-import AdminDiscounts from "@/pages/admin/discounts";
-
-import AdminSettings from "@/pages/admin/settings";
-import AdminNewsletter from "@/pages/admin/newsletter";
-import AdminMessagesWithLayout from "@/pages/admin/messages";
-import AdminTeamMembers from "@/pages/admin/team-members";
-import AdminCategoryManagement from "@/pages/admin/category-management";
 
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -47,6 +33,7 @@ import { SiteProvider } from "@/context/SiteContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import Layout from "@/components/Layout";
+import { AdminRoutes } from "./AdminRoutes";
 
 function App() {
   return (
@@ -57,21 +44,7 @@ function App() {
             <Switch>
               {/* Admin Routes - Without Main Layout */}
               <Route path="/admin/login" component={AdminLogin} />
-              <Route path="/admin/dashboard" component={AdminDashboard} />
-
-              <Route path="/admin/enhanced-products" component={AdminEnhancedProducts} />
-              <Route path="/admin/orders" component={AdminOrders} />
-              <Route path="/admin/users" component={AdminUsers} />
-              <Route path="/admin/farmers" component={AdminFarmers} />
-              <Route path="/admin/team-members" component={AdminTeamMembers} />
-              <Route path="/admin/newsletter" component={AdminNewsletter} />
-              <Route path="/admin/messages" component={AdminMessagesWithLayout} />
-              <Route path="/admin/inventory" component={AdminInventory} />
-              <Route path="/admin/discounts" component={AdminDiscounts} />
-              <Route path="/admin/category-management" component={AdminCategoryManagement} />
-
-              <Route path="/admin/settings" component={AdminSettings} />
-              
+              <Route path="/admin/*" component={AdminRoutes} />
               {/* Main Store Routes - Wrapped in Layout */}
               <Route>
                 {() => (
@@ -88,19 +61,34 @@ function App() {
                         <Route path="/contact" component={Contact} />
                         <Route path="/login" component={Login} />
                         <Route path="/register" component={Register} />
-                        <Route path="/forgot-password" component={ForgotPassword} />
-                        <Route path="/reset-password" component={ResetPassword} />
+                        <Route
+                          path="/forgot-password"
+                          component={ForgotPassword}
+                        />
+                        <Route
+                          path="/reset-password"
+                          component={ResetPassword}
+                        />
                         <Route path="/account" component={Account} />
                         <Route path="/order-history" component={OrderHistory} />
                         <Route path="/payment" component={Payment} />
-                        <Route path="/payment-success" component={PaymentSuccess} />
-                        
+                        <Route
+                          path="/payment-success"
+                          component={PaymentSuccess}
+                        />
+
                         {/* Customer Care Pages */}
                         <Route path="/faqs" component={FAQs} />
-                        <Route path="/shipping-returns" component={ShippingReturns} />
+                        <Route
+                          path="/shipping-returns"
+                          component={ShippingReturns}
+                        />
                         <Route path="/track-order" component={TrackOrder} />
-                        <Route path="/privacy-policy" component={PrivacyPolicy} />
-                        
+                        <Route
+                          path="/privacy-policy"
+                          component={PrivacyPolicy}
+                        />
+
                         {/* 404 Route */}
                         <Route component={NotFound} />
                       </Switch>

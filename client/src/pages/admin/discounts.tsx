@@ -319,510 +319,74 @@ export default function AdminDiscounts() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading discounts...</div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading discounts...</div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-red-600">Error loading discounts</div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-red-600">Error loading discounts</div>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Discount Management
-            </h1>
-            <p className="text-muted-foreground">
-              Create and manage discount codes and coupons
-            </p>
-          </div>
-          <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Discount
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Discount</DialogTitle>
-                <DialogDescription>
-                  Create a new discount code or coupon for your customers
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onCreateSubmit)}
-                  className="space-y-4"
-                >
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="code"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Discount Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="SUMMER20" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Discount Type</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="percentage">
-                                Percentage
-                              </SelectItem>
-                              <SelectItem value="fixed">
-                                Fixed Amount
-                              </SelectItem>
-                              <SelectItem value="shipping">
-                                Free Shipping
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="value"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Value{" "}
-                            {form.watch("type") === "percentage"
-                              ? "(%)"
-                              : "(₹)"}
-                          </FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="active">Active</SelectItem>
-                              <SelectItem value="scheduled">
-                                Scheduled
-                              </SelectItem>
-                              <SelectItem value="disabled">Disabled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Describe your discount..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="minPurchase"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Minimum Purchase (₹)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="usageLimit"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Usage Limit (0 = unlimited)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="perUser"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>One per user</FormLabel>
-                          <div className="text-sm text-muted-foreground">
-                            Limit this discount to one use per customer
-                          </div>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Start Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => date < new Date()}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="endDate"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>End Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => date < new Date()}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex justify-end space-x-2 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsCreateModalOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={createDiscountMutation.isPending}
-                    >
-                      {createDiscountMutation.isPending
-                        ? "Creating..."
-                        : "Create Discount"}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Discount Management
+          </h1>
+          <p className="text-muted-foreground">
+            Create and manage discount codes and coupons
+          </p>
         </div>
-
-        {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Discounts
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Array.isArray(discounts) ? discounts.length : 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Discounts
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Array.isArray(discounts)
-                  ? discounts.filter((d: Discount) => d.status === "active")
-                      .length
-                  : 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Scheduled Discounts
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Array.isArray(discounts)
-                  ? discounts.filter((d: Discount) => d.status === "scheduled")
-                      .length
-                  : 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Usage</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Array.isArray(discounts)
-                  ? discounts.reduce(
-                      (sum: number, d: Discount) => sum + (d.used || 0),
-                      0
-                    )
-                  : 0}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Discounts Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>All Discounts</CardTitle>
-            <CardDescription>
-              Manage your discount codes and their settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {Array.isArray(discounts) &&
-                discounts.map((discount: Discount) => (
-                  <div
-                    key={discount.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-bold text-lg">
-                          {discount.code}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyDiscountCode(discount.code)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Badge variant={getStatusBadgeVariant(discount.status)}>
-                          {discount.status}
-                        </Badge>
-                        <Badge variant={getTypeBadgeVariant(discount.type)}>
-                          {formatDiscountValue(discount.type, discount.value)}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {discount.description}
-                      </p>
-                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                        <span>Min: ₹{discount.minPurchase || 0}</span>
-                        <span>
-                          Used: {discount.used || 0}/
-                          {discount.usageLimit || "∞"}
-                        </span>
-                        <span>
-                          Valid until:{" "}
-                          {format(new Date(discount.endDate), "MMM dd, yyyy")}
-                        </span>
-                        {discount.perUser && <span>One per user</span>}
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleView(discount)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(discount)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(discount.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              {(!Array.isArray(discounts) || discounts.length === 0) && (
-                <div className="text-center py-8 text-muted-foreground">
-                  No discounts found. Create your first discount to get started.
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Edit Modal */}
-        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Discount
+            </Button>
+          </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Edit Discount</DialogTitle>
-              <DialogDescription>Update the discount details</DialogDescription>
+              <DialogTitle>Create New Discount</DialogTitle>
+              <DialogDescription>
+                Create a new discount code or coupon for your customers
+              </DialogDescription>
             </DialogHeader>
-            <Form {...editForm}>
+            <Form {...form}>
               <form
-                onSubmit={editForm.handleSubmit(onEditSubmit)}
+                onSubmit={form.handleSubmit(onCreateSubmit)}
                 className="space-y-4"
               >
-                {/* Same form fields as create modal */}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={editForm.control}
+                    control={form.control}
                     name="code"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Discount Code</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="SUMMER20" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={editForm.control}
+                    control={form.control}
                     name="type"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Discount Type</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value}
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -847,15 +411,13 @@ export default function AdminDiscounts() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={editForm.control}
+                    control={form.control}
                     name="value"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
                           Value{" "}
-                          {editForm.watch("type") === "percentage"
-                            ? "(%)"
-                            : "(₹)"}
+                          {form.watch("type") === "percentage" ? "(%)" : "(₹)"}
                         </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
@@ -865,14 +427,14 @@ export default function AdminDiscounts() {
                     )}
                   />
                   <FormField
-                    control={editForm.control}
+                    control={form.control}
                     name="status"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Status</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value}
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -892,119 +454,531 @@ export default function AdminDiscounts() {
                 </div>
 
                 <FormField
-                  control={editForm.control}
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Textarea
+                          placeholder="Describe your discount..."
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="minPurchase"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum Purchase (₹)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="usageLimit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Usage Limit (0 = unlimited)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="perUser"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>One per user</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Limit this discount to one use per customer
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Start Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>End Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsEditModalOpen(false)}
+                    onClick={() => setIsCreateModalOpen(false)}
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    disabled={updateDiscountMutation.isPending}
+                    disabled={createDiscountMutation.isPending}
                   >
-                    {updateDiscountMutation.isPending
-                      ? "Updating..."
-                      : "Update Discount"}
+                    {createDiscountMutation.isPending
+                      ? "Creating..."
+                      : "Create Discount"}
                   </Button>
                 </div>
               </form>
             </Form>
           </DialogContent>
         </Dialog>
+      </div>
 
-        {/* View Modal */}
-        <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Discount Details</DialogTitle>
-            </DialogHeader>
-            {viewingDiscount && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xl">
-                    {viewingDiscount.code}
-                  </span>
-                  <div className="space-x-2">
-                    <Badge
-                      variant={getStatusBadgeVariant(viewingDiscount.status)}
+      {/* Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Discounts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Array.isArray(discounts) ? discounts.length : 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Discounts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Array.isArray(discounts)
+                ? discounts.filter((d: Discount) => d.status === "active")
+                    .length
+                : 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Scheduled Discounts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Array.isArray(discounts)
+                ? discounts.filter((d: Discount) => d.status === "scheduled")
+                    .length
+                : 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Usage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Array.isArray(discounts)
+                ? discounts.reduce(
+                    (sum: number, d: Discount) => sum + (d.used || 0),
+                    0
+                  )
+                : 0}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Discounts Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Discounts</CardTitle>
+          <CardDescription>
+            Manage your discount codes and their settings
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Array.isArray(discounts) &&
+              discounts.map((discount: Discount) => (
+                <div
+                  key={discount.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-lg">{discount.code}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyDiscountCode(discount.code)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Badge variant={getStatusBadgeVariant(discount.status)}>
+                        {discount.status}
+                      </Badge>
+                      <Badge variant={getTypeBadgeVariant(discount.type)}>
+                        {formatDiscountValue(discount.type, discount.value)}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {discount.description}
+                    </p>
+                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                      <span>Min: ₹{discount.minPurchase || 0}</span>
+                      <span>
+                        Used: {discount.used || 0}/{discount.usageLimit || "∞"}
+                      </span>
+                      <span>
+                        Valid until:{" "}
+                        {format(new Date(discount.endDate), "MMM dd, yyyy")}
+                      </span>
+                      {discount.perUser && <span>One per user</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleView(discount)}
                     >
-                      {viewingDiscount.status}
-                    </Badge>
-                    <Badge variant={getTypeBadgeVariant(viewingDiscount.type)}>
-                      {formatDiscountValue(
-                        viewingDiscount.type,
-                        viewingDiscount.value
-                      )}
-                    </Badge>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(discount)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(discount.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                <p className="text-muted-foreground">
-                  {viewingDiscount.description}
-                </p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Minimum Purchase:</span>
-                    <span>₹{viewingDiscount.minPurchase || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Usage:</span>
-                    <span>
-                      {viewingDiscount.used || 0}/
-                      {viewingDiscount.usageLimit || "∞"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Valid From:</span>
-                    <span>
-                      {format(
-                        new Date(viewingDiscount.startDate),
-                        "MMM dd, yyyy"
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Valid Until:</span>
-                    <span>
-                      {format(
-                        new Date(viewingDiscount.endDate),
-                        "MMM dd, yyyy"
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>One per user:</span>
-                    <span>{viewingDiscount.perUser ? "Yes" : "No"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Created:</span>
-                    <span>
-                      {format(
-                        new Date(viewingDiscount.createdAt),
-                        "MMM dd, yyyy"
-                      )}
-                    </span>
-                  </div>
-                </div>
+              ))}
+            {(!Array.isArray(discounts) || discounts.length === 0) && (
+              <div className="text-center py-8 text-muted-foreground">
+                No discounts found. Create your first discount to get started.
               </div>
             )}
-          </DialogContent>
-        </Dialog>
-      </div>
-    </AdminLayout>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Discount</DialogTitle>
+            <DialogDescription>Update the discount details</DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(onEditSubmit)}
+              className="space-y-4"
+            >
+              {/* Same form fields as create modal */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Discount Code</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Discount Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage</SelectItem>
+                          <SelectItem value="fixed">Fixed Amount</SelectItem>
+                          <SelectItem value="shipping">
+                            Free Shipping
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Value{" "}
+                        {editForm.watch("type") === "percentage"
+                          ? "(%)"
+                          : "(₹)"}
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                          <SelectItem value="disabled">Disabled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={editForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={updateDiscountMutation.isPending}
+                >
+                  {updateDiscountMutation.isPending
+                    ? "Updating..."
+                    : "Update Discount"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Discount Details</DialogTitle>
+          </DialogHeader>
+          {viewingDiscount && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xl">
+                  {viewingDiscount.code}
+                </span>
+                <div className="space-x-2">
+                  <Badge
+                    variant={getStatusBadgeVariant(viewingDiscount.status)}
+                  >
+                    {viewingDiscount.status}
+                  </Badge>
+                  <Badge variant={getTypeBadgeVariant(viewingDiscount.type)}>
+                    {formatDiscountValue(
+                      viewingDiscount.type,
+                      viewingDiscount.value
+                    )}
+                  </Badge>
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                {viewingDiscount.description}
+              </p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Minimum Purchase:</span>
+                  <span>₹{viewingDiscount.minPurchase || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Usage:</span>
+                  <span>
+                    {viewingDiscount.used || 0}/
+                    {viewingDiscount.usageLimit || "∞"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Valid From:</span>
+                  <span>
+                    {format(
+                      new Date(viewingDiscount.startDate),
+                      "MMM dd, yyyy"
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Valid Until:</span>
+                  <span>
+                    {format(new Date(viewingDiscount.endDate), "MMM dd, yyyy")}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>One per user:</span>
+                  <span>{viewingDiscount.perUser ? "Yes" : "No"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Created:</span>
+                  <span>
+                    {format(
+                      new Date(viewingDiscount.createdAt),
+                      "MMM dd, yyyy"
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

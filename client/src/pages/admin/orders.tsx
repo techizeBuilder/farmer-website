@@ -175,7 +175,6 @@ export default function AdminOrders() {
     await fetchOrderDetails(orderId);
   };
 
-
   // Fetch orders from API
   const fetchOrders = async (page = 1, search = "", status = "") => {
     setIsLoading(true);
@@ -566,517 +565,499 @@ export default function AdminOrders() {
 
   return (
     <AdminAuthWrapper>
-      <AdminLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-              <p className="text-muted-foreground">Manage customer orders</p>
-            </div>
-            <DropdownMenu
-              open={showExportMenu}
-              onOpenChange={setShowExportMenu}
-            >
-              <DropdownMenuTrigger asChild>
-                <Button disabled={isExporting}>
-                  {isExporting ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4 mr-2" />
-                  )}
-                  {isExporting ? "Exporting..." : "Export Orders"}
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={handleExportCSV}
-                  disabled={isExporting}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export as CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleExportExcel}
-                  disabled={isExporting}
-                >
-                  <FileSpreadsheet className="h-4 w-4 mr-2" />
-                  Export as Excel
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+            <p className="text-muted-foreground">Manage customer orders</p>
           </div>
+          <DropdownMenu open={showExportMenu} onOpenChange={setShowExportMenu}>
+            <DropdownMenuTrigger asChild>
+              <Button disabled={isExporting}>
+                {isExporting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                {isExporting ? "Exporting..." : "Export Orders"}
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={handleExportCSV}
+                disabled={isExporting}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleExportExcel}
+                disabled={isExporting}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Export as Excel
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          <Card>
-            <CardHeader className="py-4">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <CardTitle>Order List</CardTitle>
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                  <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search orders..."
-                      className="pl-8"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-40">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ORDER_STATUSES.map((status) => (
-                        <SelectItem key={status.value} value={status.value}>
-                          {status.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        <Card>
+          <CardHeader className="py-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <CardTitle>Order List</CardTitle>
+              <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search orders..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ORDER_STATUSES.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="flex justify-center items-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : error ? (
-                <div className="bg-red-50 p-4 rounded-md text-red-500">
-                  {error}
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 p-4 rounded-md text-red-500">
+                {error}
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-nowrap">Order ID</TableHead>
+                        <TableHead className="text-nowrap">Customer</TableHead>
+                        <TableHead className="text-nowrap">Date</TableHead>
+                        <TableHead className="text-nowrap">
+                          Tracking ID
+                        </TableHead>
+                        <TableHead className="text-nowrap">Total</TableHead>
+                        <TableHead className="text-nowrap">
+                          Payment Method
+                        </TableHead>
+                        <TableHead className="text-nowrap">Status</TableHead>
+                        <TableHead className="text-nowrap">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orders.length === 0 ? (
                         <TableRow>
-                          <TableHead className="text-nowrap">
-                            Order ID
-                          </TableHead>
-                          <TableHead className="text-nowrap">
-                            Customer
-                          </TableHead>
-                          <TableHead className="text-nowrap">Date</TableHead>
-                          <TableHead className="text-nowrap">
-                            Tracking ID
-                          </TableHead>
-                          <TableHead className="text-nowrap">Total</TableHead>
-                          <TableHead className="text-nowrap">
-                            Payment Method
-                          </TableHead>
-                          <TableHead className="text-nowrap">Status</TableHead>
-                          <TableHead className="text-nowrap">Actions</TableHead>
+                          <TableCell colSpan={7} className="text-center py-4">
+                            No orders found
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {orders.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={7} className="text-center py-4">
-                              No orders found
+                      ) : (
+                        orders.map((order) => (
+                          <TableRow key={order.id}>
+                            <TableCell className="font-medium text-nowrap">
+                              ORD-{order.id}
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              <div>
+                                <div>{order.userName || "Guest Customer"}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {order.userEmail || "No email"}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              {formatDate(order.createdAt)}
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              <Link
+                                href=""
+                                className="underline"
+                                onClick={() => handleTrackingIdClick(order)}
+                              >
+                                {order?.trackingId || "HGJ567G"}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              {formatCurrency(order.total)}
+                            </TableCell>
+                            <TableCell className="text-nowrap capitalize">
+                              {order.paymentMethod}
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              <Badge
+                                className={getStatusBadgeClass(order.status)}
+                                variant="secondary"
+                              >
+                                {order.status.charAt(0).toUpperCase() +
+                                  order.status.slice(1)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-nowrap">
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleViewOrderDetails(order.id)
+                                  }
+                                  title="View Order Details"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setPrintStickerOrder(order)}
+                                  title="Print Delivery Sticker"
+                                >
+                                  <Printer className="h-4 w-4" />
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <Filter className="h-4 w-4 mr-1" />
+                                      Update
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    {ORDER_STATUSES.filter(
+                                      (status) => status.value !== "all"
+                                    ).map((status) => (
+                                      <DropdownMenuItem
+                                        key={status.value}
+                                        onClick={() =>
+                                          handleUpdateStatus(
+                                            order.id,
+                                            status.value
+                                          )
+                                        }
+                                        disabled={order.status === status.value}
+                                      >
+                                        {status.label}
+                                      </DropdownMenuItem>
+                                    ))}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </TableCell>
                           </TableRow>
-                        ) : (
-                          orders.map((order) => (
-                            <TableRow key={order.id}>
-                              <TableCell className="font-medium text-nowrap">
-                                ORD-{order.id}
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                <div>
-                                  <div>
-                                    {order.userName || "Guest Customer"}
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {order.userEmail || "No email"}
-                                  </div>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                {formatDate(order.createdAt)}
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                <Link
-                                  href=""
-                                  className="underline"
-                                  onClick={() => handleTrackingIdClick(order)}
-                                >
-                                  {order?.trackingId || "HGJ567G"}
-                                </Link>
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                {formatCurrency(order.total)}
-                              </TableCell>
-                              <TableCell className="text-nowrap capitalize">
-                                {order.paymentMethod}
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                <Badge
-                                  className={getStatusBadgeClass(order.status)}
-                                  variant="secondary"
-                                >
-                                  {order.status.charAt(0).toUpperCase() +
-                                    order.status.slice(1)}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-nowrap">
-                                <div className="flex space-x-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleViewOrderDetails(order.id)
-                                    }
-                                    title="View Order Details"
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setPrintStickerOrder(order)}
-                                    title="Print Delivery Sticker"
-                                  >
-                                    <Printer className="h-4 w-4" />
-                                  </Button>
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="sm">
-                                        <Filter className="h-4 w-4 mr-1" />
-                                        Update
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      {ORDER_STATUSES.filter(
-                                        (status) => status.value !== "all"
-                                      ).map((status) => (
-                                        <DropdownMenuItem
-                                          key={status.value}
-                                          onClick={() =>
-                                            handleUpdateStatus(
-                                              order.id,
-                                              status.value
-                                            )
-                                          }
-                                          disabled={
-                                            order.status === status.value
-                                          }
-                                        >
-                                          {status.label}
-                                        </DropdownMenuItem>
-                                      ))}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="flex justify-center mt-6">
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                          Page {currentPage} of {totalPages}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Order Details Modal */}
-          <Dialog
-            open={selectedOrder !== null}
-            onOpenChange={() => {
-              setSelectedOrder(null);
-              setSelectedOrderDetails(null);
-            }}
-          >
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Order Details #{selectedOrder}</DialogTitle>
-              </DialogHeader>
-
-              {orderDetailsLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              ) : selectedOrderDetails ? (
-                <div className="space-y-6">
-                  {/* Order Summary */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">
-                          Order Status
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Badge
-                          variant={
-                            selectedOrderDetails.status === "delivered"
-                              ? "default"
-                              : "secondary"
-                          }
-                        >
-                          {selectedOrderDetails.status
-                            ?.charAt(0)
-                            .toUpperCase() +
-                            selectedOrderDetails.status?.slice(1)}
-                        </Badge>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">
-                          Order Total
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">
-                          ₹{selectedOrderDetails.total}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">
-                          Order Date
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-sm">
-                          {new Date(
-                            selectedOrderDetails.createdAt
-                          ).toLocaleDateString("en-IN", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Customer Information */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Customer Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Customer Name
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedOrderDetails.user?.name ||
-                            selectedOrderDetails.userName ||
-                            "Guest Customer"}
-                        </p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">Email</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedOrderDetails.user?.email ||
-                            selectedOrderDetails.userEmail ||
-                            "No email provided"}
-                        </p>
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label className="text-sm font-medium">
-                          Shipping Address
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedOrderDetails.shippingAddress ||
-                            "No address provided"}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Payment Information */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Payment Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Payment Method
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedOrderDetails.paymentMethod ||
-                            "Not specified"}
-                        </p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Payment ID
-                        </Label>
-                        <p className="text-sm text-muted-foreground font-mono">
-                          {selectedOrderDetails.paymentId || "Not available"}
-                        </p>
-                      </div>
-                      {selectedOrderDetails.payment && (
-                        <>
-                          <div>
-                            <Label className="text-sm font-medium">
-                              Payment Status
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedOrderDetails.payment.status || "Unknown"}
-                            </p>
-                          </div>
-                          <div>
-                            <Label className="text-sm font-medium">
-                              Amount Paid
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                              ₹
-                              {selectedOrderDetails.payment.amount ||
-                                selectedOrderDetails.total}
-                            </p>
-                          </div>
-                        </>
+                        ))
                       )}
-                    </CardContent>
-                  </Card>
+                    </TableBody>
+                  </Table>
+                </div>
 
-                  {/* Order Items */}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center mt-6">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Order Details Modal */}
+        <Dialog
+          open={selectedOrder !== null}
+          onOpenChange={() => {
+            setSelectedOrder(null);
+            setSelectedOrderDetails(null);
+          }}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Order Details #{selectedOrder}</DialogTitle>
+            </DialogHeader>
+
+            {orderDetailsLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : selectedOrderDetails ? (
+              <div className="space-y-6">
+                {/* Order Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Order Items</CardTitle>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Order Status
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {selectedOrderDetails.items &&
-                      selectedOrderDetails.items.length > 0 ? (
-                        <div className="space-y-4">
-                          {selectedOrderDetails.items.map(
-                            (item: any, index: number) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between p-4 border rounded-lg"
-                              >
-                                <div className="flex items-center space-x-4">
-                                  {item.product?.imageUrl && (
-                                    <img
-                                      src={item.product.imageUrl}
-                                      alt={item.product.name}
-                                      className="w-16 h-16 rounded object-cover"
-                                    />
-                                  )}
-                                  <div>
-                                    <h4 className="font-medium">
-                                      {item.product?.name || "Product Name"}
-                                    </h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      SKU: {item.product?.sku || "N/A"}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                      Quantity: {item.quantity}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-medium">₹{item.price}</p>
+                      <Badge
+                        variant={
+                          selectedOrderDetails.status === "delivered"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {selectedOrderDetails.status?.charAt(0).toUpperCase() +
+                          selectedOrderDetails.status?.slice(1)}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Order Total
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        ₹{selectedOrderDetails.total}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Order Date
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-sm">
+                        {new Date(
+                          selectedOrderDetails.createdAt
+                        ).toLocaleDateString("en-IN", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Customer Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Customer Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">
+                        Customer Name
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrderDetails.user?.name ||
+                          selectedOrderDetails.userName ||
+                          "Guest Customer"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Email</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrderDetails.user?.email ||
+                          selectedOrderDetails.userEmail ||
+                          "No email provided"}
+                      </p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label className="text-sm font-medium">
+                        Shipping Address
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrderDetails.shippingAddress ||
+                          "No address provided"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Payment Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Payment Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">
+                        Payment Method
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrderDetails.paymentMethod || "Not specified"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Payment ID</Label>
+                      <p className="text-sm text-muted-foreground font-mono">
+                        {selectedOrderDetails.paymentId || "Not available"}
+                      </p>
+                    </div>
+                    {selectedOrderDetails.payment && (
+                      <>
+                        <div>
+                          <Label className="text-sm font-medium">
+                            Payment Status
+                          </Label>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedOrderDetails.payment.status || "Unknown"}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">
+                            Amount Paid
+                          </Label>
+                          <p className="text-sm text-muted-foreground">
+                            ₹
+                            {selectedOrderDetails.payment.amount ||
+                              selectedOrderDetails.total}
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Order Items */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order Items</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {selectedOrderDetails.items &&
+                    selectedOrderDetails.items.length > 0 ? (
+                      <div className="space-y-4">
+                        {selectedOrderDetails.items.map(
+                          (item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-4 border rounded-lg"
+                            >
+                              <div className="flex items-center space-x-4">
+                                {item.product?.imageUrl && (
+                                  <img
+                                    src={item.product.imageUrl}
+                                    alt={item.product.name}
+                                    className="w-16 h-16 rounded object-cover"
+                                  />
+                                )}
+                                <div>
+                                  <h4 className="font-medium">
+                                    {item.product?.name || "Product Name"}
+                                  </h4>
                                   <p className="text-sm text-muted-foreground">
-                                    Total: ₹{item.price * item.quantity}
+                                    SKU: {item.product?.sku || "N/A"}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Quantity: {item.quantity}
                                   </p>
                                 </div>
                               </div>
-                            )
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">
-                          No items found for this order
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  Failed to load order details
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-          <Dialog
-            open={isTrackingIdModalOpen}
-            onOpenChange={setIsTrackingIdModalOpen}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Update Tracking ID</DialogTitle>
-                <DialogDescription>
-                  Update the tracking ID for order ORD-{editingOrder?.id}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="trackingId" className="text-right">
-                    Tracking ID
-                  </Label>
-                  <Input
-                    id="trackingId"
-                    value={newTrackingId}
-                    onChange={(e) => setNewTrackingId(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Enter tracking ID"
-                  />
-                </div>
+                              <div className="text-right">
+                                <p className="font-medium">₹{item.price}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Total: ₹{item.price * item.quantity}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        No items found for this order
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={handleTrackingIdCancel}>
-                  Cancel
-                </Button>
-                <Button onClick={() => handleTrackingIdSave()}>Save</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          {/* Print Delivery Sticker Modal */}
-          {printStickerOrder && (
-            <PrintableDeliverySticker
-              orderId={printStickerOrder.id}
-              customerName={printStickerOrder.userName || "Guest Customer"}
-              customerEmail={printStickerOrder.userEmail || "No email provided"}
-              shippingAddress={printStickerOrder.shippingAddress}
-              orderTotal={printStickerOrder.total}
-              orderDate={printStickerOrder.createdAt}
-              paymentMethod={printStickerOrder.paymentMethod}
-              onClose={() => setPrintStickerOrder(null)}
-            />
-          )}
-        </div>
-      </AdminLayout>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Failed to load order details
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={isTrackingIdModalOpen}
+          onOpenChange={setIsTrackingIdModalOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Update Tracking ID</DialogTitle>
+              <DialogDescription>
+                Update the tracking ID for order ORD-{editingOrder?.id}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="trackingId" className="text-right">
+                  Tracking ID
+                </Label>
+                <Input
+                  id="trackingId"
+                  value={newTrackingId}
+                  onChange={(e) => setNewTrackingId(e.target.value)}
+                  className="col-span-3"
+                  placeholder="Enter tracking ID"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={handleTrackingIdCancel}>
+                Cancel
+              </Button>
+              <Button onClick={() => handleTrackingIdSave()}>Save</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Print Delivery Sticker Modal */}
+        {printStickerOrder && (
+          <PrintableDeliverySticker
+            orderId={printStickerOrder.id}
+            customerName={printStickerOrder.userName || "Guest Customer"}
+            customerEmail={printStickerOrder.userEmail || "No email provided"}
+            shippingAddress={printStickerOrder.shippingAddress}
+            orderTotal={printStickerOrder.total}
+            orderDate={printStickerOrder.createdAt}
+            paymentMethod={printStickerOrder.paymentMethod}
+            onClose={() => setPrintStickerOrder(null)}
+          />
+        )}
+      </div>
     </AdminAuthWrapper>
   );
 }

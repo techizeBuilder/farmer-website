@@ -337,9 +337,5 @@ function AdminMessages() {
 }
 
 export default function AdminMessagesWithLayout() {
-  return (
-    <AdminLayout>
-      <AdminMessages />
-    </AdminLayout>
-  );
+  return <AdminMessages />;
 }

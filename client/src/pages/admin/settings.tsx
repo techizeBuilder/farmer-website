@@ -176,300 +176,296 @@ export default function AdminSettings() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="container">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Store Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your store information and social media links
-          </p>
-        </div>
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Site Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Site Information
-              </CardTitle>
-              <CardDescription>
-                Basic information about your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="site_name">Site Name</Label>
-                  <Input
-                    id="site_name"
-                    {...form.register("site_name")}
-                    placeholder="HarvestDirect"
-                  />
-                  {form.formState.errors.site_name && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.site_name.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="site_tagline">Site Tagline</Label>
-                  <Input
-                    id="site_tagline"
-                    {...form.register("site_tagline")}
-                    placeholder="Fresh from Farm to Your Table"
-                  />
-                  {form.formState.errors.site_tagline && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.site_tagline.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="site_logo">Site Logo URL (Optional)</Label>
-                <Input
-                  id="site_logo"
-                  {...form.register("site_logo")}
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Store Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Store className="h-5 w-5" />
-                Store Information
-              </CardTitle>
-              <CardDescription>
-                Contact details and address information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="store_email">Email</Label>
-                  <Input
-                    id="store_email"
-                    type="email"
-                    {...form.register("store_email")}
-                    placeholder="contact@harvestdirect.com"
-                  />
-                  {form.formState.errors.store_email && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.store_email.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="store_phone">Phone</Label>
-                  <Input
-                    id="store_phone"
-                    {...form.register("store_phone")}
-                    placeholder="+1 (555) 123-4567"
-                  />
-                  {form.formState.errors.store_phone && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.store_phone.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="store_address">Address</Label>
-                <Input
-                  id="store_address"
-                  {...form.register("store_address")}
-                  placeholder="123 Harvest Lane"
-                />
-                {form.formState.errors.store_address && (
-                  <p className="text-sm text-destructive mt-1">
-                    {form.formState.errors.store_address.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="store_city">City</Label>
-                  <Input
-                    id="store_city"
-                    {...form.register("store_city")}
-                    placeholder="Farmington"
-                  />
-                  {form.formState.errors.store_city && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.store_city.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="store_state">State</Label>
-                  <Input
-                    id="store_state"
-                    {...form.register("store_state")}
-                    placeholder="California"
-                  />
-                  {form.formState.errors.store_state && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.store_state.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="store_zip">ZIP Code</Label>
-                  <Input
-                    id="store_zip"
-                    {...form.register("store_zip")}
-                    placeholder="90210"
-                  />
-                  {form.formState.errors.store_zip && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.store_zip.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="store_country">Country</Label>
-                <Input
-                  id="store_country"
-                  {...form.register("store_country")}
-                  placeholder="United States"
-                />
-                {form.formState.errors.store_country && (
-                  <p className="text-sm text-destructive mt-1">
-                    {form.formState.errors.store_country.message}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Social Media Links */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Social Media Links</CardTitle>
-              <CardDescription>
-                Connect your social media profiles (all optional)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="social_facebook">Facebook</Label>
-                  <Input
-                    id="social_facebook"
-                    {...form.register("social_facebook")}
-                    placeholder="https://facebook.com/harvestdirect"
-                  />
-                  {form.formState.errors.social_facebook && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_facebook.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="social_instagram">Instagram</Label>
-                  <Input
-                    id="social_instagram"
-                    {...form.register("social_instagram")}
-                    placeholder="https://instagram.com/harvestdirect"
-                  />
-                  {form.formState.errors.social_instagram && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_instagram.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="social_twitter">Twitter</Label>
-                  <Input
-                    id="social_twitter"
-                    {...form.register("social_twitter")}
-                    placeholder="https://twitter.com/harvestdirect"
-                  />
-                  {form.formState.errors.social_twitter && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_twitter.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="social_linkedin">LinkedIn</Label>
-                  <Input
-                    id="social_linkedin"
-                    {...form.register("social_linkedin")}
-                    placeholder="https://linkedin.com/company/harvestdirect"
-                  />
-                  {form.formState.errors.social_linkedin && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_linkedin.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="social_youtube">YouTube</Label>
-                  <Input
-                    id="social_youtube"
-                    {...form.register("social_youtube")}
-                    placeholder="https://youtube.com/@harvestdirect"
-                  />
-                  {form.formState.errors.social_youtube && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_youtube.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="social_website">Website</Label>
-                  <Input
-                    id="social_website"
-                    {...form.register("social_website")}
-                    placeholder="https://harvestdirect.com"
-                  />
-                  {form.formState.errors.social_website && (
-                    <p className="text-sm text-destructive mt-1">
-                      {form.formState.errors.social_website.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={updateSettingMutation.isPending}
-              className="min-w-[120px]"
-            >
-              {updateSettingMutation.isPending ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Settings
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
+    <div className="container">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Store Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your store information and social media links
+        </p>
       </div>
-    </AdminLayout>
+
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Site Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              Site Information
+            </CardTitle>
+            <CardDescription>
+              Basic information about your website
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="site_name">Site Name</Label>
+                <Input
+                  id="site_name"
+                  {...form.register("site_name")}
+                  placeholder="HarvestDirect"
+                />
+                {form.formState.errors.site_name && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.site_name.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="site_tagline">Site Tagline</Label>
+                <Input
+                  id="site_tagline"
+                  {...form.register("site_tagline")}
+                  placeholder="Fresh from Farm to Your Table"
+                />
+                {form.formState.errors.site_tagline && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.site_tagline.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="site_logo">Site Logo URL (Optional)</Label>
+              <Input
+                id="site_logo"
+                {...form.register("site_logo")}
+                placeholder="https://example.com/logo.png"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Store Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Store className="h-5 w-5" />
+              Store Information
+            </CardTitle>
+            <CardDescription>
+              Contact details and address information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="store_email">Email</Label>
+                <Input
+                  id="store_email"
+                  type="email"
+                  {...form.register("store_email")}
+                  placeholder="contact@harvestdirect.com"
+                />
+                {form.formState.errors.store_email && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.store_email.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="store_phone">Phone</Label>
+                <Input
+                  id="store_phone"
+                  {...form.register("store_phone")}
+                  placeholder="+1 (555) 123-4567"
+                />
+                {form.formState.errors.store_phone && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.store_phone.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="store_address">Address</Label>
+              <Input
+                id="store_address"
+                {...form.register("store_address")}
+                placeholder="123 Harvest Lane"
+              />
+              {form.formState.errors.store_address && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.store_address.message}
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="store_city">City</Label>
+                <Input
+                  id="store_city"
+                  {...form.register("store_city")}
+                  placeholder="Farmington"
+                />
+                {form.formState.errors.store_city && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.store_city.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="store_state">State</Label>
+                <Input
+                  id="store_state"
+                  {...form.register("store_state")}
+                  placeholder="California"
+                />
+                {form.formState.errors.store_state && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.store_state.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="store_zip">ZIP Code</Label>
+                <Input
+                  id="store_zip"
+                  {...form.register("store_zip")}
+                  placeholder="90210"
+                />
+                {form.formState.errors.store_zip && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.store_zip.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="store_country">Country</Label>
+              <Input
+                id="store_country"
+                {...form.register("store_country")}
+                placeholder="United States"
+              />
+              {form.formState.errors.store_country && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.store_country.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Social Media Links */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Social Media Links</CardTitle>
+            <CardDescription>
+              Connect your social media profiles (all optional)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="social_facebook">Facebook</Label>
+                <Input
+                  id="social_facebook"
+                  {...form.register("social_facebook")}
+                  placeholder="https://facebook.com/harvestdirect"
+                />
+                {form.formState.errors.social_facebook && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_facebook.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="social_instagram">Instagram</Label>
+                <Input
+                  id="social_instagram"
+                  {...form.register("social_instagram")}
+                  placeholder="https://instagram.com/harvestdirect"
+                />
+                {form.formState.errors.social_instagram && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_instagram.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="social_twitter">Twitter</Label>
+                <Input
+                  id="social_twitter"
+                  {...form.register("social_twitter")}
+                  placeholder="https://twitter.com/harvestdirect"
+                />
+                {form.formState.errors.social_twitter && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_twitter.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="social_linkedin">LinkedIn</Label>
+                <Input
+                  id="social_linkedin"
+                  {...form.register("social_linkedin")}
+                  placeholder="https://linkedin.com/company/harvestdirect"
+                />
+                {form.formState.errors.social_linkedin && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_linkedin.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="social_youtube">YouTube</Label>
+                <Input
+                  id="social_youtube"
+                  {...form.register("social_youtube")}
+                  placeholder="https://youtube.com/@harvestdirect"
+                />
+                {form.formState.errors.social_youtube && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_youtube.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="social_website">Website</Label>
+                <Input
+                  id="social_website"
+                  {...form.register("social_website")}
+                  placeholder="https://harvestdirect.com"
+                />
+                {form.formState.errors.social_website && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.social_website.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={updateSettingMutation.isPending}
+            className="min-w-[120px]"
+          >
+            {updateSettingMutation.isPending ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Settings
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

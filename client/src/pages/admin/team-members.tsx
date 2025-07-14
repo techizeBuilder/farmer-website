@@ -538,9 +538,5 @@ function TeamMembersAdmin() {
 }
 
 export default function TeamMembersAdminWithLayout() {
-  return (
-    <AdminLayout>
-      <TeamMembersAdmin />
-    </AdminLayout>
-  );
+  return <TeamMembersAdmin />;
 }

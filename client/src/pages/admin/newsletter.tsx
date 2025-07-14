@@ -2,7 +2,14 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Mail, User, Calendar, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
@@ -32,7 +39,9 @@ export default function NewsletterSubscriptionsPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/newsletter-subscriptions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/admin/newsletter-subscriptions"],
+      });
       toast({
         title: "Success",
         description: "Newsletter subscription deleted successfully",
@@ -52,47 +61,46 @@ export default function NewsletterSubscriptionsPage() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Newsletter Subscriptions</h1>
-          </div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-          </div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Newsletter Subscriptions</h1>
         </div>
-      </AdminLayout>
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Newsletter Subscriptions</h1>
-          </div>
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-red-600">Failed to load newsletter subscriptions</p>
-            </CardContent>
-          </Card>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Newsletter Subscriptions</h1>
         </div>
-      </AdminLayout>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-red-600">
+              Failed to load newsletter subscriptions
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   const subscriptions = data?.subscriptions || [];
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Newsletter Subscriptions</h1>
         <div className="flex items-center gap-2">
           <Mail className="h-5 w-5" />
-          <span className="text-sm text-gray-600">{subscriptions.length} total subscriptions</span>
+          <span className="text-sm text-gray-600">
+            {subscriptions.length} total subscriptions
+          </span>
         </div>
       </div>
 
@@ -100,7 +108,9 @@ export default function NewsletterSubscriptionsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Subscriptions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Subscriptions
+            </CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -110,12 +120,14 @@ export default function NewsletterSubscriptionsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Consented Users</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Consented Users
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {subscriptions.filter(sub => sub.agreedToTerms).length}
+              {subscriptions.filter((sub) => sub.agreedToTerms).length}
             </div>
           </CardContent>
         </Card>
@@ -127,11 +139,16 @@ export default function NewsletterSubscriptionsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {subscriptions.filter(sub => {
-                const subDate = new Date(sub.createdAt);
-                const now = new Date();
-                return subDate.getMonth() === now.getMonth() && subDate.getFullYear() === now.getFullYear();
-              }).length}
+              {
+                subscriptions.filter((sub) => {
+                  const subDate = new Date(sub.createdAt);
+                  const now = new Date();
+                  return (
+                    subDate.getMonth() === now.getMonth() &&
+                    subDate.getFullYear() === now.getFullYear()
+                  );
+                }).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -162,15 +179,24 @@ export default function NewsletterSubscriptionsPage() {
               <TableBody>
                 {subscriptions.map((subscription) => (
                   <TableRow key={subscription.id}>
-                    <TableCell className="font-medium">{subscription.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {subscription.name}
+                    </TableCell>
                     <TableCell>{subscription.email}</TableCell>
                     <TableCell>
-                      <Badge variant={subscription.agreedToTerms ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          subscription.agreedToTerms ? "default" : "secondary"
+                        }
+                      >
                         {subscription.agreedToTerms ? "Agreed" : "Not Agreed"}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {format(new Date(subscription.createdAt), "MMM dd, yyyy 'at' h:mm a")}
+                      {format(
+                        new Date(subscription.createdAt),
+                        "MMM dd, yyyy 'at' h:mm a"
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -180,7 +206,9 @@ export default function NewsletterSubscriptionsPage() {
                         disabled={deletingId === subscription.id}
                       >
                         <Trash2 className="h-4 w-4" />
-                        {deletingId === subscription.id ? "Deleting..." : "Delete"}
+                        {deletingId === subscription.id
+                          ? "Deleting..."
+                          : "Delete"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -190,7 +218,6 @@ export default function NewsletterSubscriptionsPage() {
           )}
         </CardContent>
       </Card>
-      </div>
-    </AdminLayout>
+    </div>
   );
 }

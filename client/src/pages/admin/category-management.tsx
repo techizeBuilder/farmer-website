@@ -311,264 +311,260 @@ export default function CategoryManagement() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading categories...</p>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading categories...</p>
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="container ">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-forest">
-              Category Management
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Manage product categories and subcategories
-            </p>
-          </div>
-          <Button
-            onClick={() => setShowCreateDialog(true)}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Category
-          </Button>
+    <div className="container ">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-forest">
+            Category Management
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage product categories and subcategories
+          </p>
         </div>
+        <Button
+          onClick={() => setShowCreateDialog(true)}
+          className="bg-primary hover:bg-primary/90"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Category
+        </Button>
+      </div>
 
-        {/* Categories List */}
-        <div className="space-y-4">
-          {categories.map((category) => (
-            <Card key={category.id}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleCategoryExpansion(category.id)}
-                      disabled={!subcategories[category.id]?.length}
-                    >
-                      {expandedCategories.has(category.id) ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <div>
-                      <h3 className="text-lg font-semibold">{category.name}</h3>
-                      {category.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {category.description}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Slug: {category.slug} | Created:{" "}
-                        {new Date(category.createdAt).toLocaleDateString()}
+      {/* Categories List */}
+      <div className="space-y-4">
+        {categories.map((category) => (
+          <Card key={category.id}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleCategoryExpansion(category.id)}
+                    disabled={!subcategories[category.id]?.length}
+                  >
+                    {expandedCategories.has(category.id) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <div>
+                    <h3 className="text-lg font-semibold">{category.name}</h3>
+                    {category.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {category.description}
                       </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openCreateSubcategoryDialog(category)}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Subcategory
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditDialog(category)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteCategory(category)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Slug: {category.slug} | Created:{" "}
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openCreateSubcategoryDialog(category)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Subcategory
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openEditDialog(category)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => deleteCategory(category)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
-                {/* Subcategories */}
-                {expandedCategories.has(category.id) &&
-                  subcategories[category.id] && (
-                    <div className="mt-4 ml-8 space-y-2">
-                      {subcategories[category.id].map((subcategory) => (
-                        <Card key={subcategory.id} className="bg-muted/50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-medium">
-                                  {subcategory.name}
-                                </h4>
-                                {subcategory.description && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {subcategory.description}
-                                  </p>
-                                )}
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Slug: {subcategory.slug} | Created:{" "}
-                                  {new Date(
-                                    subcategory.createdAt
-                                  ).toLocaleDateString()}
+              {/* Subcategories */}
+              {expandedCategories.has(category.id) &&
+                subcategories[category.id] && (
+                  <div className="mt-4 ml-8 space-y-2">
+                    {subcategories[category.id].map((subcategory) => (
+                      <Card key={subcategory.id} className="bg-muted/50">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium">
+                                {subcategory.name}
+                              </h4>
+                              {subcategory.description && (
+                                <p className="text-sm text-muted-foreground">
+                                  {subcategory.description}
                                 </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openEditDialog(subcategory)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => deleteCategory(subcategory)}
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Slug: {subcategory.slug} | Created:{" "}
+                                {new Date(
+                                  subcategory.createdAt
+                                ).toLocaleDateString()}
+                              </p>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Create Category Dialog */}
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Category</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="category-name">Category Name</Label>
-                <Input
-                  id="category-name"
-                  value={categoryName}
-                  onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="Enter category name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="category-description">
-                  Description (Optional)
-                </Label>
-                <Input
-                  id="category-description"
-                  value={categoryDescription}
-                  onChange={(e) => setCategoryDescription(e.target.value)}
-                  placeholder="Enter category description"
-                />
-              </div>
-              <Button onClick={createCategory} disabled={!categoryName.trim()}>
-                Create Category
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit Category Dialog */}
-        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                Edit {editingCategory?.parentId ? "Subcategory" : "Category"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="edit-category-name">Name</Label>
-                <Input
-                  id="edit-category-name"
-                  value={categoryName}
-                  onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="Enter category name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-category-description">
-                  Description (Optional)
-                </Label>
-                <Input
-                  id="edit-category-description"
-                  value={categoryDescription}
-                  onChange={(e) => setCategoryDescription(e.target.value)}
-                  placeholder="Enter category description"
-                />
-              </div>
-              <Button onClick={updateCategory} disabled={!categoryName.trim()}>
-                Update {editingCategory?.parentId ? "Subcategory" : "Category"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Create Subcategory Dialog */}
-        <Dialog
-          open={showCreateSubcategoryDialog}
-          onOpenChange={setShowCreateSubcategoryDialog}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Subcategory</DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                Adding subcategory to: {selectedCategory?.name}
-              </p>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="subcategory-name">Subcategory Name</Label>
-                <Input
-                  id="subcategory-name"
-                  value={subcategoryName}
-                  onChange={(e) => setSubcategoryName(e.target.value)}
-                  placeholder="Enter subcategory name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="subcategory-description">
-                  Description (Optional)
-                </Label>
-                <Input
-                  id="subcategory-description"
-                  value={subcategoryDescription}
-                  onChange={(e) => setSubcategoryDescription(e.target.value)}
-                  placeholder="Enter subcategory description"
-                />
-              </div>
-              <Button
-                onClick={createSubcategory}
-                disabled={!subcategoryName.trim()}
-              >
-                Create Subcategory
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openEditDialog(subcategory)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => deleteCategory(subcategory)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </AdminLayout>
+
+      {/* Create Category Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Category</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="category-name">Category Name</Label>
+              <Input
+                id="category-name"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="Enter category name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category-description">
+                Description (Optional)
+              </Label>
+              <Input
+                id="category-description"
+                value={categoryDescription}
+                onChange={(e) => setCategoryDescription(e.target.value)}
+                placeholder="Enter category description"
+              />
+            </div>
+            <Button onClick={createCategory} disabled={!categoryName.trim()}>
+              Create Category
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Edit {editingCategory?.parentId ? "Subcategory" : "Category"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-category-name">Name</Label>
+              <Input
+                id="edit-category-name"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="Enter category name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-category-description">
+                Description (Optional)
+              </Label>
+              <Input
+                id="edit-category-description"
+                value={categoryDescription}
+                onChange={(e) => setCategoryDescription(e.target.value)}
+                placeholder="Enter category description"
+              />
+            </div>
+            <Button onClick={updateCategory} disabled={!categoryName.trim()}>
+              Update {editingCategory?.parentId ? "Subcategory" : "Category"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Subcategory Dialog */}
+      <Dialog
+        open={showCreateSubcategoryDialog}
+        onOpenChange={setShowCreateSubcategoryDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Subcategory</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Adding subcategory to: {selectedCategory?.name}
+            </p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="subcategory-name">Subcategory Name</Label>
+              <Input
+                id="subcategory-name"
+                value={subcategoryName}
+                onChange={(e) => setSubcategoryName(e.target.value)}
+                placeholder="Enter subcategory name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="subcategory-description">
+                Description (Optional)
+              </Label>
+              <Input
+                id="subcategory-description"
+                value={subcategoryDescription}
+                onChange={(e) => setSubcategoryDescription(e.target.value)}
+                placeholder="Enter subcategory description"
+              />
+            </div>
+            <Button
+              onClick={createSubcategory}
+              disabled={!subcategoryName.trim()}
+            >
+              Create Subcategory
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
