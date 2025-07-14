@@ -26,7 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-
+import placeholderImage from "../../../../public/uploads/products/No-Image.png";
 interface Product {
   id: number;
   name: string;
@@ -354,6 +354,9 @@ export default function AdminInventory() {
                                     <img
                                       src={product.imageUrl}
                                       alt={product.name}
+                                      onError={(e) => {
+                                        e.currentTarget.src = placeholderImage;
+                                      }}
                                       className="w-10 h-10 rounded object-cover"
                                     />
                                   )}
@@ -365,7 +368,7 @@ export default function AdminInventory() {
                                 </div>
                               </td>
                               <td className="p-2 text-sm text-muted-foreground">
-                                {product.sku}
+                                {product.sku || "-"}
                               </td>
                               <td className="p-2">
                                 <Badge variant="outline">

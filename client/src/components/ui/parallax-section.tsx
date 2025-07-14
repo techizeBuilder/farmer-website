@@ -11,47 +11,48 @@ interface ParallaxSectionProps {
 
 export function ParallaxSection({
   backgroundUrl,
-  opacity = 0.6,  // Increased opacity for better text contrast
+  opacity = 0.6, // Increased opacity for better text contrast
   children,
   className = "",
-  overlayColor = "bg-forest"
+  overlayColor = "bg-forest",
 }: ParallaxSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [windowHeight, setWindowHeight] = useState(0);
-  
+
   useEffect(() => {
     const handleResize = () => {
       setWindowHeight(window.innerHeight);
     };
-    
+
     handleResize();
     window.addEventListener("resize", handleResize);
-    
+
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end start"],
   });
-  
+
   const y = useTransform(scrollYProgress, [0, 1], [0, windowHeight * 0.2]);
 
   return (
-    <section ref={sectionRef} className={`relative overflow-hidden ${className}`}>
-      <motion.div 
+    <section
+      ref={sectionRef}
+      className={`relative overflow-hidden ${className}`}
+    >
+      <motion.div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
+        style={{
           backgroundImage: `url(${backgroundUrl})`,
-          y
+          // y,
         }}
       />
       <div className="absolute inset-0 bg-black bg-opacity-70" />
-      <div className="relative z-10">
-        {children}
-      </div>
+      <div className="relative z-10">{children}</div>
     </section>
   );
 }

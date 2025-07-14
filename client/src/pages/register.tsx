@@ -170,7 +170,7 @@ export default function Register() {
   };
 
   return (
-    <div className="container mx-auto py-10 flex justify-center relative top-14">
+    <div className="container mx-auto py-10 flex justify-center relative top-14 mb-10">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">
