@@ -742,7 +742,7 @@ export default function EnhancedAdminProducts() {
                     ) : (
                       filteredProducts.map((product) => (
                         <TableRow key={product.id}>
-                          <TableCell>
+                          <TableCell className="w-[250px]">
                             <div className="flex items-center space-x-3">
                               <div className="relative">
                                 <img
@@ -752,7 +752,7 @@ export default function EnhancedAdminProducts() {
                                       : placeHolderImage
                                   }
                                   alt={product.name}
-                                  className="w-20 h-14 rounded object-cover border"
+                                  className="w-50 h-14 rounded object-cover border"
                                   // onError={(e) => {
                                   //   const target = e.target as HTMLImageElement;
                                   //   target.src = '/api/images/placeholder.png';
@@ -778,8 +778,10 @@ export default function EnhancedAdminProducts() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{product.category}</TableCell>
-                          <TableCell>
+                          <TableCell className="w-[150px]">
+                            {product.category}
+                          </TableCell>
+                          <TableCell className="w-[150px]">
                             <div>
                               <p>₹{product.price.toFixed(2)}</p>
                               {product.discountPrice && (
@@ -789,7 +791,7 @@ export default function EnhancedAdminProducts() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="w-[150px]">
                             {product.stockQuantity === 0 ? (
                               <Badge variant="destructive">Out of Stock</Badge>
                             ) : product.stockQuantity < 10 ? (
@@ -802,19 +804,29 @@ export default function EnhancedAdminProducts() {
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-1">
+                          <TableCell className="w-[160px]">
+                            <div className="flex flex-col gap-1 space-x-1">
                               {product.naturallyGrown && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Leaf className="h-3 w-3 mr-1" />
-                                  Natural
-                                </Badge>
+                                <>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    <Leaf className="h-3 w-3 mr-1" />
+                                    Natural
+                                  </Badge>
+                                </>
                               )}
                               {product.chemicalFree && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Chemical-Free
-                                </Badge>
+                                <>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    <Shield className="h-3 w-3 mr-1" />
+                                    Chemical-Free
+                                  </Badge>
+                                </>
                               )}
                               {product.premiumQuality && (
                                 <Badge variant="secondary" className="text-xs">
@@ -1152,12 +1164,15 @@ export default function EnhancedAdminProducts() {
                                 type="number"
                                 step="0.01"
                                 placeholder="0.00"
-                                {...field}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
+                                {...(!isCreateDialogOpen ? field : {})}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value);
+                                  if (value < 0) {
+                                    e.target.value = "0";
+                                  } else {
+                                    field.onChange(value);
+                                  }
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
@@ -1176,12 +1191,15 @@ export default function EnhancedAdminProducts() {
                                 type="number"
                                 step="0.01"
                                 placeholder="Optional discount price"
-                                {...field}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    parseFloat(e.target.value) || undefined
-                                  )
-                                }
+                                {...(!isCreateDialogOpen ? field : {})}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value);
+                                  if (value < 0) {
+                                    e.target.value = "0";
+                                  } else {
+                                    field.onChange(value);
+                                  }
+                                }}
                               />
                             </FormControl>
                             <FormDescription>
@@ -1204,10 +1222,15 @@ export default function EnhancedAdminProducts() {
                               <Input
                                 type="number"
                                 placeholder="100"
-                                {...field}
-                                onChange={(e) =>
-                                  field.onChange(parseInt(e.target.value) || 0)
-                                }
+                                {...(!isCreateDialogOpen ? field : {})}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value);
+                                  if (value < 0) {
+                                    e.target.value = "0";
+                                  } else {
+                                    field.onChange(value);
+                                  }
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
