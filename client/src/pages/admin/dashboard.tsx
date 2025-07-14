@@ -67,7 +67,7 @@ export default function AdminDashboard() {
             },
           }
         );
-
+        console.log("response++", response);
         if (!response.ok) {
           throw new Error("Failed to fetch dashboard data");
         }

@@ -89,7 +89,7 @@ export default function Footer() {
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       toast({
@@ -114,7 +114,7 @@ export default function Footer() {
   const fetchMainCategories = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/main`,
+        `${import.meta.env.VITE_API_URL}/api/categories/main`
       );
       if (response.ok) {
         const data = await response.json();
@@ -251,7 +251,7 @@ export default function Footer() {
                   onClick={() => handleCategoryChange(null)}
                   className={cn(
                     "text-white/90 hover:text-[#DDA15E] transition-all duration-300 flex items-center",
-                    !categoryParam && "text-[#DDA15E] font-medium",
+                    !categoryParam && "text-[#DDA15E] font-medium"
                   )}
                 >
                   All Products
@@ -264,7 +264,7 @@ export default function Footer() {
                     className={cn(
                       "text-white/90 hover:text-[#DDA15E] transition-all duration-300 flex items-center",
                       categoryParam === category.name &&
-                        "text-[#DDA15E] font-medium",
+                        "text-[#DDA15E] font-medium"
                     )}
                   >
                     <svg

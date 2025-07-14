@@ -157,6 +157,7 @@
   .animate-pulse-custom {
     animation: pulse 0.5s ease-in-out;
   }
+
   .shimmer {
     position: relative;
     overflow: hidden;

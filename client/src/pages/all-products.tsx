@@ -77,7 +77,7 @@ export default function AllProducts() {
   // State for filters and pagination - initialize from URL parameters
   const [searchQuery, setSearchQuery] = useState(searchParam || "");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryParam || category  || null
+    categoryParam || category || null
   );
 
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
@@ -150,7 +150,7 @@ export default function AllProducts() {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/products?${queryString}`
       );
-      console.log(response,"nidhi")
+      console.log(response, "nidhi");
       if (!response.ok) {
         throw new Error(`Failed to fetch products: ${response.status}`);
       }
@@ -284,7 +284,9 @@ export default function AllProducts() {
 
     if ((searchParam || "") !== searchQuery) {
       setSearchQuery(searchParam || "");
-      const searchInput = document.getElementById("product-search") as HTMLInputElement;
+      const searchInput = document.getElementById(
+        "product-search"
+      ) as HTMLInputElement;
       if (searchInput) searchInput.value = searchParam || "";
     }
 
@@ -604,7 +606,7 @@ export default function AllProducts() {
                 transition={{ duration: 0.3 }}
                 className="lg:block overflow-hidden"
               >
-                <div className="bg-white p-6 rounded-lg shadow-sm sticky top-32">
+                <div className="bg-white p-6 rounded-lg shadow-sm sticky top-32 ">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="font-heading text-forest text-xl font-semibold">
                       Filters
@@ -613,7 +615,7 @@ export default function AllProducts() {
                       variant="ghost"
                       size="sm"
                       onClick={resetFilters}
-                      className="text-primary hover:text-primary-dark"
+                      className="text-primary hover:text-white"
                     >
                       Reset All
                     </Button>
@@ -670,7 +672,7 @@ export default function AllProducts() {
                               "w-full justify-start font-normal",
                               isSelected
                                 ? "bg-primary/10 text-primary font-medium"
-                                : "text-foreground hover:bg-muted"
+                                : "hover:text-black hover:bg-muted"
                             )}
                             onClick={() => handleCategoryChange(category.name)}
                           >
