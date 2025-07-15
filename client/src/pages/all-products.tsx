@@ -558,7 +558,7 @@ export default function AllProducts() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     updateURL({ page: page.toString() });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Debounced search handler
@@ -569,7 +569,7 @@ export default function AllProducts() {
   // Reset filters
   const resetFilters = () => {
     // Immediate scroll to top
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 
     setSearchQuery("");
     setSelectedCategory(null);

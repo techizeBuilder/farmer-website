@@ -43,34 +43,36 @@ interface Category {
   parentId?: number;
   createdAt: string;
 }
-
 export default function CategoryManagement() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<{
     [key: number]: Category[];
   }>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showCreateSubcategoryDialog, setShowCreateSubcategoryDialog] =
-    useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(
     new Set()
   );
-  const { toast } = useToast();
 
-  // Form states
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showCreateSubcategoryDialog, setShowCreateSubcategoryDialog] =
+    useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+
   const [categoryName, setCategoryName] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
   const [subcategoryName, setSubcategoryName] = useState("");
   const [subcategoryDescription, setSubcategoryDescription] = useState("");
 
-  // Fetch all categories and subcategories
-  const fetchCategories = async () => {
+  const { toast } = useToast();
+
+  const fetchCategories = async (
+    preserveExpanded = false,
+    categoryIdToPreserve?: number
+  ) => {
     try {
       const token = localStorage.getItem("adminToken");
       if (!token) return;
@@ -84,7 +86,6 @@ export default function CategoryManagement() {
       if (response.ok) {
         const allCategories = await response.json();
 
-        // Separate main categories and subcategories
         const mainCategories = allCategories.filter(
           (cat: Category) => !cat.parentId
         );
@@ -101,6 +102,15 @@ export default function CategoryManagement() {
 
         setCategories(mainCategories);
         setSubcategories(subcategoriesMap);
+
+        // Preserve expanded state if requested
+        if (preserveExpanded && categoryIdToPreserve) {
+          setExpandedCategories((prev) => {
+            const newExpanded = new Set(prev);
+            newExpanded.add(categoryIdToPreserve);
+            return newExpanded;
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -114,13 +124,10 @@ export default function CategoryManagement() {
     }
   };
 
-  // Create new category
   const createCategory = async () => {
-    if (!categoryName.trim()) return;
-
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch("/api/admin/categories", {
+      const res = await fetch("/api/admin/categories", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,86 +135,66 @@ export default function CategoryManagement() {
         },
         body: JSON.stringify({
           name: categoryName.trim(),
-          description: categoryDescription.trim() || undefined,
+          description: categoryDescription || undefined,
         }),
       });
-
-      if (response.ok) {
+      if (res.ok) {
         await fetchCategories();
         setShowCreateDialog(false);
         setCategoryName("");
         setCategoryDescription("");
-        toast({
-          title: "Success",
-          description: "Category created successfully",
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message);
+        toast({ title: "Success", description: "Category created" });
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to create category",
+        description: "Failed to create category",
         variant: "destructive",
       });
     }
   };
 
-  // Create new subcategory
   const createSubcategory = async () => {
-    if (!subcategoryName.trim() || !selectedCategory) return;
-
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch("/api/admin/categories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: subcategoryName.trim(),
-          description: subcategoryDescription.trim() || undefined,
-          parentId: selectedCategory.id,
-        }),
-      });
-
-      if (response.ok) {
+      const res = await fetch(
+        `/api/admin/categories/${selectedCategory?.id}/subcategories`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: subcategoryName.trim(),
+            description: subcategoryDescription || undefined,
+          }),
+        }
+      );
+      if (res.ok) {
         await fetchCategories();
         setShowCreateSubcategoryDialog(false);
         setSubcategoryName("");
         setSubcategoryDescription("");
         setSelectedCategory(null);
-        toast({
-          title: "Success",
-          description: "Subcategory created successfully",
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message);
+        toast({ title: "Success", description: "Subcategory created" });
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to create subcategory",
+        description: "Failed to create subcategory",
         variant: "destructive",
       });
     }
   };
 
-  // Update category
   const updateCategory = async () => {
-    if (!categoryName.trim() || !editingCategory) return;
-
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `/api/admin/categories/${editingCategory.id}`,
+      const res = await fetch(
+        editingCategory?.parentId
+          ? `/api/admin/subcategories/${editingCategory.id}`
+          : `/api/admin/categories/${editingCategory?.id}`,
         {
           method: "PUT",
           headers: {
@@ -216,92 +203,115 @@ export default function CategoryManagement() {
           },
           body: JSON.stringify({
             name: categoryName.trim(),
-            description: categoryDescription.trim() || undefined,
+            description: categoryDescription || undefined,
           }),
         }
       );
-
-      if (response.ok) {
-        await fetchCategories();
+      if (res.ok) {
+        if (editingCategory?.parentId) {
+          // Preserve the parent's expanded state
+          await fetchCategories(true, editingCategory.parentId);
+        } else {
+          // Preserve this category's expanded state
+          await fetchCategories(true, editingCategory?.id);
+        }
         setShowEditDialog(false);
-        setCategoryName("");
-        setCategoryDescription("");
         setEditingCategory(null);
-        toast({
-          title: "Success",
-          description: `${
-            editingCategory.parentId ? "Subcategory" : "Category"
-          } updated successfully`,
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message);
+        toast({ title: "Updated", description: "Category updated" });
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update category",
+        description: "Failed to update",
         variant: "destructive",
       });
     }
   };
 
-  // Delete category
   const deleteCategory = async (category: Category) => {
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch(`/api/admin/categories/${category.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        await fetchCategories();
-        toast({
-          title: "Success",
-          description: `${
-            category.parentId ? "Subcategory" : "Category"
-          } deleted successfully`,
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message);
+      const res = await fetch(
+        category.parentId
+          ? `/api/admin/subcategories/${category.id}`
+          : `/api/admin/categories/${category.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.ok) {
+        if (category.parentId) {
+          // Preserve the parent's expanded state
+          await fetchCategories(true, category.parentId);
+        } else {
+          await fetchCategories();
+        }
+        toast({ title: "Deleted", description: "Category deleted" });
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to delete category",
+        description: "Delete failed",
         variant: "destructive",
       });
     }
   };
 
-  // Toggle category expansion
   const toggleCategoryExpansion = (categoryId: number) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
-    setExpandedCategories(newExpanded);
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+
+        // Only fetch if we don't already have the subcategories
+        if (!subcategories[categoryId]) {
+          fetchSubcategories(categoryId);
+        }
+      }
+      return newSet;
+    });
   };
 
-  // Open edit dialog
-  const openEditDialog = (category: Category) => {
-    setEditingCategory(category);
-    setCategoryName(category.name);
-    setCategoryDescription(category.description || "");
+  const fetchSubcategories = async (categoryId: number) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await fetch(
+        `/api/admin/categories/${categoryId}/subcategories`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const subs = await res.json();
+        setSubcategories((prev) => ({
+          ...prev,
+          [categoryId]: subs,
+        }));
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load subcategories",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openEditDialog = (cat: Category) => {
+    setEditingCategory(cat);
+    setCategoryName(cat.name);
+    setCategoryDescription(cat.description || "");
     setShowEditDialog(true);
   };
 
-  // Open create subcategory dialog
-  const openCreateSubcategoryDialog = (category: Category) => {
-    setSelectedCategory(category);
+  const openCreateSubcategoryDialog = (cat: Category) => {
+    setSelectedCategory(cat);
     setShowCreateSubcategoryDialog(true);
   };
 
@@ -310,184 +320,135 @@ export default function CategoryManagement() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading categories...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <div className="text-center py-10">Loading...</div>;
   }
 
   return (
-    <div className="container ">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-forest">
-            Category Management
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage product categories and subcategories
-          </p>
-        </div>
-        <Button
-          onClick={() => setShowCreateDialog(true)}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Category
+    <div className="container py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Category Management</h1>
+        <Button onClick={() => setShowCreateDialog(true)}>
+          <Plus className="w-4 h-4 mr-2" /> Add Category
         </Button>
       </div>
 
-      {/* Categories List */}
-      <div className="space-y-4">
-        {categories.map((category) => (
-          <Card key={category.id}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleCategoryExpansion(category.id)}
-                    disabled={!subcategories[category.id]?.length}
-                  >
-                    {expandedCategories.has(category.id) ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <div>
-                    <h3 className="text-lg font-semibold">{category.name}</h3>
-                    {category.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {category.description}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Slug: {category.slug} | Created:{" "}
-                      {new Date(category.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openCreateSubcategoryDialog(category)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Subcategory
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openEditDialog(category)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => deleteCategory(category)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+      {categories.map((cat) => (
+        <Card key={cat.id} className="mb-4">
+          <CardContent className="p-4">
+            <div className="flex justify-between">
+              <div className="flex items-start gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleCategoryExpansion(cat.id)}
+                >
+                  {expandedCategories.has(cat.id) ? (
+                    <ChevronDown />
+                  ) : (
+                    <ChevronRight />
+                  )}
+                </Button>
+                <div>
+                  <h3 className="font-semibold">{cat.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {cat.description}
+                  </p>
                 </div>
               </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openCreateSubcategoryDialog(cat)}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Subcategory
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openEditDialog(cat)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => deleteCategory(cat)}
+                  className="text-red-600"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
 
-              {/* Subcategories */}
-              {expandedCategories.has(category.id) &&
-                subcategories[category.id] && (
-                  <div className="mt-4 ml-8 space-y-2">
-                    {subcategories[category.id].map((subcategory) => (
-                      <Card key={subcategory.id} className="bg-muted/50">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-medium">
-                                {subcategory.name}
-                              </h4>
-                              {subcategory.description && (
-                                <p className="text-sm text-muted-foreground">
-                                  {subcategory.description}
-                                </p>
-                              )}
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Slug: {subcategory.slug} | Created:{" "}
-                                {new Date(
-                                  subcategory.createdAt
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => openEditDialog(subcategory)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteCategory(subcategory)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+            {/* Subcategories */}
+            <AnimatePresence>
+              {expandedCategories.has(cat.id) &&
+                subcategories[cat.id]?.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="ml-8 mt-4 space-y-2"
+                  >
+                    {subcategories[cat.id].map((sub) => (
+                      <Card key={sub.id} className="bg-muted/50">
+                        <CardContent className="p-3 flex justify-between items-center">
+                          <div>
+                            <h4>{sub.name}</h4>
+                            <p className="text-xs text-muted-foreground">
+                              {sub.description}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditDialog(sub)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => deleteCategory(sub)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
-                  </div>
+                  </motion.div>
                 )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      ))}
 
       {/* Create Category Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Category</DialogTitle>
+            <DialogTitle>Create Category</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="category-name">Category Name</Label>
-              <Input
-                id="category-name"
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="Enter category name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="category-description">
-                Description (Optional)
-              </Label>
-              <Input
-                id="category-description"
-                value={categoryDescription}
-                onChange={(e) => setCategoryDescription(e.target.value)}
-                placeholder="Enter category description"
-              />
-            </div>
-            <Button onClick={createCategory} disabled={!categoryName.trim()}>
-              Create Category
-            </Button>
-          </div>
+          <Label>Name</Label>
+          <Input
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+          />
+          <Label>Description</Label>
+          <Input
+            value={categoryDescription}
+            onChange={(e) => setCategoryDescription(e.target.value)}
+          />
+          <Button onClick={createCategory}>Create</Button>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Category Dialog */}
+      {/* Edit Category/Subcategory Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
@@ -495,31 +456,17 @@ export default function CategoryManagement() {
               Edit {editingCategory?.parentId ? "Subcategory" : "Category"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-category-name">Name</Label>
-              <Input
-                id="edit-category-name"
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="Enter category name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-category-description">
-                Description (Optional)
-              </Label>
-              <Input
-                id="edit-category-description"
-                value={categoryDescription}
-                onChange={(e) => setCategoryDescription(e.target.value)}
-                placeholder="Enter category description"
-              />
-            </div>
-            <Button onClick={updateCategory} disabled={!categoryName.trim()}>
-              Update {editingCategory?.parentId ? "Subcategory" : "Category"}
-            </Button>
-          </div>
+          <Label>Name</Label>
+          <Input
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+          />
+          <Label>Description</Label>
+          <Input
+            value={categoryDescription}
+            onChange={(e) => setCategoryDescription(e.target.value)}
+          />
+          <Button onClick={updateCategory}>Update</Button>
         </DialogContent>
       </Dialog>
 
@@ -530,39 +477,21 @@ export default function CategoryManagement() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Subcategory</DialogTitle>
-            <p className="text-sm text-muted-foreground">
-              Adding subcategory to: {selectedCategory?.name}
-            </p>
+            <DialogTitle>
+              Add Subcategory to {selectedCategory?.name}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="subcategory-name">Subcategory Name</Label>
-              <Input
-                id="subcategory-name"
-                value={subcategoryName}
-                onChange={(e) => setSubcategoryName(e.target.value)}
-                placeholder="Enter subcategory name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="subcategory-description">
-                Description (Optional)
-              </Label>
-              <Input
-                id="subcategory-description"
-                value={subcategoryDescription}
-                onChange={(e) => setSubcategoryDescription(e.target.value)}
-                placeholder="Enter subcategory description"
-              />
-            </div>
-            <Button
-              onClick={createSubcategory}
-              disabled={!subcategoryName.trim()}
-            >
-              Create Subcategory
-            </Button>
-          </div>
+          <Label>Name</Label>
+          <Input
+            value={subcategoryName}
+            onChange={(e) => setSubcategoryName(e.target.value)}
+          />
+          <Label>Description</Label>
+          <Input
+            value={subcategoryDescription}
+            onChange={(e) => setSubcategoryDescription(e.target.value)}
+          />
+          <Button onClick={createSubcategory}>Create</Button>
         </DialogContent>
       </Dialog>
     </div>
