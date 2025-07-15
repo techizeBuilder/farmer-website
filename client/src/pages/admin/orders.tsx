@@ -54,7 +54,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
 import { useAuth } from "@/context/AuthContext";
-
+import placeholderImage from "../../../../public/uploads/products/No-Image.png";
 // Order type definition for API response
 interface OrderData {
   id: number;
@@ -960,6 +960,9 @@ export default function AdminOrders() {
                                   src={item.product.imageUrl}
                                   alt={item.product.name}
                                   className="w-16 h-16 rounded object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = placeholderImage;
+                                  }}
                                 />
                               )}
                               <div>
