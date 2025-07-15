@@ -2,9 +2,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./initDb";
+import cron from "node-cron";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import { disableExpiredCoupons } from "./jobs/disableExpiredCoupons";
+import { scheduleCouponExpiration } from "./jobs/scheduleCouponExpiration";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -41,7 +44,7 @@ app.use((req, res, next) => {
 });
 const allowedOrigins = [
   "http://localhost:5000",
-  "https://new-farmer-e5cl.onrender.com",
+  // "https://new-farmer-e5cl.onrender.com",
   // "https://new-farmer.onrender.com",
   // "https://farmfresh.techizebuilder.com",
 ];
@@ -99,6 +102,8 @@ app.use(morgan("dev"));
     serveStatic(app);
   }
 
+  // Run every day at 12:00 AM
+  scheduleCouponExpiration();
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
