@@ -8,13 +8,13 @@ import { insertFarmerSchema, type Farmer } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
   Dialog,
@@ -31,18 +31,18 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { 
-  Pencil, 
-  Trash2, 
-  Plus, 
-  Search, 
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Search,
   RefreshCw,
   Upload,
   ImageIcon,
-  X
+  X,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +53,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import placeholderImage from "../../../../public/uploads/products/no-profile.jpg";
 // Create a comprehensive validation schema for the farmer form
 const farmerFormSchema = insertFarmerSchema.extend({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -63,7 +63,9 @@ const farmerFormSchema = insertFarmerSchema.extend({
   location: z.string().min(2, "Location must be at least 2 characters"),
   story: z.string().min(10, "Story must be at least 10 characters"),
   farmName: z.string().optional(),
-  certificationStatus: z.enum(["none", "organic", "certified", "pending"]).default("none"),
+  certificationStatus: z
+    .enum(["none", "organic", "certified", "pending"])
+    .default("none"),
   certificationDetails: z.string().optional(),
   farmSize: z.string().optional(),
   experienceYears: z.number().min(0).optional(),
@@ -75,7 +77,7 @@ const farmerFormSchema = insertFarmerSchema.extend({
   imageUrl: z.string().url("Please enter a valid image URL"),
   featured: z.boolean().default(false),
   verified: z.boolean().default(false),
-  active: z.boolean().default(true)
+  active: z.boolean().default(true),
 });
 
 // Type definition for our form
@@ -91,23 +93,24 @@ export default function FarmerManagement() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploadMethod, setUploadMethod] = useState<"url" | "upload">("url");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const queryClient = useQueryClient();
 
   // Fetch farmers data
-  const { 
-    data: farmers = [], 
+  const {
+    data: farmers = [],
     isLoading,
-    refetch 
-  } = useQuery<Farmer[]>({ 
-    queryKey: ['/api/admin/farmers'],
+    refetch,
+  } = useQuery<Farmer[]>({
+    queryKey: ["/api/admin/farmers"],
   });
 
   // Image handling functions
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
         toast({
           title: "Error",
           description: "Image size must be less than 5MB",
@@ -153,74 +156,83 @@ export default function FarmerManagement() {
     mutationFn: async (data: FarmerFormValues) => {
       return apiRequest("/api/admin/farmers", {
         method: "POST",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
       toast({
         title: "Farmer added successfully",
-        variant: "default"
+        variant: "default",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/farmers'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/farmers"] });
       setIsAddDialogOpen(false);
       addForm.reset();
     },
     onError: (error) => {
       toast({
         title: "Failed to add farmer",
-        description: error instanceof Error ? error.message : "An error occurred",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Update farmer mutation
   const updateFarmerMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: FarmerFormValues }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: FarmerFormValues;
+    }) => {
       return apiRequest(`/api/admin/farmers/${id}`, {
         method: "PUT",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
       toast({
         title: "Farmer updated successfully",
-        variant: "default"
+        variant: "default",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/farmers'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/farmers"] });
       setIsEditDialogOpen(false);
     },
     onError: (error) => {
       toast({
         title: "Failed to update farmer",
-        description: error instanceof Error ? error.message : "An error occurred",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Delete farmer mutation
   const deleteFarmerMutation = useMutation({
     mutationFn: async (id: number) => {
       return apiRequest(`/api/admin/farmers/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
     },
     onSuccess: () => {
       toast({
         title: "Farmer deleted successfully",
-        variant: "default"
+        variant: "default",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/farmers'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/farmers"] });
       setIsDeleteDialogOpen(false);
     },
     onError: (error) => {
       toast({
         title: "Failed to delete farmer",
-        description: error instanceof Error ? error.message : "An error occurred",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Set up add form
@@ -246,8 +258,8 @@ export default function FarmerManagement() {
       imageUrl: "",
       featured: false,
       verified: false,
-      active: true
-    }
+      active: true,
+    },
   });
 
   // Set up edit form
@@ -273,8 +285,8 @@ export default function FarmerManagement() {
       imageUrl: "",
       featured: false,
       verified: false,
-      active: true
-    }
+      active: true,
+    },
   });
 
   // Handle add form submission
@@ -312,7 +324,7 @@ export default function FarmerManagement() {
       imageUrl: farmer.imageUrl,
       featured: farmer.featured || false,
       verified: (farmer as any).verified || false,
-      active: (farmer as any).active !== false
+      active: (farmer as any).active !== false,
     });
     setIsEditDialogOpen(true);
   };
@@ -331,17 +343,18 @@ export default function FarmerManagement() {
   };
 
   // Filter farmers based on search term
-  const filteredFarmers = farmers.filter((farmer: Farmer) => 
-    farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredFarmers = farmers.filter(
+    (farmer: Farmer) =>
+      farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      farmer.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      farmer.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-2xl font-bold">Farmer Management</h2>
-        
+
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
           <div className="relative flex-grow">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -352,17 +365,17 @@ export default function FarmerManagement() {
               className="pl-8"
             />
           </div>
-          
+
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => refetch()} 
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => refetch()}
               title="Refresh"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
-            
+
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -377,12 +390,17 @@ export default function FarmerManagement() {
                     Fill in the details to add a new farmer to the platform.
                   </DialogDescription>
                 </DialogHeader>
-                
+
                 <Form {...addForm}>
-                  <form onSubmit={addForm.handleSubmit(onAddSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto">
+                  <form
+                    onSubmit={addForm.handleSubmit(onAddSubmit)}
+                    className="space-y-4 max-h-[70vh] overflow-y-auto"
+                  >
                     {/* Basic Information */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Basic Information
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={addForm.control}
@@ -391,13 +409,16 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Name *</FormLabel>
                               <FormControl>
-                                <Input placeholder="Farmer's full name" {...field} />
+                                <Input
+                                  placeholder="Farmer's full name"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="email"
@@ -405,13 +426,17 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Email *</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="farmer@example.com" {...field} />
+                                <Input
+                                  type="email"
+                                  placeholder="farmer@example.com"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="phone"
@@ -425,7 +450,7 @@ export default function FarmerManagement() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="specialty"
@@ -433,14 +458,17 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Specialty *</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g. Coffee, Spices, Vegetables" {...field} />
+                                <Input
+                                  placeholder="e.g. Coffee, Spices, Vegetables"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
-                      
+
                       <FormField
                         control={addForm.control}
                         name="location"
@@ -448,7 +476,10 @@ export default function FarmerManagement() {
                           <FormItem>
                             <FormLabel>Location *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Farm location (City, State)" {...field} />
+                              <Input
+                                placeholder="Farm location (City, State)"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -458,7 +489,9 @@ export default function FarmerManagement() {
 
                     {/* Farm Details */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Farm Details</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Farm Details
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={addForm.control}
@@ -467,13 +500,16 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Farm Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Name of the farm" {...field} />
+                                <Input
+                                  placeholder="Name of the farm"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="farmSize"
@@ -481,13 +517,16 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Farm Size</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g. 5 acres, 2 hectares" {...field} />
+                                <Input
+                                  placeholder="e.g. 5 acres, 2 hectares"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="experienceYears"
@@ -495,35 +534,52 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Experience (Years)</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  placeholder="0" 
+                                <Input
+                                  type="number"
+                                  placeholder="0"
                                   {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      e.target.value
+                                        ? parseInt(e.target.value)
+                                        : undefined
+                                    )
+                                  }
                                 />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="certificationStatus"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Certification Status</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select certification status" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="none">No Certification</SelectItem>
-                                  <SelectItem value="organic">Organic Certified</SelectItem>
-                                  <SelectItem value="certified">Other Certification</SelectItem>
-                                  <SelectItem value="pending">Certification Pending</SelectItem>
+                                  <SelectItem value="none">
+                                    No Certification
+                                  </SelectItem>
+                                  <SelectItem value="organic">
+                                    Organic Certified
+                                  </SelectItem>
+                                  <SelectItem value="certified">
+                                    Other Certification
+                                  </SelectItem>
+                                  <SelectItem value="pending">
+                                    Certification Pending
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -531,7 +587,7 @@ export default function FarmerManagement() {
                           )}
                         />
                       </div>
-                      
+
                       <FormField
                         control={addForm.control}
                         name="certificationDetails"
@@ -539,7 +595,10 @@ export default function FarmerManagement() {
                           <FormItem>
                             <FormLabel>Certification Details</FormLabel>
                             <FormControl>
-                              <Textarea placeholder="Details about certifications, license numbers, etc." {...field} />
+                              <Textarea
+                                placeholder="Details about certifications, license numbers, etc."
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -549,7 +608,9 @@ export default function FarmerManagement() {
 
                     {/* Contact & Social */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Contact & Social</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Contact & Social
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={addForm.control}
@@ -558,13 +619,16 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Website</FormLabel>
                               <FormControl>
-                                <Input placeholder="https://farmwebsite.com" {...field} />
+                                <Input
+                                  placeholder="https://farmwebsite.com"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="socialMedia"
@@ -572,7 +636,10 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Social Media</FormLabel>
                               <FormControl>
-                                <Input placeholder="Instagram, Facebook, etc." {...field} />
+                                <Input
+                                  placeholder="Instagram, Facebook, etc."
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -583,7 +650,9 @@ export default function FarmerManagement() {
 
                     {/* Financial Details */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Financial Details</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Financial Details
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={addForm.control}
@@ -592,13 +661,16 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Bank Account</FormLabel>
                               <FormControl>
-                                <Input placeholder="Bank account information" {...field} />
+                                <Input
+                                  placeholder="Bank account information"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="panNumber"
@@ -612,7 +684,7 @@ export default function FarmerManagement() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="aadharNumber"
@@ -620,7 +692,10 @@ export default function FarmerManagement() {
                             <FormItem>
                               <FormLabel>Aadhar Number</FormLabel>
                               <FormControl>
-                                <Input placeholder="1234 5678 9012" {...field} />
+                                <Input
+                                  placeholder="1234 5678 9012"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -631,7 +706,9 @@ export default function FarmerManagement() {
 
                     {/* Profile & Story */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Profile & Story</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Profile & Story
+                      </h3>
                       <FormField
                         control={addForm.control}
                         name="imageUrl"
@@ -639,13 +716,16 @@ export default function FarmerManagement() {
                           <FormItem>
                             <FormLabel>Profile Image URL *</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://example.com/image.jpg" {...field} />
+                              <Input
+                                placeholder="https://example.com/image.jpg"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={addForm.control}
                         name="story"
@@ -653,10 +733,10 @@ export default function FarmerManagement() {
                           <FormItem>
                             <FormLabel>Story *</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Tell the farmer's story, their farming journey, and what makes them special..." 
-                                className="min-h-[100px]" 
-                                {...field} 
+                              <Textarea
+                                placeholder="Tell the farmer's story, their farming journey, and what makes them special..."
+                                className="min-h-[100px]"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -667,7 +747,9 @@ export default function FarmerManagement() {
 
                     {/* Settings */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold border-b pb-2">Settings</h3>
+                      <h3 className="text-lg font-semibold border-b pb-2">
+                        Settings
+                      </h3>
                       <div className="space-y-3">
                         <FormField
                           control={addForm.control}
@@ -687,7 +769,7 @@ export default function FarmerManagement() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="verified"
@@ -706,7 +788,7 @@ export default function FarmerManagement() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={addForm.control}
                           name="active"
@@ -727,20 +809,22 @@ export default function FarmerManagement() {
                         />
                       </div>
                     </div>
-                    
+
                     <DialogFooter>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         onClick={() => setIsAddDialogOpen(false)}
                       >
                         Cancel
                       </Button>
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         disabled={addFarmerMutation.isPending}
                       >
-                        {addFarmerMutation.isPending ? "Adding..." : "Add Farmer"}
+                        {addFarmerMutation.isPending
+                          ? "Adding..."
+                          : "Add Farmer"}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -770,14 +854,18 @@ export default function FarmerManagement() {
                   <div className="flex justify-center">
                     <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
-                  <div className="mt-2 text-muted-foreground">Loading farmers...</div>
+                  <div className="mt-2 text-muted-foreground">
+                    Loading farmers...
+                  </div>
                 </TableCell>
               </TableRow>
             ) : filteredFarmers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-10">
                   <div className="text-muted-foreground">
-                    {searchTerm ? "No farmers match your search" : "No farmers found"}
+                    {searchTerm
+                      ? "No farmers match your search"
+                      : "No farmers found"}
                   </div>
                 </TableCell>
               </TableRow>
@@ -786,10 +874,25 @@ export default function FarmerManagement() {
                 <TableRow key={farmer.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
-                      <div 
+                      {/* <div
                         className="w-10 h-10 rounded-full bg-muted overflow-hidden flex-shrink-0"
-                        style={{ backgroundImage: `url(${farmer.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                      ></div>
+                        style={{
+                          backgroundImage: `url(${farmer.imageUrl})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      ></div>{" "} */}
+                      {/* abhi
+                       */}
+                      <img
+                        src={farmer.imageUrl}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null; // prevent infinite loop
+                          e.currentTarget.src = placeholderImage; // fallback image
+                        }}
+                        alt={farmer.name}
+                        className="w-10 h-10 rounded-full object-cover bg-muted flex-shrink-0"
+                      />
                       <span>{farmer.name}</span>
                     </div>
                   </TableCell>
@@ -840,9 +943,12 @@ export default function FarmerManagement() {
               Update the farmer's information.
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+            <form
+              onSubmit={editForm.handleSubmit(onEditSubmit)}
+              className="space-y-4"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={editForm.control}
@@ -857,7 +963,7 @@ export default function FarmerManagement() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={editForm.control}
                   name="specialty"
@@ -872,7 +978,7 @@ export default function FarmerManagement() {
                   )}
                 />
               </div>
-              
+
               <FormField
                 control={editForm.control}
                 name="location"
@@ -886,7 +992,7 @@ export default function FarmerManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={editForm.control}
                 name="imageUrl"
@@ -900,7 +1006,7 @@ export default function FarmerManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={editForm.control}
                 name="story"
@@ -908,16 +1014,13 @@ export default function FarmerManagement() {
                   <FormItem>
                     <FormLabel>Story</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        className="min-h-[100px]" 
-                        {...field} 
-                      />
+                      <Textarea className="min-h-[100px]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={editForm.control}
                 name="featured"
@@ -936,20 +1039,19 @@ export default function FarmerManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsEditDialogOpen(false)}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={updateFarmerMutation.isPending}
-                >
-                  {updateFarmerMutation.isPending ? "Updating..." : "Update Farmer"}
+                <Button type="submit" disabled={updateFarmerMutation.isPending}>
+                  {updateFarmerMutation.isPending
+                    ? "Updating..."
+                    : "Update Farmer"}
                 </Button>
               </DialogFooter>
             </form>
@@ -963,20 +1065,21 @@ export default function FarmerManagement() {
           <DialogHeader>
             <DialogTitle>Delete Farmer</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {currentFarmer?.name}? This action cannot be undone.
+              Are you sure you want to delete {currentFarmer?.name}? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Cancel
             </Button>
-            <Button 
-              type="button" 
-              variant="destructive" 
+            <Button
+              type="button"
+              variant="destructive"
               onClick={confirmDelete}
               disabled={deleteFarmerMutation.isPending}
             >

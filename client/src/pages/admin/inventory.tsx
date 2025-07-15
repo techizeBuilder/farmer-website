@@ -236,7 +236,7 @@ export default function AdminInventory() {
             <CardTitle className="text-sm font-medium">
               Total Products
             </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-8 w-8 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{products.length}</div>
@@ -251,7 +251,7 @@ export default function AdminInventory() {
             <CardTitle className="text-sm font-medium">
               Low Stock Items
             </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            <AlertTriangle className="h-8 w-8 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
@@ -266,7 +266,7 @@ export default function AdminInventory() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
-            <TrendingDown className="h-4 w-4 text-red-500" />
+            <TrendingDown className="h-8 w-8 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
@@ -536,6 +536,9 @@ export default function AdminInventory() {
                         {product.imageUrl && (
                           <img
                             src={product.imageUrl}
+                            onError={(e) => {
+                              e.currentTarget.src = placeholderImage;
+                            }}
                             alt={product.name}
                             className="w-12 h-12 rounded object-cover"
                           />

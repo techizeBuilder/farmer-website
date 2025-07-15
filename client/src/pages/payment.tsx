@@ -38,6 +38,7 @@ export default function Payment() {
 
   // Get the order amount and details from URL parameters or set defaults
   useEffect(() => {
+    window.scrollTo(0, 0);
     const searchParams = new URLSearchParams(window.location.search);
     const amount = Number(searchParams.get("amount")) || 100;
     const currency = searchParams.get("currency") || "INR";
@@ -239,7 +240,7 @@ export default function Payment() {
   return (
     //  <Layout>
     // abhi
-    <div className="container mx-auto py-10 flex justify-center relative top-16 mb-8">
+    <div className="container mx-auto py-10 flex justify-center relative top-16 mb-14">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Complete Your Payment</CardTitle>

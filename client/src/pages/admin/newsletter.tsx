@@ -180,7 +180,7 @@ export default function NewsletterSubscriptionsPage() {
                 {subscriptions.map((subscription) => (
                   <TableRow key={subscription.id}>
                     <TableCell className="font-medium">
-                      {subscription.name}
+                      {subscription.name || "-"}
                     </TableCell>
                     <TableCell>{subscription.email}</TableCell>
                     <TableCell>

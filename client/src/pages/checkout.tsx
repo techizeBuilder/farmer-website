@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { ChevronLeft, CreditCard, Truck, Shield, Check } from "lucide-react";
@@ -15,25 +21,35 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { motion, AnimatePresence } from "framer-motion";
-
+import placeholderImage from "../../../public/uploads/products/No-Image.png";
 // Dynamic form schema based on COD availability
-const createFormSchema = (codEnabled: boolean) => z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  address: z.string().min(5, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  zip: z.string().min(5, "ZIP code is required"),
-  paymentMethod: codEnabled ? z.enum(["razorpay", "cod"]) : z.literal("razorpay"),
-  cardNumber: z.string().optional(),
-  cardExpiry: z.string().optional(),
-  cardCvc: z.string().optional(),
-  notes: z.string().optional()
-});
+const createFormSchema = (codEnabled: boolean) =>
+  z.object({
+    firstName: z.string().min(2, "First name is required"),
+    lastName: z.string().min(2, "Last name is required"),
+    email: z.string().email("Please enter a valid email address"),
+    phone: z.string().min(10, "Please enter a valid phone number"),
+    address: z.string().min(5, "Address is required"),
+    city: z.string().min(2, "City is required"),
+    state: z.string().min(2, "State is required"),
+    zip: z.string().min(5, "ZIP code is required"),
+    paymentMethod: codEnabled
+      ? z.enum(["razorpay", "cod"])
+      : z.literal("razorpay"),
+    cardNumber: z.string().optional(),
+    cardExpiry: z.string().optional(),
+    cardCvc: z.string().optional(),
+    notes: z.string().optional(),
+  });
 
 export default function Checkout() {
   const [location, setLocation] = useLocation();
@@ -47,34 +63,36 @@ export default function Checkout() {
   const [discountError, setDiscountError] = useState("");
 
   // Fetch available discounts
-  const { data: availableDiscounts = [], isLoading: discountsLoading } = useQuery({
-    queryKey: ['/api/discounts/active'],
-  });
+  const { data: availableDiscounts = [], isLoading: discountsLoading } =
+    useQuery({
+      queryKey: ["/api/discounts/active"],
+    });
 
   // Check user's COD access status
   const { data: codAccessData, isLoading: codAccessLoading } = useQuery({
-    queryKey: ['/api/user/cod-access'],
+    queryKey: ["/api/user/cod-access"],
     enabled: isAuthenticated && !!token, // Only fetch if user is authenticated
   });
 
   // Type assertion for availableDiscounts
   const discounts = (availableDiscounts as any[]) || [];
-  
+
   // Type assertion for COD access data
   const codData = codAccessData as { codEnabled: boolean } | undefined;
-  
+
   // Extract COD access status (default to true if user is not authenticated or data is loading)
-  const userCodEnabled = !isAuthenticated || codAccessLoading || (codData?.codEnabled !== false);
+  const userCodEnabled =
+    !isAuthenticated || codAccessLoading || codData?.codEnabled !== false;
 
   // Calculate total with discount
   const calculateTotal = () => {
     let finalTotal = subtotal + shipping;
     if (appliedDiscount) {
-      if (appliedDiscount.type === 'percentage') {
-        finalTotal = finalTotal - (finalTotal * appliedDiscount.value / 100);
-      } else if (appliedDiscount.type === 'fixed') {
+      if (appliedDiscount.type === "percentage") {
+        finalTotal = finalTotal - (finalTotal * appliedDiscount.value) / 100;
+      } else if (appliedDiscount.type === "fixed") {
         finalTotal = Math.max(0, finalTotal - appliedDiscount.value);
-      } else if (appliedDiscount.type === 'shipping') {
+      } else if (appliedDiscount.type === "shipping") {
         finalTotal = finalTotal - shipping;
       }
     }
@@ -91,10 +109,10 @@ export default function Checkout() {
     setDiscountError("");
 
     try {
-      const response = await fetch('/api/discounts/validate', {
-        method: 'POST',
+      const response = await fetch("/api/discounts/validate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id: discountId,
@@ -136,7 +154,7 @@ export default function Checkout() {
       applyDiscount(discountId);
     }
   };
-  
+
   // Create dynamic form schema based on COD access
   const formSchema = createFormSchema(userCodEnabled);
 
@@ -155,26 +173,30 @@ export default function Checkout() {
       cardNumber: "",
       cardExpiry: "",
       cardCvc: "",
-      notes: ""
-    }
+      notes: "",
+    },
   });
-  
+
   // If cart is empty, redirect to products page
   if (cartItems.length === 0 && !orderComplete) {
     return (
       <div className="container mx-auto px-4 py-32 text-center">
-        <h1 className="text-2xl font-bold text-foreground mb-4">Your Cart is Empty</h1>
-        <p className="text-muted-foreground mb-8">Add some products to your cart before proceeding to checkout.</p>
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Your Cart is Empty
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          Add some products to your cart before proceeding to checkout.
+        </p>
         <Link href="/products">
           <Button>Browse Products</Button>
         </Link>
       </div>
     );
   }
-  
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    
+
     try {
       // Create the order data
       const orderData = {
@@ -182,38 +204,41 @@ export default function Checkout() {
         cartItems,
         subtotal,
         shipping,
-        total
+        total,
       };
-      
+
       if (values.paymentMethod === "razorpay") {
         // Redirect to Razorpay payment page
-        setLocation(`/payment?amount=${total}&currency=INR&description=Purchase from Farm to Table`);
+        setLocation(
+          `/payment?amount=${total}&currency=INR&description=Purchase from Farm to Table`
+        );
         return;
       } else if (values.paymentMethod === "cod") {
         // Process Cash on Delivery order
         // Simulate order processing delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
         // Clear cart after successful order
         await clearCart();
-        
+
         // Show success state
         setOrderComplete(true);
-        
+
         // Scroll to top
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was a problem processing your order. Please try again.",
-        variant: "destructive"
+        description:
+          "There was a problem processing your order. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   // Order confirmation screen
   if (orderComplete) {
     return (
@@ -227,44 +252,59 @@ export default function Checkout() {
           <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="h-10 w-10 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-forest mb-4">Order Confirmed!</h1>
+          <h1 className="text-3xl font-bold text-forest mb-4">
+            Order Confirmed!
+          </h1>
           <p className="text-olive mb-8">
-            Thank you for your order. We've received your purchase and will begin processing it right away.
-            You'll receive an email confirmation shortly.
+            Thank you for your order. We've received your purchase and will
+            begin processing it right away. You'll receive an email confirmation
+            shortly.
           </p>
           <div className="flex flex-col space-y-4">
             <Link href="/">
               <Button className="w-full bg-primary">Return to Home</Button>
             </Link>
             <Link href="/products">
-              <Button variant="outline" className="w-full">Continue Shopping</Button>
+              <Button variant="outline" className="w-full">
+                Continue Shopping
+              </Button>
             </Link>
           </div>
         </motion.div>
       </div>
     );
   }
-  
+
   return (
     <div className="bg-background py-32">
       <div className="container mx-auto px-4">
         <Link href="/">
-          <Button variant="ghost" className="mb-8 flex items-center text-muted-foreground">
+          <Button
+            variant="ghost"
+            className="mb-8 flex items-center text-muted-foreground"
+          >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Continue Shopping
           </Button>
         </Link>
-        
-        <h1 className="text-3xl font-heading font-bold text-forest mb-10">Checkout</h1>
-        
+
+        <h1 className="text-3xl font-heading font-bold text-forest mb-10">
+          Checkout
+        </h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Checkout Form */}
           <div className="lg:col-span-2">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 {/* Personal Information */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">Personal Information</h2>
+                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                    Personal Information
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -299,7 +339,11 @@ export default function Checkout() {
                         <FormItem>
                           <FormLabel>Email Address</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="john.doe@example.com" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="john.doe@example.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -320,10 +364,12 @@ export default function Checkout() {
                     />
                   </div>
                 </div>
-                
+
                 {/* Shipping Information */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">Shipping Address</h2>
+                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                    Shipping Address
+                  </h2>
                   <div className="grid grid-cols-1 gap-6">
                     <FormField
                       control={form.control}
@@ -381,10 +427,12 @@ export default function Checkout() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Payment Information */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">Payment Method</h2>
+                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                    Payment Method
+                  </h2>
                   <FormField
                     control={form.control}
                     name="paymentMethod"
@@ -398,7 +446,10 @@ export default function Checkout() {
                           >
                             <div className="flex items-center space-x-3 border p-4 rounded-md">
                               <RadioGroupItem value="razorpay" id="razorpay" />
-                              <Label htmlFor="razorpay" className="flex items-center font-medium cursor-pointer">
+                              <Label
+                                htmlFor="razorpay"
+                                className="flex items-center font-medium cursor-pointer"
+                              >
                                 <CreditCard className="mr-2 h-5 w-5 text-primary" />
                                 Pay with Razorpay
                               </Label>
@@ -406,19 +457,25 @@ export default function Checkout() {
                             {userCodEnabled ? (
                               <div className="flex items-center space-x-3 border p-4 rounded-md">
                                 <RadioGroupItem value="cod" id="cod" />
-                                <Label htmlFor="cod" className="flex items-center font-medium cursor-pointer">
+                                <Label
+                                  htmlFor="cod"
+                                  className="flex items-center font-medium cursor-pointer"
+                                >
                                   <Truck className="mr-2 h-5 w-5 text-primary" />
                                   Cash on Delivery
                                 </Label>
                               </div>
-                            ) : isAuthenticated && !codAccessLoading && (
-                              <div className="flex items-center space-x-3 border border-gray-300 p-4 rounded-md bg-gray-50 opacity-75">
-                                <div className="w-4 h-4 border border-gray-300 rounded-full bg-gray-200"></div>
-                                <Label className="flex items-center font-medium text-gray-500 cursor-not-allowed">
-                                  <Truck className="mr-2 h-5 w-5 text-gray-400" />
-                                  Cash on Delivery (Disabled)
-                                </Label>
-                              </div>
+                            ) : (
+                              isAuthenticated &&
+                              !codAccessLoading && (
+                                <div className="flex items-center space-x-3 border border-gray-300 p-4 rounded-md bg-gray-50 opacity-75">
+                                  <div className="w-4 h-4 border border-gray-300 rounded-full bg-gray-200"></div>
+                                  <Label className="flex items-center font-medium text-gray-500 cursor-not-allowed">
+                                    <Truck className="mr-2 h-5 w-5 text-gray-400" />
+                                    Cash on Delivery (Disabled)
+                                  </Label>
+                                </div>
+                              )
                             )}
                           </RadioGroup>
                         </FormControl>
@@ -426,7 +483,7 @@ export default function Checkout() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <AnimatePresence>
                     {form.watch("paymentMethod") === "razorpay" && (
                       <motion.div
@@ -437,8 +494,15 @@ export default function Checkout() {
                         className="overflow-hidden mt-6"
                       >
                         <div className="p-4 bg-gray-50 rounded-md text-sm">
-                          <p className="mb-2">You will be redirected to Razorpay's secure payment page to complete your purchase after submitting the order.</p>
-                          <p>Razorpay accepts all major credit/debit cards, UPI, wallets, and net banking options.</p>
+                          <p className="mb-2">
+                            You will be redirected to Razorpay's secure payment
+                            page to complete your purchase after submitting the
+                            order.
+                          </p>
+                          <p>
+                            Razorpay accepts all major credit/debit cards, UPI,
+                            wallets, and net banking options.
+                          </p>
                         </div>
                       </motion.div>
                     )}
@@ -451,17 +515,24 @@ export default function Checkout() {
                         className="overflow-hidden mt-6"
                       >
                         <div className="p-4 bg-gray-50 rounded-md text-sm">
-                          <p className="mb-2">Pay with cash when your order is delivered.</p>
-                          <p>Our delivery personnel will collect the payment at the time of delivery.</p>
+                          <p className="mb-2">
+                            Pay with cash when your order is delivered.
+                          </p>
+                          <p>
+                            Our delivery personnel will collect the payment at
+                            the time of delivery.
+                          </p>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-                
+
                 {/* Additional Notes */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">Additional Notes</h2>
+                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                    Additional Notes
+                  </h2>
                   <FormField
                     control={form.control}
                     name="notes"
@@ -480,29 +551,49 @@ export default function Checkout() {
                     )}
                   />
                 </div>
-                
+
                 {/* Discount Selection Section */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">Apply Discount</h2>
+                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                    Apply Discount
+                  </h2>
                   <div className="space-y-4">
                     <div className="flex gap-2">
                       <Select
                         value={selectedDiscountId}
                         onValueChange={handleDiscountSelect}
-                        disabled={discountLoading || !!appliedDiscount || discountsLoading}
+                        disabled={
+                          discountLoading ||
+                          !!appliedDiscount ||
+                          discountsLoading
+                        }
                       >
                         <SelectTrigger className="flex-1">
-                          <SelectValue placeholder={discountsLoading ? "Loading discounts..." : "Select a discount"} />
+                          <SelectValue
+                            placeholder={
+                              discountsLoading
+                                ? "Loading discounts..."
+                                : "Select a discount"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {discounts.map((discount: any) => (
-                            <SelectItem key={discount.id} value={discount.id.toString()}>
+                            <SelectItem
+                              key={discount.id}
+                              value={discount.id.toString()}
+                            >
                               <div className="flex justify-between items-center w-full">
-                                <span className="font-medium">{discount.code}</span>
+                                <span className="font-medium">
+                                  {discount.code}
+                                </span>
                                 <span className="text-sm text-gray-600 ml-2">
-                                  {discount.type === 'percentage' && `${discount.value}% off`}
-                                  {discount.type === 'fixed' && `₹${discount.value} off`}
-                                  {discount.type === 'shipping' && 'Free Shipping'}
+                                  {discount.type === "percentage" &&
+                                    `${discount.value}% off`}
+                                  {discount.type === "fixed" &&
+                                    `₹${discount.value} off`}
+                                  {discount.type === "shipping" &&
+                                    "Free Shipping"}
                                 </span>
                               </div>
                             </SelectItem>
@@ -519,31 +610,38 @@ export default function Checkout() {
                         </Button>
                       )}
                     </div>
-                    
+
                     {discountError && (
                       <p className="text-red-600 text-sm">{discountError}</p>
                     )}
-                    
+
                     {appliedDiscount && (
                       <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-green-800">{appliedDiscount.code} Applied!</p>
-                            <p className="text-sm text-green-600">{appliedDiscount.description}</p>
+                            <p className="font-medium text-green-800">
+                              {appliedDiscount.code} Applied!
+                            </p>
+                            <p className="text-sm text-green-600">
+                              {appliedDiscount.description}
+                            </p>
                           </div>
                           <div className="text-green-800 font-semibold">
-                            {appliedDiscount.type === 'percentage' && `-${appliedDiscount.value}%`}
-                            {appliedDiscount.type === 'fixed' && `-₹${appliedDiscount.value}`}
-                            {appliedDiscount.type === 'shipping' && 'Free Shipping'}
+                            {appliedDiscount.type === "percentage" &&
+                              `-${appliedDiscount.value}%`}
+                            {appliedDiscount.type === "fixed" &&
+                              `-₹${appliedDiscount.value}`}
+                            {appliedDiscount.type === "shipping" &&
+                              "Free Shipping"}
                           </div>
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
-                
-                <Button 
-                  type="submit" 
+
+                <Button
+                  type="submit"
                   className="w-full bg-primary hover:bg-primary-dark text-white py-3 text-lg"
                   disabled={isSubmitting}
                 >
@@ -552,23 +650,35 @@ export default function Checkout() {
               </form>
             </Form>
           </div>
-          
+
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-sm sticky top-32">
-              <h2 className="text-xl font-heading font-semibold text-forest mb-6">Order Summary</h2>
-              
+              <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                Order Summary
+              </h2>
+
               <div className="max-h-96 overflow-y-auto mb-6 pr-2">
                 {cartItems.map((item) => (
-                  <div key={item.product.id} className="flex items-center py-3 border-b border-border/10">
-                    <img 
-                      src={item.product.imageUrl} 
-                      alt={item.product.name} 
+                  <div
+                    key={item.product.id}
+                    className="flex items-center py-3 border-b border-border/10"
+                  >
+                    <img
+                      src={item.product.imageUrl}
+                      alt={item.product.name}
                       className="w-14 h-14 object-cover rounded-md mr-4"
+                      onError={(e) => {
+                        e.currentTarget.src = placeholderImage;
+                      }}
                     />
                     <div className="flex-1">
-                      <h3 className="text-foreground font-medium">{item.product.name}</h3>
-                      <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
+                      <h3 className="text-foreground font-medium">
+                        {item.product.name}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        Qty: {item.quantity}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-foreground font-medium">
@@ -578,7 +688,7 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-foreground">
                   <span>Subtotal</span>
@@ -586,39 +696,55 @@ export default function Checkout() {
                 </div>
                 <div className="flex justify-between text-foreground">
                   <span>Shipping</span>
-                  <span>{appliedDiscount?.type === 'shipping' ? (
-                    <span className="line-through text-muted-foreground">₹{shipping.toFixed(2)}</span>
-                  ) : (
-                    `₹${shipping.toFixed(2)}`
-                  )}</span>
+                  <span>
+                    {appliedDiscount?.type === "shipping" ? (
+                      <span className="line-through text-muted-foreground">
+                        ₹{shipping.toFixed(2)}
+                      </span>
+                    ) : (
+                      `₹${shipping.toFixed(2)}`
+                    )}
+                  </span>
                 </div>
-                
+
                 {appliedDiscount && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount ({appliedDiscount.code})</span>
                     <span>
-                      {appliedDiscount.type === 'percentage' && `-₹${((subtotal + shipping) * appliedDiscount.value / 100).toFixed(2)}`}
-                      {appliedDiscount.type === 'fixed' && `-₹${appliedDiscount.value.toFixed(2)}`}
-                      {appliedDiscount.type === 'shipping' && `-₹${shipping.toFixed(2)}`}
+                      {appliedDiscount.type === "percentage" &&
+                        `-₹${(
+                          ((subtotal + shipping) * appliedDiscount.value) /
+                          100
+                        ).toFixed(2)}`}
+                      {appliedDiscount.type === "fixed" &&
+                        `-₹${appliedDiscount.value.toFixed(2)}`}
+                      {appliedDiscount.type === "shipping" &&
+                        `-₹${shipping.toFixed(2)}`}
                     </span>
                   </div>
                 )}
-                
+
                 <Separator className="my-2" />
                 <div className="flex justify-between text-lg font-semibold text-foreground">
                   <span>Total</span>
                   <span>₹{calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
-              
+
               <div className="space-y-4 text-sm text-muted-foreground">
                 <div className="flex items-start">
                   <Truck className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5" />
-                  <p>Free shipping on orders over ₹50. Standard delivery 3-5 business days.</p>
+                  <p>
+                    Free shipping on orders over ₹50. Standard delivery 3-5
+                    business days.
+                  </p>
                 </div>
                 <div className="flex items-start">
                   <Shield className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5" />
-                  <p>All transactions are secure and encrypted. Pay securely with Razorpay or choose Cash on Delivery.</p>
+                  <p>
+                    All transactions are secure and encrypted. Pay securely with
+                    Razorpay or choose Cash on Delivery.
+                  </p>
                 </div>
               </div>
             </div>

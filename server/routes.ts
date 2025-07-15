@@ -70,6 +70,13 @@ const authenticate = async (
       return res.status(401).json({ message: "Invalid user" });
     }
 
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        message: "Your email verification is pending. Please contact admin.",
+        forceLogout: true, // 👈 frontend isko check kare abhi
+      });
+    }
+
     console.log("Authenticated user:", {
       id: user.id,
       email: user.email,
@@ -1070,6 +1077,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         const user = (req as any).user;
+
         const { amount, currency = "INR" } = req.body;
 
         if (!amount || isNaN(amount) || amount <= 0) {

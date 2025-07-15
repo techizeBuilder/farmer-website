@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import placeHolderImage from "../../../../placeholder.svg";
+import placeholderImage from "../../../../public/uploads/products/No-Image.png";
 import {
   Plus,
   Search,
@@ -739,32 +739,29 @@ export default function EnhancedAdminProducts() {
                   ) : (
                     filteredProducts.map((product) => (
                       <TableRow key={product.id}>
-                        <TableCell className="w-[250px]">
-                          <div className="flex items-center space-x-3">
-                            <div className="relative">
+                        <TableCell className="w-[300px] align-top">
+                          <div className="flex items-start gap-3">
+                            <div className="relative w-24 h-20 flex-shrink-0">
                               <img
-                                src={
-                                  product.imageUrl.startsWith("http")
-                                    ? product.imageUrl
-                                    : placeHolderImage
-                                }
+                                src={product.imageUrl}
                                 alt={product.name}
-                                className="w-50 h-14 rounded object-cover border"
-                                // onError={(e) => {
-                                //   const target = e.target as HTMLImageElement;
-                                //   target.src = '/api/images/placeholder.png';
-                                // }}
+                                className="w-full h-full object-cover rounded-md"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = placeholderImage;
+                                }}
                               />
-                              {product.imageUrls &&
-                                product.imageUrls.length > 0 && (
-                                  <div className="absolute -bottom-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                    +{product.imageUrls.length}
-                                  </div>
-                                )}
+                              {product.imageUrls?.length > 0 && (
+                                <div className="absolute -bottom-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                  +{product.imageUrls.length}
+                                </div>
+                              )}
                             </div>
-                            <div>
-                              <p className="font-medium">{product.name}</p>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="flex flex-col overflow-hidden">
+                              <p className="font-medium truncate">
+                                {product.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
                                 {product.shortDescription}
                               </p>
                               {product.sku && (
@@ -775,6 +772,7 @@ export default function EnhancedAdminProducts() {
                             </div>
                           </div>
                         </TableCell>
+
                         <TableCell className="w-[150px]">
                           {product.category}
                         </TableCell>
