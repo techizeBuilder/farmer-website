@@ -113,27 +113,26 @@ export default function Payment() {
       }
 
       // Initialize payment with the server
-      const response = await fetch("/api/payments/initialize", {
+      // const response = await fetch("/api/payments/initialize", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      //   body: JSON.stringify({
+      //     amount: orderDetails.amount,
+      //     currency: orderDetails.currency,
+      //   }),
+      // });
+      // abhi
+      const data = await apiRequest("/api/payments/initialize", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           amount: orderDetails.amount,
           currency: orderDetails.currency,
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Payment initialization failed:", errorData);
-        throw new Error(
-          errorData.error || errorData.message || "Failed to initialize payment"
-        );
-      }
-
-      const data = await response.json();
       console.log("Payment initialization successful:", data);
 
       // Configure Razorpay options
@@ -240,7 +239,7 @@ export default function Payment() {
   return (
     //  <Layout>
     // abhi
-    <div className="container mx-auto py-10 flex justify-center relative top-16">
+    <div className="container mx-auto py-10 flex justify-center relative top-16 mb-8">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Complete Your Payment</CardTitle>

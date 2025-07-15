@@ -11,7 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Package, Calendar, CreditCard, MapPin, ArrowLeft } from "lucide-react";
-
+import placeholderImage from "../../../public/uploads/products/No-Image.png";
 interface Product {
   id: number;
   name: string;
@@ -142,7 +142,7 @@ export default function OrderHistory() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10  relative top-16">
+      <div className="container mx-auto py-10  relative top-16 mb-8">
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="m-4 shimmer">
@@ -175,225 +175,232 @@ export default function OrderHistory() {
   const orders = orderHistory?.orders || [];
 
   return (
-    <div className="container p-16 relative top-16">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/account">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Account
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">Order History</h1>
-          <p className="text-gray-600">
-            View all your past orders and their status
-          </p>
-        </div>
-      </div>
-
-      {orders.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Orders Yet</h3>
-            <p className="text-gray-600 mb-6">
-              You haven't placed any orders yet. Start shopping to see your
-              orders here!
+    <div className="flex justify-center">
+      <div className="container p-16 relative top-16 mb-8">
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/account">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Account
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Order History</h1>
+            <p className="text-gray-600">
+              View all your past orders and their status
             </p>
-            <Link href="/products">
-              <Button>Browse Products</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <Card key={order.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Package className="h-5 w-5" />
-                      Order #{order.id}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-4 mt-2">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(order.createdAt)}
-                      </span>
-                      {order.paymentId && (
-                        <span className="flex items-center gap-1">
-                          <CreditCard className="h-4 w-4" />
-                          Payment ID: {order.paymentId.slice(-8)}
-                        </span>
-                      )}
-                    </CardDescription>
-                  </div>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status.toUpperCase()}
-                  </span>
-                </div>
-              </CardHeader>
+          </div>
+        </div>
 
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-2">Order Details</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Items:</span>
-                        <span>{order.items.length} item(s)</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Payment Method:</span>
-                        <span className="capitalize">
-                          {order.payment?.method ||
-                            order.paymentMethod ||
-                            "Unknown"}
+        {orders.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No Orders Yet</h3>
+              <p className="text-gray-600 mb-6">
+                You haven't placed any orders yet. Start shopping to see your
+                orders here!
+              </p>
+              <Link href="/products">
+                <Button>Browse Products</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <Card key={order.id}>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Package className="h-5 w-5" />
+                        Order #{order.id}
+                      </CardTitle>
+                      <CardDescription className="flex items-center gap-4 mt-2">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {formatDate(order.createdAt)}
                         </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Tracking ID:</span>
-                        <span className="capitalize">
-                          {order?.trackingId || "Unknown"}
-                        </span>
-                      </div>
-                      {order.payment?.razorpayPaymentId && (
+                        {order.paymentId && (
+                          <span className="flex items-center gap-1">
+                            <CreditCard className="h-4 w-4" />
+                            Payment ID: {order.paymentId.slice(-8)}
+                          </span>
+                        )}
+                      </CardDescription>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
+                      {order.status.toUpperCase()}
+                    </span>
+                  </div>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold mb-2">Order Details</h4>
+                      <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span>Payment ID:</span>
-                          <span className="text-xs font-mono">
-                            {order.payment.razorpayPaymentId.slice(-8)}
+                          <span>Items:</span>
+                          <span>{order.items.length} item(s)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Payment Method:</span>
+                          <span className="capitalize">
+                            {order.payment?.method ||
+                              order.paymentMethod ||
+                              "Unknown"}
                           </span>
                         </div>
-                      )}
-                      {order.appliedDiscounts &&
-                        order.appliedDiscounts.length > 0 && (
-                          <div className="space-y-1">
-                            <span className="text-green-600 font-medium">
-                              Applied Discounts:
+                        <div className="flex justify-between">
+                          <span>Tracking ID:</span>
+                          <span className="capitalize">
+                            {order?.trackingId || "Unknown"}
+                          </span>
+                        </div>
+                        {order.payment?.razorpayPaymentId && (
+                          <div className="flex justify-between">
+                            <span>Payment ID:</span>
+                            <span className="text-xs font-mono">
+                              {order.payment.razorpayPaymentId.slice(-8)}
                             </span>
-                            {order.appliedDiscounts.map((discount) => (
-                              <div
-                                key={discount.id}
-                                className="flex justify-between text-green-600"
-                              >
-                                <span>Code: {discount.code}</span>
-                                <span>
-                                  {discount.type === "percentage"
-                                    ? `${discount.value}%`
-                                    : `₹${discount.value}`}
-                                </span>
-                              </div>
-                            ))}
                           </div>
                         )}
-                      <div className="flex justify-between font-semibold">
-                        <span>Total:</span>
-                        <span>₹{order.total.toFixed(2)}</span>
+                        {order.appliedDiscounts &&
+                          order.appliedDiscounts.length > 0 && (
+                            <div className="space-y-1">
+                              <span className="text-green-600 font-medium">
+                                Applied Discounts:
+                              </span>
+                              {order.appliedDiscounts.map((discount) => (
+                                <div
+                                  key={discount.id}
+                                  className="flex justify-between text-green-600"
+                                >
+                                  <span>Code: {discount.code}</span>
+                                  <span>
+                                    {discount.type === "percentage"
+                                      ? `${discount.value}%`
+                                      : `₹${discount.value}`}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        <div className="flex justify-between font-semibold">
+                          <span>Total:</span>
+                          <span>₹{order.total.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      Shipping Address
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {order.shippingAddress}
-                    </p>
-
-                    {order.billingAddress &&
-                      order.billingAddress !== order.shippingAddress && (
-                        <>
-                          <h4 className="font-semibold mb-2 mt-4">
-                            Billing Address
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {order.billingAddress}
-                          </p>
-                        </>
-                      )}
-                  </div>
-                </div>
-
-                {order.items.length > 0 && (
-                  <>
-                    <Separator className="my-4" />
                     <div>
-                      <h4 className="font-semibold mb-3">Order Items</h4>
-                      <div className="space-y-3">
-                        {order.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center gap-4 p-3 border rounded-lg"
-                          >
-                            {item.product?.imageUrl && (
-                              <img
-                                src={item.product.imageUrl}
-                                alt={item.product.name}
-                                className="w-16 h-16 object-cover rounded-md"
-                              />
-                            )}
-                            <div className="flex-1">
-                              <div className="font-medium">
-                                {item.product?.name ||
-                                  `Product ID: ${item.productId}`}
-                              </div>
-                              {item.product?.sku && (
-                                <div className="text-sm text-gray-500">
-                                  SKU: {item.product.sku}
-                                </div>
-                              )}
-                              {item.product?.category && (
-                                <div className="text-sm text-gray-500">
-                                  Category: {item.product.category}
-                                </div>
-                              )}
-                              <div className="text-sm text-gray-600">
-                                Quantity: {item.quantity} × ₹
-                                {item.price.toFixed(2)}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-semibold">
-                                ₹{(item.price * item.quantity).toFixed(2)}
-                              </div>
-                              <div className="text-sm text-gray-500">Total</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Shipping Address
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {order.shippingAddress}
+                      </p>
+
+                      {order.billingAddress &&
+                        order.billingAddress !== order.shippingAddress && (
+                          <>
+                            <h4 className="font-semibold mb-2 mt-4">
+                              Billing Address
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {order.billingAddress}
+                            </p>
+                          </>
+                        )}
                     </div>
-                  </>
-                )}
-
-                {order.deliveredAt && (
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-800">
-                      <strong>Delivered on:</strong>{" "}
-                      {formatDate(order.deliveredAt)}
-                    </p>
                   </div>
-                )}
 
-                {order.cancellationReason && (
-                  <div className="mt-4 p-3 bg-red-50 rounded-lg">
-                    <p className="text-sm text-red-800">
-                      <strong>Cancellation Reason:</strong>{" "}
-                      {order.cancellationReason}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  {order.items.length > 0 && (
+                    <>
+                      <Separator className="my-4" />
+                      <div>
+                        <h4 className="font-semibold mb-3">Order Items</h4>
+                        <div className="space-y-3">
+                          {order.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex items-center gap-4 p-3 border rounded-lg"
+                            >
+                              {item.product?.imageUrl && (
+                                <img
+                                  src={item.product.imageUrl}
+                                  alt={item.product.name}
+                                  onError={(e) => {
+                                    e.currentTarget.src = placeholderImage;
+                                  }}
+                                  className="w-16 h-16 object-cover rounded-md"
+                                />
+                              )}
+                              <div className="flex-1">
+                                <div className="font-medium">
+                                  {item.product?.name ||
+                                    `Product ID: ${item.productId}`}
+                                </div>
+                                {item.product?.sku && (
+                                  <div className="text-sm text-gray-500">
+                                    SKU: {item.product.sku}
+                                  </div>
+                                )}
+                                {item.product?.category && (
+                                  <div className="text-sm text-gray-500">
+                                    Category: {item.product.category}
+                                  </div>
+                                )}
+                                <div className="text-sm text-gray-600">
+                                  Quantity: {item.quantity} × ₹
+                                  {item.price.toFixed(2)}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-semibold">
+                                  ₹{(item.price * item.quantity).toFixed(2)}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  Total
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {order.deliveredAt && (
+                    <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                      <p className="text-sm text-green-800">
+                        <strong>Delivered on:</strong>{" "}
+                        {formatDate(order.deliveredAt)}
+                      </p>
+                    </div>
+                  )}
+
+                  {order.cancellationReason && (
+                    <div className="mt-4 p-3 bg-red-50 rounded-lg">
+                      <p className="text-sm text-red-800">
+                        <strong>Cancellation Reason:</strong>{" "}
+                        {order.cancellationReason}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

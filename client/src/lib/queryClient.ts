@@ -9,23 +9,29 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   url: string,
-  options?: RequestInit,
+  options?: RequestInit
 ): Promise<any> {
   // Get admin token if this is an admin request
-  const isAdminRequest = url.includes('/admin/');
+  const isAdminRequest = url.includes("/admin/");
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
-  
+
   // Add existing headers if any
   if (options?.headers) {
     Object.assign(headers, options.headers);
   }
-  
+
   if (isAdminRequest) {
-    const adminToken = localStorage.getItem('adminToken');
+    const adminToken = localStorage.getItem("adminToken");
     if (adminToken) {
-      headers['Authorization'] = `Bearer ${adminToken}`;
+      headers["Authorization"] = `Bearer ${adminToken}`;
+    }
+  } else {
+    // User token for normal API requests
+    const userToken = localStorage.getItem("token"); // or 'userToken', whatever you store
+    if (userToken) {
+      headers["Authorization"] = `Bearer ${userToken}`;
     }
   }
 
@@ -46,19 +52,19 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey[0] as string;
-    const isAdminRequest = url.includes('/admin/');
+    const isAdminRequest = url.includes("/admin/");
     const headers: Record<string, string> = {};
-    
+
     if (isAdminRequest) {
-      const adminToken = localStorage.getItem('adminToken');
+      const adminToken = localStorage.getItem("adminToken");
       if (adminToken) {
-        headers['Authorization'] = `Bearer ${adminToken}`;
+        headers["Authorization"] = `Bearer ${adminToken}`;
       }
     } else {
       // For regular user API calls, use user JWT token
-      const userToken = localStorage.getItem('token');
+      const userToken = localStorage.getItem("token");
       if (userToken) {
-        headers['Authorization'] = `Bearer ${userToken}`;
+        headers["Authorization"] = `Bearer ${userToken}`;
       }
     }
 
