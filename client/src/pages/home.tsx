@@ -33,7 +33,7 @@ import type {
   TeamMember,
   Category,
 } from "@shared/schema";
-
+import farmerImage from "../../../public/uploads/products/famer-home.jpg";
 const newsletterSchema = z.object({
   name: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
@@ -330,7 +330,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
             <div className="scroll-animation">
               <img
-                src="https://img.freepik.com/free-photo/adult-nature-coffee-harvesting_23-2151711377.jpg?t=st=1752641642~exp=1752645242~hmac=62ebd3de8afb798d08366102957dfad810fae43c302f7e6e88e8221f0afe1715&w=1380"
+                src={farmerImage}
                 alt="Farmer harvesting coffee beans"
                 className="rounded-lg shadow-xl w-full h-auto"
               />

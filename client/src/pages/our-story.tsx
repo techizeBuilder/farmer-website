@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { type TeamMember } from "@shared/schema";
-
+import farmerImage from "../../../public/uploads/products/farmer-story.jpg";
 export default function OurStory() {
   // Set up animations
   const { setupScrollAnimation } = useAnimations();
@@ -87,7 +87,7 @@ export default function OurStory() {
             </div>
             <div>
               <img
-                src="https://img.freepik.com/free-photo/woman-planting-vegetables-smiling-farm-with-equipments_114579-2781.jpg?t=st=1752641975~exp=1752645575~hmac=ea44dedc4097573fa52575d321a3bb31dfbc0336f1a7d08bf1897d697d6364fc&w=1380"
+                src={farmerImage}
                 alt="Farmers in a traditional farm"
                 className="rounded-lg shadow-xl w-full h-auto object-cover"
               />
