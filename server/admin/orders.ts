@@ -239,13 +239,69 @@ export const getOrderById = async (req: Request, res: Response) => {
   }
 };
 
-// Update order status
+// // Update order status
+// export const updateOrderStatus = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.params;
+//     const { status, cancellationReason } = req.body;
+
+//     // Validate status
+//     const validStatuses = [
+//       "pending",
+//       "processing",
+//       "shipped",
+//       "delivered",
+//       "cancelled",
+//     ];
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({ message: "Invalid order status" });
+//     }
+
+//     // Prepare update data
+//     const updateData: Partial<Order> = { status };
+
+//     // Add additional fields based on status
+//     if (status === "cancelled" && cancellationReason) {
+//       updateData.cancellationReason = cancellationReason;
+//     }
+
+//     if (status === "delivered") {
+//       updateData.deliveredAt = new Date();
+//     }
+
+//     // Update order in database
+//     const [updatedOrder] = await db
+//       .update(orders)
+//       .set(updateData)
+//       .where(eq(orders.id, parseInt(id)))
+//       .returning();
+
+//     if (!updatedOrder) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     res.json({
+//       message: "Order status updated successfully",
+//       order: updatedOrder,
+//     });
+//   } catch (error) {
+//     console.error("Error updating order status:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Failed to update order status", error: String(error) });
+//   }
+// };
 export const updateOrderStatus = async (req: Request, res: Response) => {
+  interface OrderEvent {
+    status: string;
+    message: string;
+    date: string;
+    location?: string;
+  }
   try {
     const { id } = req.params;
     const { status, cancellationReason } = req.body;
 
-    // Validate status
     const validStatuses = [
       "pending",
       "processing",
@@ -257,10 +313,37 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid order status" });
     }
 
-    // Prepare update data
-    const updateData: Partial<Order> = { status };
+    const orderId = parseInt(id);
+    const existingOrder = await db.query.orders.findFirst({
+      where: eq(orders.id, orderId),
+    });
 
-    // Add additional fields based on status
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const now = new Date().toISOString();
+    const message = `Order status updated to ${status}`;
+    const newEvent: OrderEvent = {
+      status,
+      message,
+      date: now,
+      ...(status === "shipped" && { location: "Warehouse, Delhi" }),
+      ...(status === "delivered" && {
+        location: existingOrder.shippingAddress,
+      }),
+    };
+
+    const updatedTimeline = Array.isArray(existingOrder.statusTimeline)
+      ? [...existingOrder.statusTimeline, newEvent]
+      : [newEvent];
+
+    const updateData: Partial<typeof orders.$inferInsert> = {
+      status,
+      statusTimeline: updatedTimeline,
+      updatedAt: new Date(),
+    };
+
     if (status === "cancelled" && cancellationReason) {
       updateData.cancellationReason = cancellationReason;
     }
@@ -269,16 +352,11 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       updateData.deliveredAt = new Date();
     }
 
-    // Update order in database
     const [updatedOrder] = await db
       .update(orders)
       .set(updateData)
-      .where(eq(orders.id, parseInt(id)))
+      .where(eq(orders.id, orderId))
       .returning();
-
-    if (!updatedOrder) {
-      return res.status(404).json({ message: "Order not found" });
-    }
 
     res.json({
       message: "Order status updated successfully",
@@ -286,9 +364,10 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error updating order status:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to update order status", error: String(error) });
+    res.status(500).json({
+      message: "Failed to update order status",
+      error: String(error),
+    });
   }
 };
 

@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -7,6 +8,7 @@ import {
   doublePrecision,
   timestamp,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -189,7 +191,7 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(
 // Order Schema
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id"),
+  userId: integer("user_id").references(() => users.id),
   sessionId: text("session_id").notNull(),
   paymentId: text("payment_id"),
   total: doublePrecision("total").notNull(),
@@ -200,6 +202,10 @@ export const orders = pgTable("orders", {
   discountId: integer("discount_id").references(() => discounts.id),
   cancellationReason: text("cancellation_reason"),
   trackingId: text("tracking_id"),
+  statusTimeline:
+    jsonb("status_timeline").$type<
+      { status: string; message: string; date: string; location?: string }[]
+    >(),
   deliveredAt: timestamp("delivered_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -213,8 +219,12 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
 // Order Items Schema
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull(),
-  productId: integer("product_id").notNull(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => products.id),
   quantity: integer("quantity").notNull(),
   price: doublePrecision("price").notNull(),
 });
@@ -500,7 +510,26 @@ export const insertSiteSettingSchema = createInsertSchema(siteSettings).omit({
 
 export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
 export type SiteSetting = typeof siteSettings.$inferSelect;
+// Order -> OrderItems
+export const ordersRelations = relations(orders, ({ many, one }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id],
+  }),
+  items: many(orderItems),
+}));
 
+// OrderItem -> Product
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
+  }),
+}));
 // Cart with items
 export interface CartWithItems extends Cart {
   items: (CartItem & { product: Product })[];

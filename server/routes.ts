@@ -8,6 +8,7 @@ import * as crypto from "crypto";
 import * as nodemailer from "nodemailer";
 import Razorpay from "razorpay";
 import { emailService } from "./emailService";
+
 import { smsService } from "./smsService";
 import {
   insertNewsletterSubscriptionSchema,
@@ -31,9 +32,12 @@ import {
   newsletterSubscriptions,
   smsVerifications,
   users,
+  Order,
+  insertOrderSchema,
+  User,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, asc, inArray } from "drizzle-orm";
+import { eq, sql, desc, asc, inArray, and, isNotNull } from "drizzle-orm";
 import adminRouter from "./admin";
 import imageRouter from "./imageRoutes";
 import { exportDatabase, exportTable } from "./databaseExport";
@@ -737,7 +741,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to reset password" });
     }
   });
+  // tracking order
+  app.post(`${apiPrefix}/orders/tracking`, async (req, res) => {
+    try {
+      // Input validation
+      const { orderNumber, email } = req.body;
+      if (!orderNumber?.trim() || !email?.trim()) {
+        return res.status(400).json({
+          message: "Order number and email are required",
+        });
+      }
 
+      const order = await db.query.orders.findFirst({
+        where: and(
+          eq(orders.trackingId, orderNumber.trim()),
+          isNotNull(orders.userId)
+        ),
+        with: {
+          user: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          items: {
+            columns: {
+              quantity: true,
+            },
+            with: {
+              product: {
+                columns: {
+                  id: true,
+                  name: true,
+                  price: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !order ||
+        !order.user ||
+        order.user.email.toLowerCase() !== email.trim().toLowerCase()
+      ) {
+        return res.status(404).json({
+          message:
+            "No order found with this order number and email combination.",
+        });
+      }
+
+      // Prepare response
+      const response = {
+        orderNumber: order.tracking_id || order.trackingId,
+        status: order.status,
+        statusDate: order.updated_at || order.updatedAt,
+        estimatedDelivery: order.delivered_at || order.deliveredAt || null,
+        shippingAddress: order.shipping_address || order.shippingAddress,
+        items: order.items.map((item) => ({
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price,
+        })),
+        trackingEvents: order.status_timeline || order.statusTimeline || [],
+      };
+
+      return res.json(response);
+    } catch (error) {
+      console.error("Order tracking error:", error);
+      return res.status(500).json({
+        message: "Internal server error",
+        ...(process.env.NODE_ENV === "development" && {
+          error: error instanceof Error ? error.message : String(error),
+          stack:
+            process.env.NODE_ENV === "development"
+              ? error instanceof Error
+                ? error.stack
+                : undefined
+              : undefined,
+        }),
+      });
+    }
+  });
   // User Profile Routes (protected)
 
   // Get user profile
@@ -1244,6 +1331,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         total: amount / 100,
         status: "confirmed",
         shippingAddress: shippingAddress || "No address provided",
+        statusTimeline: [
+          {
+            status: "confirmed",
+            message: "Your order has been placed successfully",
+            date: new Date().toISOString(),
+          },
+        ],
         paymentMethod: "razorpay",
         trackingId: randomId,
       });

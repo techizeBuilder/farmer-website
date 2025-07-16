@@ -16,70 +16,119 @@ export default function TrackOrder() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   setIsLoading(true);
+
+  //   // In a real application, this would make an API call to get tracking information
+  //   // For demo purposes, we'll simulate a response after a short delay
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+
+  //     // Demo only: Show error for empty fields
+  //     if (!orderNumber.trim() || !email.trim()) {
+  //       setError("Please enter both order number and email address.");
+  //       return;
+  //     }
+
+  //     // Demo only: Show error for invalid order number format
+  //     if (!/^[A-Z]{2}\d{6}$/.test(orderNumber)) {
+  //       setError("Order number should be in format: XX123456");
+  //       return;
+  //     }
+
+  //     // Demo only: Simulate tracking result for a specific order number
+  //     if (orderNumber === "HD123456") {
+  //       setTrackingResult({
+  //         orderNumber: "HD123456",
+  //         status: "shipped",
+  //         statusDate: "May 23, 2025",
+  //         estimatedDelivery: "May 26, 2025",
+  //         items: [
+  //           { name: "Mountain Coffee Beans", quantity: 2 },
+  //           { name: "Himalayan Honey", quantity: 1 },
+  //         ],
+  //         shippingAddress: "123 Green Street, Bangalore, Karnataka 560001",
+  //         trackingEvents: [
+  //           {
+  //             date: "May 23, 2025, 10:30 AM",
+  //             status: "Shipped",
+  //             location: "Warehouse, Delhi",
+  //           },
+  //           {
+  //             date: "May 22, 2025, 3:45 PM",
+  //             status: "Packed",
+  //             location: "Warehouse, Delhi",
+  //           },
+  //           {
+  //             date: "May 22, 2025, 11:20 AM",
+  //             status: "Processing",
+  //             location: "Warehouse, Delhi",
+  //           },
+  //           {
+  //             date: "May 21, 2025, 2:15 PM",
+  //             status: "Order Confirmed",
+  //             location: "Online",
+  //           },
+  //         ],
+  //       });
+  //     } else {
+  //       // Demo only: For any other order number, show an error
+  //       setError(
+  //         "No order found with this order number and email combination. Please check and try again."
+  //       );
+  //     }
+  //   }, 1500);
+  // };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
+    setTrackingResult(null); // Clear previous result
 
-    // In a real application, this would make an API call to get tracking information
-    // For demo purposes, we'll simulate a response after a short delay
-    setTimeout(() => {
+    if (!orderNumber.trim() || !email.trim()) {
+      setError("Please enter both order number and email address.");
       setIsLoading(false);
+      return;
+    }
 
-      // Demo only: Show error for empty fields
-      if (!orderNumber.trim() || !email.trim()) {
-        setError("Please enter both order number and email address.");
-        return;
+    try {
+      const res = await fetch("/api/orders/tracking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNumber, email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch tracking info");
       }
 
-      // Demo only: Show error for invalid order number format
-      if (!/^[A-Z]{2}\d{6}$/.test(orderNumber)) {
-        setError("Order number should be in format: XX123456");
-        return;
-      }
+      // Format tracking events for UI if needed
+      const formattedEvents = (data.trackingEvents || []).map((event: any) => ({
+        date: new Date(event.date).toLocaleString(),
+        status: event.status,
+        location: event.location || "Online", // fallback if not available
+      }));
 
-      // Demo only: Simulate tracking result for a specific order number
-      if (orderNumber === "HD123456") {
-        setTrackingResult({
-          orderNumber: "HD123456",
-          status: "shipped",
-          statusDate: "May 23, 2025",
-          estimatedDelivery: "May 26, 2025",
-          items: [
-            { name: "Mountain Coffee Beans", quantity: 2 },
-            { name: "Himalayan Honey", quantity: 1 },
-          ],
-          shippingAddress: "123 Green Street, Bangalore, Karnataka 560001",
-          trackingEvents: [
-            {
-              date: "May 23, 2025, 10:30 AM",
-              status: "Shipped",
-              location: "Warehouse, Delhi",
-            },
-            {
-              date: "May 22, 2025, 3:45 PM",
-              status: "Packed",
-              location: "Warehouse, Delhi",
-            },
-            {
-              date: "May 22, 2025, 11:20 AM",
-              status: "Processing",
-              location: "Warehouse, Delhi",
-            },
-            {
-              date: "May 21, 2025, 2:15 PM",
-              status: "Order Confirmed",
-              location: "Online",
-            },
-          ],
-        });
-      } else {
-        // Demo only: For any other order number, show an error
-        setError(
-          "No order found with this order number and email combination. Please check and try again."
-        );
-      }
-    }, 1500);
+      setTrackingResult({
+        orderNumber: data.orderNumber,
+        status: data.status,
+        statusDate: new Date(data.statusDate).toLocaleDateString(),
+        estimatedDelivery: data.estimatedDelivery
+          ? new Date(data.estimatedDelivery).toLocaleDateString()
+          : "",
+        shippingAddress: data.shippingAddress,
+        items: data.items,
+        trackingEvents: formattedEvents,
+      });
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getStatusStep = () => {
@@ -183,10 +232,10 @@ export default function TrackOrder() {
           </div>
 
           {/* Demo Note */}
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-8 text-blue-700 text-sm">
+          {/* <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-8 text-blue-700 text-sm">
             <strong>Demo Note:</strong> For testing, use order number "HD123456"
             with any email address.
-          </div>
+          </div> */}
 
           {/* Tracking Results */}
           {trackingResult && (
@@ -385,7 +434,7 @@ export default function TrackOrder() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {event.date}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-forest">
+                          <td className="px-6 capitalize py-4 whitespace-nowrap text-sm font-medium text-forest">
                             {event.status}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
