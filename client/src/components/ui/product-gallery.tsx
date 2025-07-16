@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import placeholderImage from "../../../../public/uploads/products/No-Image.png";
 interface ProductGalleryProps {
   mainImage: string;
   additionalImages?: string[];
@@ -14,19 +14,18 @@ export function ProductGallery({
   mainImage,
   additionalImages = [],
   videoUrl,
-  productName
+  productName,
 }: ProductGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
-  
+
   // Only use actual additional images from the product data
-  const actualAdditionalImages = additionalImages && additionalImages.length > 0 
-    ? additionalImages 
-    : [];
-  
+  const actualAdditionalImages =
+    additionalImages && additionalImages.length > 0 ? additionalImages : [];
+
   // Combine all actual images into one array
   const allImages = [mainImage, ...actualAdditionalImages];
-  
+
   const handlePrev = () => {
     if (showVideo) {
       setShowVideo(false);
@@ -34,28 +33,28 @@ export function ProductGallery({
     }
     setCurrentIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
   };
-  
+
   const handleNext = () => {
     if (showVideo) {
       return;
     }
-    
+
     if (currentIndex === allImages.length - 1 && videoUrl) {
       setShowVideo(true);
     } else {
       setCurrentIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
     }
   };
-  
+
   const selectImage = (index: number) => {
     setCurrentIndex(index);
     setShowVideo(false);
   };
-  
+
   const toggleVideo = () => {
     setShowVideo(!showVideo);
   };
-  
+
   return (
     <div className="space-y-4">
       {/* Main display area */}
@@ -63,7 +62,7 @@ export function ProductGallery({
         {/* Current Image or Video */}
         <div className="w-full h-full">
           {showVideo && videoUrl ? (
-            <iframe 
+            <iframe
               src={videoUrl}
               title={`${productName} video`}
               className="w-full h-full object-cover"
@@ -74,10 +73,13 @@ export function ProductGallery({
               src={allImages[currentIndex]}
               alt={`${productName} - view ${currentIndex + 1}`}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = placeholderImage;
+              }}
             />
           )}
         </div>
-        
+
         {/* Navigation arrows */}
         <div className="absolute inset-0 flex items-center justify-between pointer-events-none p-2">
           <Button
@@ -88,7 +90,7 @@ export function ProductGallery({
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          
+
           <Button
             onClick={handleNext}
             variant="secondary"
@@ -99,7 +101,7 @@ export function ProductGallery({
           </Button>
         </div>
       </div>
-      
+
       {/* Thumbnails */}
       <div className="flex items-center space-x-2 overflow-x-auto pb-2">
         {allImages.map((image, index) => (
@@ -108,17 +110,22 @@ export function ProductGallery({
             onClick={() => selectImage(index)}
             whileHover={{ scale: 1.05 }}
             className={`cursor-pointer rounded-md overflow-hidden w-20 h-20 shrink-0 border-2 transition-all ${
-              currentIndex === index && !showVideo ? "border-primary" : "border-transparent"
+              currentIndex === index && !showVideo
+                ? "border-primary"
+                : "border-transparent"
             }`}
           >
-            <img 
-              src={image} 
+            <img
+              src={image}
               alt={`${productName} thumbnail ${index + 1}`}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = placeholderImage;
+              }}
             />
           </motion.div>
         ))}
-        
+
         {videoUrl && (
           <motion.div
             onClick={toggleVideo}

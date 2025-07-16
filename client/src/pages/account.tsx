@@ -90,7 +90,7 @@ export default function Account() {
   const [userMobile, setUserMobile] = useState("");
 
   const { toast } = useToast();
-
+  window.scrollTo(0, 0);
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {

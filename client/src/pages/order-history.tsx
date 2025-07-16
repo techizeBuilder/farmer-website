@@ -163,7 +163,7 @@ export default function OrderHistory() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-10 relative top-16 text-center">
+      <div className="container mx-auto py-10 relative top-16 text-center mb-12">
         <h1 className="text-2xl font-bold mb-4">Error Loading Orders</h1>
         <p className="text-gray-600">
           Failed to load your order history. Please try again later.

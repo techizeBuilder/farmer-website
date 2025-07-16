@@ -330,7 +330,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
             <div className="scroll-animation">
               <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDyDJmkQzQ8ZhspCQgwZElt6wUsL9y-rUhVg&s"
+                src="https://img.freepik.com/free-photo/adult-nature-coffee-harvesting_23-2151711377.jpg?t=st=1752641642~exp=1752645242~hmac=62ebd3de8afb798d08366102957dfad810fae43c302f7e6e88e8221f0afe1715&w=1380"
                 alt="Farmer harvesting coffee beans"
                 className="rounded-lg shadow-xl w-full h-auto"
               />
@@ -830,12 +830,12 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="flex justify-center mt-12 space-x-3">
+            {/* <div className="flex justify-center mt-12 space-x-3">
               <div className="w-3 h-3 rounded-full bg-white"></div>
               <div className="w-3 h-3 rounded-full bg-white/40"></div>
               <div className="w-3 h-3 rounded-full bg-white/40"></div>
               <div className="w-3 h-3 rounded-full bg-white/40"></div>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

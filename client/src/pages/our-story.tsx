@@ -87,7 +87,7 @@ export default function OurStory() {
             </div>
             <div>
               <img
-                src="https://images.pexels.com/photos/1084545/pexels-photo-1084545.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                src="https://img.freepik.com/free-photo/woman-planting-vegetables-smiling-farm-with-equipments_114579-2781.jpg?t=st=1752641975~exp=1752645575~hmac=ea44dedc4097573fa52575d321a3bb31dfbc0336f1a7d08bf1897d697d6364fc&w=1380"
                 alt="Farmers in a traditional farm"
                 className="rounded-lg shadow-xl w-full h-auto object-cover"
               />

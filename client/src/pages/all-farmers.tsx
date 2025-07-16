@@ -5,6 +5,7 @@ import { AnimatedText } from "@/components/ui/animated-text";
 import FarmerCard from "@/components/FarmerCard";
 import { motion } from "framer-motion";
 import { useAnimations } from "@/hooks/use-animations";
+import { Link } from "wouter";
 
 export default function AllFarmers() {
   // Get all farmers data
@@ -219,12 +220,12 @@ export default function AllFarmers() {
             </div>
 
             <div className="text-center mt-8">
-              <a
-                href="mailto:farmers@harvestdirect.com"
+              <Link
+                href="/contact"
                 className="inline-block bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 rounded-md transition duration-300"
               >
                 Contact Us to Learn More
-              </a>
+              </Link>
             </div>
           </div>
         </div>
