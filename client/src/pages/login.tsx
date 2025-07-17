@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -59,7 +59,9 @@ export default function Login() {
       setError("Login failed. Please check your credentials.");
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="container mx-auto py-10 flex justify-center relative top-14 mb-10">
       <Card className="w-full max-w-md">

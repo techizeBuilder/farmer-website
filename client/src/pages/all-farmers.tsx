@@ -18,6 +18,7 @@ export default function AllFarmers() {
 
   // Set up scroll animations
   useEffect(() => {
+    window.scrollTo(0, 0);
     setupScrollAnimation();
   }, []);
 

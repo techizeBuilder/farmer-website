@@ -11,6 +11,7 @@ export default function OurProcess() {
   const { setupScrollAnimation } = useAnimations();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setupScrollAnimation();
   }, [setupScrollAnimation]);
 

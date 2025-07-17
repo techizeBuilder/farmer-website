@@ -25,6 +25,7 @@ export default function OurStory() {
 
   useEffect(() => {
     setupScrollAnimation();
+    window.scrollTo(0, 0);
   }, [setupScrollAnimation]);
 
   return (

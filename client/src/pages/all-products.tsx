@@ -166,6 +166,7 @@ export default function AllProducts() {
 
   useEffect(() => {
     setupScrollAnimation();
+    window.scrollTo(0, 0);
   }, []);
 
   // Reset pagination when filters change

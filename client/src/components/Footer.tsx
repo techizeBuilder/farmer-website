@@ -16,7 +16,7 @@ import { cn, debounce } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useAnimations } from "@/hooks/use-animations";
 import { useCategory } from "@/hooks/store";
-
+import techizeLogo from "../../../public/uploads/techize-logo.png";
 const useSearchParams = () => {
   const [location, navigate] = useLocation();
   const params = new URLSearchParams(location.split("?")[1] || "");
@@ -474,8 +474,17 @@ export default function Footer() {
           <p className="text-white/80 text-sm mb-2">
             © {new Date().getFullYear()} HarvestDirect. All rights reserved.
           </p>
-          <p className="text-white/70 text-sm">
+          <p className="text-white/70 text-sm mb-2">
             Made with ❤️ for farmers and natural food.
+          </p>
+          <p className="text-white/60 text-xs flex items-center justify-center gap-1">
+            Designed by
+            <a
+              className="flex items-center"
+              href="https://www.techizebuilder.com/project-category/business"
+            >
+              <span className="font-medium">Techize Builder</span>
+            </a>
           </p>
         </div>
       </div>

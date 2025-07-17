@@ -177,7 +177,7 @@ export default function OrderHistory() {
   return (
     <div className="flex justify-center">
       <div className="container p-16 relative top-16 mb-8">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col  gap-4 mb-8">
           <Link href="/account">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
