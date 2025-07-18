@@ -1295,7 +1295,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log("Starting order creation process...");
       // Create the order
       console.log("Creating order with data:", {
         userId: user.id,

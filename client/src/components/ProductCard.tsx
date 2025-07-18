@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 interface ProductCardProps {
   product: Product;
 }
@@ -173,15 +174,24 @@ export default function ProductCard({ product }: ProductCardProps) {
               {hasDiscount ? (
                 <>
                   <span className="text-forest font-bold text-lg md:text-xl">
-                    ₹{displayPrice!.toFixed(2)}
+                    ₹{product.price.toFixed(2)}/{product.quantity}{" "}
+                    {product.unit === "pcs" && product.quantity === 1
+                      ? "Piece"
+                      : formatSnakeCase(product.unit!)}
                   </span>
                   <span className="text-gray-500 line-through text-sm">
-                    Original: ₹{product.price.toFixed(2)}
+                    Original: ₹{product.price.toFixed(2)}/{product.quantity}{" "}
+                    {product.unit === "pcs" && product.quantity === 1
+                      ? "Piece"
+                      : formatSnakeCase(product.unit!)}
                   </span>
                 </>
               ) : (
                 <span className="text-forest font-bold text-lg md:text-xl">
-                  ₹{product.price.toFixed(2)}
+                  ₹{product.price.toFixed(2)}/{product.quantity}{" "}
+                  {product.unit === "pcs" && product.quantity === 1
+                    ? "Piece"
+                    : formatSnakeCase(product.unit!)}
                 </span>
               )}
               {hasDiscount && (

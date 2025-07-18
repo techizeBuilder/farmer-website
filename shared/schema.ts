@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm";
+import { int } from "drizzle-orm/mysql-core";
 import {
   pgTable,
   text,
@@ -56,7 +57,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "expired",
   "past_due",
 ]);
-
+export const unitEnum = pgEnum("unit", ["kg", "l", "gram", "pcs"]);
 // Product Schema
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
@@ -68,6 +69,8 @@ export const products = pgTable("products", {
   category: text("category").notNull(),
   subcategory: text("subcategory"), // Optional subcategory
   sku: text("sku"),
+  unit: unitEnum("unit"), // ✅ Fixed line
+  quantity: doublePrecision("quantity"),
   imageUrl: text("image_url").notNull(),
   imageUrls: text("image_urls").array(),
   thumbnailUrl: text("thumbnail_url"),
@@ -106,6 +109,7 @@ export const farmers = pgTable("farmers", {
   email: text("email").notNull(),
   phone: text("phone").notNull(),
   specialty: text("specialty").notNull(),
+
   story: text("story").notNull(),
   location: text("location").notNull(),
   farmName: text("farm_name"),

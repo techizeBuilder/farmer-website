@@ -128,7 +128,7 @@ export default function OrderHistory() {
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto py-10 text-center">
+      <div className="container mx-auto py-10 text-center relative top-[10rem] mb-[15rem]">
         <h1 className="text-2xl font-bold mb-4">Please Log In</h1>
         <p className="text-gray-600 mb-6">
           You need to be logged in to view your order history.
@@ -364,11 +364,11 @@ export default function OrderHistory() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="font-semibold">
-                                  ₹{(item.price * item.quantity).toFixed(2)}
-                                </div>
                                 <div className="text-sm text-gray-500">
                                   Total
+                                </div>
+                                <div className="font-semibold">
+                                  ₹{(item.price * item.quantity).toFixed(2)}
                                 </div>
                               </div>
                             </div>

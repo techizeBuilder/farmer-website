@@ -77,6 +77,8 @@ interface EnhancedProduct {
   category: string;
   subcategory?: string;
   sku?: string;
+  unit: string;
+  quantity?: number;
   stockQuantity: number;
   imageUrl: string;
   imageUrls?: string[];
@@ -110,7 +112,8 @@ const enhancedProductFormSchema = z.object({
     .min(20, "Full description must be at least 20 characters"),
   category: z.string().min(1, "Please select a category"),
   subcategory: z.string().optional(),
-
+  unit: z.string().min(1, "Please select a unit"),
+  quantity: z.number().min(0.01, "Quantity must be greater than 0"),
   // Pricing & Inventory
   price: z.number().min(0.01, "Price must be greater than 0"),
   discountPrice: z.number().optional(),
@@ -189,6 +192,8 @@ export default function EnhancedAdminProducts() {
       discountPrice: undefined,
       category: "",
       subcategory: "",
+      unit: "",
+      quantity: 0,
       sku: "",
       stockQuantity: 0,
       imageUrl: "",
@@ -456,6 +461,8 @@ export default function EnhancedAdminProducts() {
       price: product.price,
       discountPrice: product.discountPrice,
       category: product.category,
+      unit: product.unit || "",
+      quantity: product.quantity,
       sku: product.sku || "",
       stockQuantity: product.stockQuantity,
       imageUrl: product.imageUrl,
@@ -536,6 +543,8 @@ export default function EnhancedAdminProducts() {
       price: 0,
       discountPrice: undefined,
       category: "",
+      unit: "",
+      quantity: 0,
       sku: "",
       stockQuantity: 0,
       imageUrl: "",
@@ -1200,6 +1209,61 @@ export default function EnhancedAdminProducts() {
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
+                      name="quantity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Quantity</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              {...(!isCreateDialogOpen ? field : {})}
+                              onChange={(e) => {
+                                const value = parseFloat(e.target.value);
+                                if (value < 0) {
+                                  e.target.value = "0";
+                                } else {
+                                  field.onChange(value);
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={(value) => field.onChange(value)}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a unit" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="kg">Kg</SelectItem>
+                                <SelectItem value="gram">gram</SelectItem>
+                                <SelectItem value="l">L</SelectItem>
+                                <SelectItem value="pcs">pcs</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="stockQuantity"
                       render={({ field }) => (
                         <FormItem>
@@ -1223,7 +1287,6 @@ export default function EnhancedAdminProducts() {
                         </FormItem>
                       )}
                     />
-
                     <FormField
                       control={form.control}
                       name="sku"

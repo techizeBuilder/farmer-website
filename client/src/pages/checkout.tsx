@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/form";
 import { motion, AnimatePresence } from "framer-motion";
 import placeholderImage from "../../../public/uploads/products/No-Image.png";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 // Dynamic form schema based on COD availability
 const createFormSchema = (codEnabled: boolean) =>
   z.object({
@@ -683,6 +684,13 @@ export default function Checkout() {
                     <div className="text-right">
                       <p className="text-foreground font-medium">
                         ₹{(item.product.price * item.quantity).toFixed(2)}
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        {item.product.quantity}{" "}
+                        {item.product.unit === "pcs" &&
+                        item.product.quantity === 1
+                          ? "Piece"
+                          : formatSnakeCase(item.product.unit!)}
                       </p>
                     </div>
                   </div>

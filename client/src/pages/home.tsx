@@ -34,6 +34,7 @@ import type {
   Category,
 } from "@shared/schema";
 import farmerImage from "../../../public/uploads/products/famer-home.jpg";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 const newsletterSchema = z.object({
   name: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
@@ -290,7 +291,10 @@ export default function Home() {
 
               <div className="flex justify-between items-center">
                 <span className="text-forest text-xl font-bold">
-                  ₹{product.price}
+                  ₹{product.price}/{product.quantity}{" "}
+                  {product.unit === "pcs" && product.quantity === 1
+                    ? "Piece"
+                    : formatSnakeCase(product.unit!)}
                 </span>
                 <Link
                   to={`/products/${product.id}`}

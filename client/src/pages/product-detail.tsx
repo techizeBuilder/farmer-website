@@ -14,6 +14,7 @@ import ProductReviewSystem from "@/components/ProductReviewSystem";
 import SocialShare from "@/components/SocialShare";
 import { useAnimations } from "@/hooks/use-animations";
 import { useAuth } from "@/context/AuthContext";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -195,10 +196,16 @@ export default function ProductDetail() {
                 product.discountPrice < product.price ? (
                   <div className="flex items-center space-x-3">
                     <span className="text-forest text-3xl font-bold">
-                      ₹{product.discountPrice.toFixed(2)}
+                      ₹{product.discountPrice.toFixed(2)}/{product.quantity}{" "}
+                      {product.unit === "pcs" && product.quantity === 1
+                        ? "Piece"
+                        : formatSnakeCase(product.unit!)}
                     </span>
                     <span className="text-gray-500 line-through text-xl">
-                      ₹{product.price.toFixed(2)}
+                      ₹{product.price.toFixed(2)}/{product.quantity}{" "}
+                      {product.unit === "pcs" && product.quantity === 1
+                        ? "Piece"
+                        : formatSnakeCase(product.unit!)}
                     </span>
                     <span className="bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
                       {Math.round(
@@ -211,7 +218,13 @@ export default function ProductDetail() {
                   </div>
                 ) : (
                   <span className="text-forest text-3xl font-bold">
-                    ₹{product?.price ? product.price.toFixed(2) : "0.00"}
+                    ₹
+                    {product?.price
+                      ? (product.price / product.quantity).toFixed(2)
+                      : "0.00"}{" "}
+                    {product?.unit === "pcs" && product?.quantity === 1
+                      ? "Piece"
+                      : formatSnakeCase(product?.unit || "")}
                   </span>
                 )}
                 <div className="text-sm text-olive bg-background/80 px-3 py-1 rounded">
