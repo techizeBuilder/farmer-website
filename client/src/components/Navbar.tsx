@@ -132,6 +132,19 @@ export default function Navbar() {
                   >
                     Logout
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={openCart}
+                    className="text-forest hover:text-primary hover:bg-transparent relative"
+                  >
+                    <ShoppingBasket className="h-5 w-5" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Button>
                 </>
               ) : (
                 <>
@@ -150,20 +163,6 @@ export default function Navbar() {
                 </>
               )}
             </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={openCart}
-              className="text-forest hover:text-primary hover:bg-transparent relative"
-            >
-              <ShoppingBasket className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
 
             <Button
               variant="ghost"

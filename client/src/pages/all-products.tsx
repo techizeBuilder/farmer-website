@@ -20,6 +20,7 @@ import { useAnimations } from "@/hooks/use-animations";
 import { cn, debounce } from "@/lib/utils";
 import { useSearchParams as queryfinder } from "react-router-dom";
 import { useCategory } from "@/hooks/store";
+import { useAuth } from "@/context/AuthContext";
 
 // Custom hook for URL search params with navigation
 const useSearchParams = () => {
@@ -70,6 +71,8 @@ export default function AllProducts() {
   const sortOrderParam = searchParamsfromwouter.get("sortOrder");
   const pageParam = searchParamsfromwouter.get("page");
   const { category } = useCategory();
+  const { isAuthenticated } = useAuth();
+  const [location, navigate] = useLocation();
   // Ensure page always starts at top on any navigation
 
   // window.scrollTo(0, 0);
@@ -165,9 +168,14 @@ export default function AllProducts() {
   const { setupScrollAnimation } = useAnimations();
 
   useEffect(() => {
+    if (!isAuthenticated && location !== "/login") {
+      console.log("Redirecting to login...");
+      setTimeout(() => navigate("/login"), 0);
+    }
+
     setupScrollAnimation();
     window.scrollTo(0, 0);
-  }, []);
+  }, [isAuthenticated]);
 
   // Reset pagination when filters change
   useEffect(() => {

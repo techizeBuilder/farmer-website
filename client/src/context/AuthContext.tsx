@@ -220,7 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-
+  window.addEventListener("beforeunload", logout);
   return (
     <AuthContext.Provider
       value={{

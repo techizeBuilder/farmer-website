@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/ui/add-to-cart-button";
@@ -13,16 +13,23 @@ import ProductCard from "@/components/ProductCard";
 import ProductReviewSystem from "@/components/ProductReviewSystem";
 import SocialShare from "@/components/SocialShare";
 import { useAnimations } from "@/hooks/use-animations";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const productId = parseInt(id);
+  const { isAuthenticated } = useAuth();
+  const [location, navigate] = useLocation();
 
   // Animation controller
   const { setupScrollAnimation } = useAnimations();
 
   // Set up scroll animations
   useEffect(() => {
+    if (!isAuthenticated && location !== "/login") {
+      console.log("Redirecting to login...");
+      setTimeout(() => navigate("/login"), 0);
+    }
     setupScrollAnimation();
   }, [setupScrollAnimation]);
 

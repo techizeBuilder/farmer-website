@@ -5,6 +5,8 @@ import { ShoppingBasket, Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { QuantitySelector } from "./quantity-selector";
+import { useAuth } from "@/context/AuthContext";
+import { useLocation } from "wouter";
 
 interface AddToCartButtonProps {
   product: Product;
@@ -29,11 +31,17 @@ export function AddToCartButton({
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(quantity);
-
+  const { isAuthenticated } = useAuth();
+  const [location, navigate] = useLocation();
   // Set max quantity to the available stock (or specified max)
   const maxQuantity = max !== undefined ? max : product.stockQuantity;
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated && location !== "/login") {
+      console.log("Redirecting to login...");
+      setTimeout(() => navigate("/login"), 0);
+      return;
+    }
     setIsAdding(true);
     try {
       await addToCart(product.id, selectedQuantity);

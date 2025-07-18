@@ -37,7 +37,10 @@ const registerSchema = z
     }),
     password: z
       .string()
-      .min(6, { message: "Password must be at least 6 characters" }),
+      .min(6, { message: "Password must be at least 6 characters" })
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+        message: "Password must include at least one special character",
+      }),
     confirmPassword: z.string(),
     terms: z.boolean().refine((val) => val === true, {
       message: "You must agree to the terms and conditions",
