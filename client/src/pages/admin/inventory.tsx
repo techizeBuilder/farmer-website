@@ -35,6 +35,8 @@ interface Product {
   price: number;
   stockQuantity: number;
   imageUrl?: string;
+  quantity?: number;
+  unit?: string;
 }
 
 export default function AdminInventory() {
@@ -335,6 +337,7 @@ export default function AdminInventory() {
                         <th className="text-left p-2">SKU</th>
                         <th className="text-left p-2">Category</th>
                         <th className="text-left p-2">Price</th>
+                        <th className="text-left p-2">Per Stock</th>
                         <th className="text-left p-2">Stock</th>
                         <th className="text-left p-2">Status</th>
                         <th className="text-left p-2">Actions</th>
@@ -372,6 +375,9 @@ export default function AdminInventory() {
                             <Badge variant="outline">{product.category}</Badge>
                           </td>
                           <td className="p-2">₹{product.price}</td>
+                          <td className="p-2">
+                            {product.quantity} {product.unit}
+                          </td>
                           <td className="p-2">
                             {editingStock[product.id] !== undefined ? (
                               <div className="flex items-center gap-2">

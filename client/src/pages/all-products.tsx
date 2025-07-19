@@ -532,6 +532,7 @@ export default function AllProducts() {
   // Load categories on component mount
   useEffect(() => {
     fetchMainCategories();
+    window.scrollTo(0, 0);
   }, []);
 
   // Handle category loading and state sync after main categories are loaded

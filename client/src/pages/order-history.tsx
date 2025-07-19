@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Package, Calendar, CreditCard, MapPin, ArrowLeft } from "lucide-react";
 import placeholderImage from "../../../public/uploads/products/No-Image.png";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 interface Product {
   id: number;
   name: string;
@@ -27,6 +28,7 @@ interface OrderItem {
   quantity: number;
   price: number;
   product: Product | null;
+  unit: string; // Add this line
 }
 
 interface Payment {
@@ -62,6 +64,7 @@ interface Order {
   items: OrderItem[];
   payment: Payment | null;
   appliedDiscounts: AppliedDiscount[];
+  trackingId: string | null;
 }
 
 interface OrderHistoryResponse {
@@ -360,7 +363,10 @@ export default function OrderHistory() {
                                 )}
                                 <div className="text-sm text-gray-600">
                                   Quantity: {item.quantity} × ₹
-                                  {item.price.toFixed(2)}
+                                  {item.price.toFixed(2)}/{item.quantity}{" "}
+                                  {item.unit === "pcs" && item.quantity === 1
+                                    ? "Piece"
+                                    : formatSnakeCase(item.unit!)}
                                 </div>
                               </div>
                               <div className="text-right">

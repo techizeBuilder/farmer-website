@@ -34,6 +34,7 @@ import { OTPInput } from "@/components/ui/otp-input";
 import DeleteAccount from "./DeleteAccount";
 import ChangeNumberUser from "./ChangeNumberUser";
 import ChangeEmailUser from "./ChangeEmailUser";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -866,7 +867,12 @@ export default function Account() {
                                     </h4>
                                     <p className="text-sm text-gray-600">
                                       Quantity: {item.quantity} • Price: ₹
-                                      {item.price.toFixed(2)}
+                                      {item.price.toFixed(2)}/
+                                      {item.productQuantity}{" "}
+                                      {item.unit === "pcs" &&
+                                      item.productQuantity === 1
+                                        ? "Piece"
+                                        : formatSnakeCase(item.unit!)}
                                     </p>
                                   </div>
                                   <div className="flex items-center space-x-2">

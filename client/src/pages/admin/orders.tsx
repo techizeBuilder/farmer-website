@@ -55,6 +55,7 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import placeholderImage from "../../../../public/uploads/products/No-Image.png";
+import { formatSnakeCase } from "@/utils/formatSnakeCase";
 // Order type definition for API response
 interface OrderData {
   id: number;
@@ -978,7 +979,12 @@ export default function AdminOrders() {
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="font-medium">₹{item.price}</p>
+                              <p className="font-medium">
+                                ₹{item.price}/{item.quantity}{" "}
+                                {item.unit === "pcs" && item.quantity === 1
+                                  ? "Piece"
+                                  : formatSnakeCase(item.unit!)}
+                              </p>
                               <p className="text-sm text-muted-foreground">
                                 Total: ₹{item.price * item.quantity}
                               </p>

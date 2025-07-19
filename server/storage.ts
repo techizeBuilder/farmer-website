@@ -1729,6 +1729,8 @@ export class DatabaseStorage implements IStorage {
         quantity: orderItems.quantity,
         price: orderItems.price,
         productName: products.name,
+        unit: products.unit, // 👈 NEW
+        productQuantity: products.quantity, //
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))

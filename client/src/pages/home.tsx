@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,10 @@ export default function Home() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(
     null
   );
+  const storyRef = useRef(null);
+  const scrollToStory = () => {
+    storyRef.current.scrollIntoView({ behavior: "smooth" });
+  };
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -309,7 +313,7 @@ export default function Home() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-0 right-0 flex justify-center z-20">
-          <Link href="#story">
+          <Link href="#story" onClick={scrollToStory}>
             <div className="text-white animate-bounce bg-black/20 p-2 rounded-full backdrop-blur-sm">
               <ChevronDown className="h-6 w-6" />
             </div>
@@ -318,7 +322,11 @@ export default function Home() {
       </section>
 
       {/* Our Story Section */}
-      <section id="story" className="py-16 md:py-24 bg-background">
+      <section
+        id="story"
+        ref={storyRef}
+        className="py-16 md:py-24 bg-background"
+      >
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-16 scroll-animation">
             <h2 className="font-heading text-forest text-3xl md:text-4xl font-bold mb-6">

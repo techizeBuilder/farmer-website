@@ -31,6 +31,7 @@ export default function ProductDetail() {
       console.log("Redirecting to login...");
       setTimeout(() => navigate("/login"), 0);
     }
+    window.scrollTo(0, 0);
     setupScrollAnimation();
   }, [setupScrollAnimation]);
 
