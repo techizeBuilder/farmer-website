@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -178,23 +178,14 @@ export default function Checkout() {
       notes: "",
     },
   });
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (!isAuthenticated && location !== "/login") {
+      console.log("Redirecting to login...");
+      setTimeout(() => navigate("/login"), 0);
+    }
+  }, [isAuthenticated]);
   // If cart is empty, redirect to products page
-  if (cartItems.length === 0 && !orderComplete) {
-    return (
-      <div className="container mx-auto px-4 py-32 text-center">
-        <h1 className="text-2xl font-bold text-foreground mb-4">
-          Your Cart is Empty
-        </h1>
-        <p className="text-muted-foreground mb-8">
-          Add some products to your cart before proceeding to checkout.
-        </p>
-        <Link href="/products">
-          <Button>Browse Products</Button>
-        </Link>
-      </div>
-    );
-  }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -295,7 +286,21 @@ export default function Checkout() {
       setIsSubmitting(false);
     }
   };
-
+  if (cartItems.length === 0 && !orderComplete) {
+    return (
+      <div className="container mx-auto px-4 py-32 text-center">
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Your Cart is Empty
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          Add some products to your cart before proceeding to checkout.
+        </p>
+        <Link href="/products">
+          <Button>Browse Products</Button>
+        </Link>
+      </div>
+    );
+  }
   // Order confirmation screen
   if (orderComplete) {
     return (
