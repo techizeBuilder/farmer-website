@@ -910,7 +910,7 @@ export default function AdminOrders() {
                   <div>
                     <Label className="text-sm font-medium">Payment ID</Label>
                     <p className="text-sm text-muted-foreground font-mono">
-                      {selectedOrderDetails.payment.razorpayPaymentId ||
+                      {selectedOrderDetails.payment?.razorpayPaymentId ||
                         "Not available"}
                     </p>
                   </div>
