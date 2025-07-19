@@ -192,7 +192,21 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(
   createdAt: true,
 });
 
-// Order Schema
+// 🧩 Type for the customer info JSONB field
+// schema/orders.ts
+const customerInfo = jsonb("customer_info").$type<{
+  firstName: string;
+  lastName?: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  notes?: string;
+}>();
+
+// ✅ Main Orders Table Schema
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
@@ -200,16 +214,24 @@ export const orders = pgTable("orders", {
   paymentId: text("payment_id"),
   total: doublePrecision("total").notNull(),
   status: text("status").notNull().default("pending"),
-  shippingAddress: text("shipping_address").notNull(),
-  billingAddress: text("billing_address"),
+
+  // ⛔ Removed legacy shipping/billing fields
+  // shippingAddress: text("shipping_address").notNull(),
+  // billingAddress: text("billing_address"),
+
+  // ✅ New JSONB field for full customer info
+  customerInfo,
+
   paymentMethod: text("payment_method").notNull().default("razorpay"),
   discountId: integer("discount_id").references(() => discounts.id),
   cancellationReason: text("cancellation_reason"),
   trackingId: text("tracking_id"),
+
   statusTimeline:
     jsonb("status_timeline").$type<
       { status: string; message: string; date: string; location?: string }[]
     >(),
+
   deliveredAt: timestamp("delivered_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

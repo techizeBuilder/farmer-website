@@ -52,6 +52,134 @@ export const getMonthlySalesData = async () => {
   });
 };
 
+// // GET all orders with pagination, sorting and filtering
+// export const getAllOrders = async (req: Request, res: Response) => {
+//   try {
+//     const {
+//       page = "1",
+//       limit = "10",
+//       sort = "id",
+//       order = "asc",
+//       search = "",
+//       status = "",
+//       startDate = "",
+//       endDate = "",
+//     } = req.query as Record<string, string>;
+
+//     const pageNumber = parseInt(page);
+//     const limitNumber = parseInt(limit);
+//     const offset = (pageNumber - 1) * limitNumber;
+
+//     let query = db
+//       .select({
+//         id: orders.id,
+//         userId: orders.userId,
+//         sessionId: orders.sessionId,
+//         total: orders.total,
+//         status: orders.status,
+//         shippingAddress: orders.shippingAddress,
+//         paymentMethod: orders.paymentMethod,
+//         cancellationReason: orders.cancellationReason,
+//         deliveredAt: orders.deliveredAt,
+//         createdAt: orders.createdAt,
+//         trackingId: orders.trackingId,
+//         updatedAt: orders.updatedAt,
+//         userName: users.name,
+//         userEmail: users.email,
+//       })
+//       .from(orders)
+//       .leftJoin(users, eq(orders.userId, users.id));
+
+//     // Apply search filter if provided
+//     if (search) {
+//       query = query.where(like(users.name, `%${search}%`));
+//     }
+
+//     // Apply status filter if provided
+//     if (status) {
+//       query = query.where(eq(orders.status, status));
+//     }
+
+//     // Apply date range filters if provided
+//     if (startDate && endDate) {
+//       query = query.where(
+//         and(
+//           gte(orders.createdAt, new Date(startDate)),
+//           lte(orders.createdAt, new Date(endDate))
+//         )
+//       );
+//     } else if (startDate) {
+//       query = query.where(gte(orders.createdAt, new Date(startDate)));
+//     } else if (endDate) {
+//       query = query.where(lte(orders.createdAt, new Date(endDate)));
+//     }
+
+//     // Count total records for pagination
+//     const totalQuery = db.select({ count: sql<number>`count(*)` }).from(orders);
+
+//     // Apply the same filters to the count query
+//     if (search) {
+//       totalQuery
+//         .leftJoin(users, eq(orders.userId, users.id))
+//         .where(like(users.name, `%${search}%`));
+//     }
+//     if (status) {
+//       totalQuery.where(eq(orders.status, status));
+//     }
+//     if (startDate && endDate) {
+//       totalQuery.where(
+//         and(
+//           gte(orders.createdAt, new Date(startDate)),
+//           lte(orders.createdAt, new Date(endDate))
+//         )
+//       );
+//     } else if (startDate) {
+//       totalQuery.where(gte(orders.createdAt, new Date(startDate)));
+//     } else if (endDate) {
+//       totalQuery.where(lte(orders.createdAt, new Date(endDate)));
+//     }
+
+//     const [countResult] = await totalQuery;
+//     const count = countResult?.count || 0;
+
+//     // Apply sorting
+//     if (sort === "userName") {
+//       if (order === "asc") {
+//         query = query.orderBy(asc(users.name));
+//       } else {
+//         query = query.orderBy(desc(users.name));
+//       }
+//     } else {
+//       if (order === "asc") {
+//         query = query.orderBy(asc(orders[sort as keyof typeof orders]));
+//       } else {
+//         query = query.orderBy(desc(orders[sort as keyof typeof orders]));
+//       }
+//     }
+
+//     // Apply pagination
+//     query = query.limit(limitNumber).offset(offset);
+
+//     // Execute query
+//     const ordersList = await query;
+
+//     // Return orders with pagination metadata
+//     res.json({
+//       orders: ordersList,
+//       pagination: {
+//         total: Number(count),
+//         page: pageNumber,
+//         limit: limitNumber,
+//         totalPages: Math.ceil(Number(count) / limitNumber),
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching orders:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Failed to fetch orders", error: String(error) });
+//   }
+// };
 // GET all orders with pagination, sorting and filtering
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
@@ -66,10 +194,27 @@ export const getAllOrders = async (req: Request, res: Response) => {
       endDate = "",
     } = req.query as Record<string, string>;
 
-    const pageNumber = parseInt(page);
-    const limitNumber = parseInt(limit);
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
     const offset = (pageNumber - 1) * limitNumber;
 
+    // 🧠 Build conditions array for where clause
+    const conditions = [];
+
+    if (search) {
+      conditions.push(like(users.name, `%${search}%`));
+    }
+    if (status) {
+      conditions.push(eq(orders.status, status));
+    }
+    if (startDate) {
+      conditions.push(gte(orders.createdAt, new Date(startDate)));
+    }
+    if (endDate) {
+      conditions.push(lte(orders.createdAt, new Date(endDate)));
+    }
+
+    // ✅ Main query with joins
     let query = db
       .select({
         id: orders.id,
@@ -77,7 +222,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
         sessionId: orders.sessionId,
         total: orders.total,
         status: orders.status,
-        shippingAddress: orders.shippingAddress,
+        customerInfo: orders.customerInfo, // ✅ Make sure schema allows JSON
         paymentMethod: orders.paymentMethod,
         cancellationReason: orders.cancellationReason,
         deliveredAt: orders.deliveredAt,
@@ -90,94 +235,73 @@ export const getAllOrders = async (req: Request, res: Response) => {
       .from(orders)
       .leftJoin(users, eq(orders.userId, users.id));
 
-    // Apply search filter if provided
-    if (search) {
-      query = query.where(like(users.name, `%${search}%`));
+    // Apply filters
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
-    // Apply status filter if provided
-    if (status) {
-      query = query.where(eq(orders.status, status));
-    }
+    // ✅ Count query with same filters
+    let totalQuery = db
+      .select({ count: sql<number>`count(*)` })
+      .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id));
 
-    // Apply date range filters if provided
-    if (startDate && endDate) {
-      query = query.where(
-        and(
-          gte(orders.createdAt, new Date(startDate)),
-          lte(orders.createdAt, new Date(endDate))
-        )
-      );
-    } else if (startDate) {
-      query = query.where(gte(orders.createdAt, new Date(startDate)));
-    } else if (endDate) {
-      query = query.where(lte(orders.createdAt, new Date(endDate)));
-    }
-
-    // Count total records for pagination
-    const totalQuery = db.select({ count: sql<number>`count(*)` }).from(orders);
-
-    // Apply the same filters to the count query
-    if (search) {
-      totalQuery
-        .leftJoin(users, eq(orders.userId, users.id))
-        .where(like(users.name, `%${search}%`));
-    }
-    if (status) {
-      totalQuery.where(eq(orders.status, status));
-    }
-    if (startDate && endDate) {
-      totalQuery.where(
-        and(
-          gte(orders.createdAt, new Date(startDate)),
-          lte(orders.createdAt, new Date(endDate))
-        )
-      );
-    } else if (startDate) {
-      totalQuery.where(gte(orders.createdAt, new Date(startDate)));
-    } else if (endDate) {
-      totalQuery.where(lte(orders.createdAt, new Date(endDate)));
+    if (conditions.length > 0) {
+      totalQuery = totalQuery.where(and(...conditions));
     }
 
     const [countResult] = await totalQuery;
-    const count = countResult?.count || 0;
+    const count = Number(countResult?.count ?? 0);
 
-    // Apply sorting
+    // ✅ Safe sort field whitelist
+    const validSortFields = [
+      "id",
+      "userId",
+      "sessionId",
+      "total",
+      "status",
+      "paymentMethod",
+      "deliveredAt",
+      "createdAt",
+      "updatedAt",
+      "trackingId",
+    ];
+
     if (sort === "userName") {
-      if (order === "asc") {
-        query = query.orderBy(asc(users.name));
-      } else {
-        query = query.orderBy(desc(users.name));
-      }
+      query = query.orderBy(
+        order === "asc" ? asc(users.name) : desc(users.name)
+      );
+    } else if (validSortFields.includes(sort)) {
+      const sortColumn = (orders as any)[sort];
+      query = query.orderBy(
+        order === "asc" ? asc(sortColumn) : desc(sortColumn)
+      );
     } else {
-      if (order === "asc") {
-        query = query.orderBy(asc(orders[sort as keyof typeof orders]));
-      } else {
-        query = query.orderBy(desc(orders[sort as keyof typeof orders]));
-      }
+      // Default fallback
+      query = query.orderBy(desc(orders.createdAt));
     }
 
-    // Apply pagination
+    // ✅ Pagination
     query = query.limit(limitNumber).offset(offset);
 
-    // Execute query
     const ordersList = await query;
 
-    // Return orders with pagination metadata
+    // ✅ Send response
     res.json({
       orders: ordersList,
       pagination: {
-        total: Number(count),
+        total: count,
         page: pageNumber,
         limit: limitNumber,
-        totalPages: Math.ceil(Number(count) / limitNumber),
+        totalPages: Math.ceil(count / limitNumber),
       },
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch orders", error: String(error) });
+    res.status(500).json({
+      message: "Failed to fetch orders",
+      error: String(error),
+    });
   }
 };
 

@@ -17,7 +17,7 @@ export default function PaymentSuccess() {
   return (
     // <Layout>
     // abhi
-    <div className="container mx-auto py-10 flex justify-center">
+    <div className="container mx-auto py-10 flex justify-center relative top-16 mb-12">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <div className="flex justify-center mb-4">
@@ -38,7 +38,9 @@ export default function PaymentSuccess() {
           <Button variant="outline" onClick={() => navigate("/account")}>
             View Account
           </Button>
-          <Button onClick={() => navigate("/")}>Continue Shopping</Button>
+          <Button onClick={() => navigate("/products")}>
+            Continue Shopping
+          </Button>
         </CardFooter>
       </Card>
     </div>

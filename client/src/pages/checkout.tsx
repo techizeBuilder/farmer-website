@@ -32,6 +32,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import placeholderImage from "../../../public/uploads/products/No-Image.png";
 import { formatSnakeCase } from "@/utils/formatSnakeCase";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 // Dynamic form schema based on COD availability
 const createFormSchema = (codEnabled: boolean) =>
   z.object({
@@ -62,7 +63,7 @@ export default function Checkout() {
   const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
   const [discountLoading, setDiscountLoading] = useState(false);
   const [discountError, setDiscountError] = useState("");
-
+  const [, navigate] = useLocation();
   // Fetch available discounts
   const { data: availableDiscounts = [], isLoading: discountsLoading } =
     useQuery({
@@ -199,7 +200,19 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     try {
-      // Create the order data
+      // Construct customer info and order summary
+      const orderCustomerInfo = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        city: values.city,
+        state: values.state,
+        zip: values.zip,
+        notes: values.notes,
+      };
+
       const orderData = {
         ...values,
         cartItems,
@@ -208,31 +221,74 @@ export default function Checkout() {
         total,
       };
 
+      console.log("orderData", orderData);
+
       if (values.paymentMethod === "razorpay") {
-        // Redirect to Razorpay payment page
+        // For Razorpay, store customer info and redirect
+        sessionStorage.setItem(
+          "customerInfo",
+          JSON.stringify(orderCustomerInfo)
+        );
         setLocation(
-          `/payment?amount=${total}&currency=INR&description=Purchase from Farm to Table`
+          `/payment?amount=${calculateTotal().toFixed(
+            2
+          )}&currency=INR&description=Purchase from Farm to Table`
         );
         return;
-      } else if (values.paymentMethod === "cod") {
-        // Process Cash on Delivery order
-        // Simulate order processing delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
 
-        // Clear cart after successful order
+      if (values.paymentMethod === "cod") {
+        const sessionId = localStorage.getItem("sessionId");
+        // For COD, hit your backend API to create order
+        const response = await apiRequest(`/api/payments/verify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // if needed
+            "x-session-id": sessionId?.toString() ?? "",
+          },
+          body: JSON.stringify({
+            paymentMethod: "cod",
+            amount: calculateTotal().toFixed(2) * 100, // send in paise
+            currency: "INR",
+            customerInfo: orderCustomerInfo,
+          }),
+        });
+
+        // if (!response.ok) {
+        //   const data = await response.json();
+        //   throw new Error(data.message || "COD order failed");
+        // }
+
+        // const data = await response.json();
+        // console.log("COD Order Success", data);
+
+        // Clear cart and show success
+        // Clear the cart from frontend context
         await clearCart();
 
-        // Show success state
-        setOrderComplete(true);
+        // Invalidate cart and order history queries
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+        queryClient.invalidateQueries({
+          queryKey: ["/api/orders/history"],
+        });
 
-        // Scroll to top
+        toast({
+          title: "Payment Successful",
+          description: "Your payment has been processed successfully.",
+        });
+
+        // Redirect to success page
+        navigate("/payment-success");
+        setOrderComplete(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Order error", error);
       toast({
         title: "Error",
         description:
-          "There was a problem processing your order. Please try again.",
+          error.error || "There was a problem processing your order.",
         variant: "destructive",
       });
     } finally {
@@ -266,7 +322,7 @@ export default function Checkout() {
               <Button className="w-full bg-primary">Return to Home</Button>
             </Link>
             <Link href="/products">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full hover:text-white">
                 Continue Shopping
               </Button>
             </Link>
@@ -279,7 +335,7 @@ export default function Checkout() {
   return (
     <div className="bg-background py-32">
       <div className="container mx-auto px-4">
-        <Link href="/">
+        <Link href="/prooducts">
           <Button
             variant="ghost"
             className="mb-8 flex items-center text-muted-foreground"
@@ -555,7 +611,7 @@ export default function Checkout() {
 
                 {/* Discount Selection Section */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-heading font-semibold text-forest mb-6">
+                  <h2 className="text-xl font-heading font-semibold  mb-6">
                     Apply Discount
                   </h2>
                   <div className="space-y-4">
@@ -588,7 +644,7 @@ export default function Checkout() {
                                 <span className="font-medium">
                                   {discount.code}
                                 </span>
-                                <span className="text-sm text-gray-600 ml-2">
+                                <span className="text-sm  ml-2">
                                   {discount.type === "percentage" &&
                                     `${discount.value}% off`}
                                   {discount.type === "fixed" &&

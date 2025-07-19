@@ -47,6 +47,18 @@ interface AppliedDiscount {
   description: string;
 }
 
+interface CustomerInfo {
+  zip: string;
+  city: string;
+  email: string;
+  notes: string;
+  phone: string;
+  state: string;
+  address: string;
+  lastName: string;
+  firstName: string;
+}
+
 interface Order {
   id: number;
   userId: number;
@@ -55,6 +67,7 @@ interface Order {
   total: number;
   status: string;
   shippingAddress: string;
+  customerInfo: CustomerInfo; // ✅ Fix this line
   billingAddress: string;
   paymentMethod: string;
   cancellationReason: string | null;
@@ -66,7 +79,6 @@ interface Order {
   appliedDiscounts: AppliedDiscount[];
   trackingId: string | null;
 }
-
 interface OrderHistoryResponse {
   orders: Order[];
 }
@@ -303,25 +315,46 @@ export default function OrderHistory() {
                     </div>
 
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        Shipping Address
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {order.shippingAddress}
-                      </p>
-
-                      {order.billingAddress &&
-                        order.billingAddress !== order.shippingAddress && (
-                          <>
-                            <h4 className="font-semibold mb-2 mt-4">
-                              Billing Address
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              {order.billingAddress}
-                            </p>
-                          </>
+                      <h4 className="font-semibold mb-2">Customer Details</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Name:</span>
+                          <span>
+                            {order.customerInfo?.firstName}{" "}
+                            {order.customerInfo?.lastName}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Phone:</span>
+                          <span>{order.customerInfo?.phone || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Email:</span>
+                          <span>{order.customerInfo?.email || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Address:</span>
+                          <span className="text-right">
+                            {order.customerInfo ? (
+                              <>
+                                {order.customerInfo.address}
+                                <br />
+                                {order.customerInfo.city},{" "}
+                                {order.customerInfo.state} -{" "}
+                                {order.customerInfo.zip}
+                              </>
+                            ) : (
+                              "No address"
+                            )}
+                          </span>
+                        </div>
+                        {order.customerInfo?.notes && (
+                          <div className="flex justify-between">
+                            <span>Notes:</span>
+                            <span>{order.customerInfo.notes}</span>
+                          </div>
                         )}
+                      </div>
                     </div>
                   </div>
 

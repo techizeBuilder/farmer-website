@@ -24,7 +24,6 @@ declare global {
 }
 
 export default function Payment() {
-  const location = useLocation();
   const [, navigate] = useLocation();
   const { isAuthenticated, token, user } = useAuth();
   const { sessionId, clearCart } = useCart();
@@ -134,8 +133,10 @@ export default function Payment() {
         }),
       });
 
-      console.log("Payment initialization successful:", data);
-
+      console.log("Payment initialization successful:", orderDetails);
+      const customerInfo = JSON.parse(
+        sessionStorage.getItem("customerInfo") || "{}"
+      );
       // Configure Razorpay options
       const options = {
         key: data.keyId,
@@ -160,7 +161,7 @@ export default function Payment() {
                 razorpaySignature: response.razorpay_signature,
                 amount: data.amount,
                 currency: data.currency,
-                shippingAddress: "Default address", // You can get this from form data if needed
+                customerInfo: customerInfo, // You can get this from form data if needed
               }),
             });
 

@@ -1,6 +1,13 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { Product } from "@shared/schema";
 import { v4 as uuidv4 } from "uuid"; // Using UUID v4 for session IDs
+import { useLocation } from "wouter";
 
 interface CartItem {
   product: Product;
@@ -31,12 +38,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState("");
-  
+  const [location, navigate] = useLocation();
   const subtotal = cartItems.reduce(
     (total, item) => total + item.product.price * item.quantity,
     0
   );
-  
+
   const shipping = subtotal > 0 ? 4.99 : 0;
   const total = subtotal + shipping;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -45,13 +52,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedSessionId = localStorage.getItem("sessionId");
     const newSessionId = storedSessionId || uuidv4();
-    
+
     if (!storedSessionId) {
       localStorage.setItem("sessionId", newSessionId);
     }
-    
+
     setSessionId(newSessionId);
-    
+
     // Load cart data
     fetchCart(newSessionId);
   }, []);
@@ -61,11 +68,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const response = await fetch(`/api/cart`, {
         headers: {
-          'x-session-id': id
-        }
+          "x-session-id": id,
+        },
       });
       const data = await response.json();
-      
+
       console.log("Fetched cart data:", data);
       if (data && data.items) {
         setCartItems(data.items);
@@ -88,6 +95,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const closeCart = () => {
     setIsCartOpen(false);
+    navigate("/products");
     // Restore scrolling
     document.body.style.overflow = "auto";
   };
@@ -99,17 +107,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-session-id": sessionId
+          "x-session-id": sessionId,
         },
         body: JSON.stringify({
           productId,
-          quantity
-        })
+          quantity,
+        }),
       });
-      
+
       const data = await response.json();
       console.log("Added to cart:", data);
-      
+
       if (data && data.items) {
         setCartItems(data.items);
         // Open the cart when an item is added
@@ -126,20 +134,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (quantity < 1) {
       return removeFromCart(productId);
     }
-    
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/cart/items/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "x-session-id": sessionId
+          "x-session-id": sessionId,
         },
-        body: JSON.stringify({ quantity })
+        body: JSON.stringify({ quantity }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data && data.items) {
         setCartItems(data.items);
       }
@@ -156,12 +164,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const response = await fetch(`/api/cart/items/${productId}`, {
         method: "DELETE",
         headers: {
-          "x-session-id": sessionId
-        }
+          "x-session-id": sessionId,
+        },
       });
-      
+
       const data = await response.json();
-      
+
       if (data && data.items) {
         setCartItems(data.items);
       }
@@ -178,10 +186,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const response = await fetch(`/api/cart`, {
         method: "DELETE",
         headers: {
-          "x-session-id": sessionId
-        }
+          "x-session-id": sessionId,
+        },
       });
-      
+
       if (response.ok) {
         setCartItems([]);
         // Fetch updated cart data to ensure synchronization
@@ -210,7 +218,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         shipping,
         total,
         totalItems,
-        sessionId
+        sessionId,
       }}
     >
       {children}

@@ -870,16 +870,13 @@ export default function AdminOrders() {
                   <div>
                     <Label className="text-sm font-medium">Customer Name</Label>
                     <p className="text-sm text-muted-foreground">
-                      {selectedOrderDetails.user?.name ||
-                        selectedOrderDetails.userName ||
-                        "Guest Customer"}
+                      {selectedOrderDetails.customer?.name || "Guest Customer"}
                     </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Email</Label>
                     <p className="text-sm text-muted-foreground">
-                      {selectedOrderDetails.user?.email ||
-                        selectedOrderDetails.userEmail ||
+                      {selectedOrderDetails.customer?.email ||
                         "No email provided"}
                     </p>
                   </div>
@@ -888,8 +885,9 @@ export default function AdminOrders() {
                       Shipping Address
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      {selectedOrderDetails.shippingAddress ||
-                        "No address provided"}
+                      {selectedOrderDetails.customer
+                        ? `${selectedOrderDetails.customer.address}, ${selectedOrderDetails.customer.city}, ${selectedOrderDetails.customer.state} - ${selectedOrderDetails.customer.zip}`
+                        : "No address provided"}
                     </p>
                   </div>
                 </CardContent>
@@ -912,7 +910,8 @@ export default function AdminOrders() {
                   <div>
                     <Label className="text-sm font-medium">Payment ID</Label>
                     <p className="text-sm text-muted-foreground font-mono">
-                      {selectedOrderDetails.paymentId || "Not available"}
+                      {selectedOrderDetails.payment.razorpayPaymentId ||
+                        "Not available"}
                     </p>
                   </div>
                   {selectedOrderDetails.payment && (

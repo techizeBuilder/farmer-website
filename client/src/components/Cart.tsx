@@ -174,7 +174,7 @@ export default function Cart() {
                   </Link>
                   <Button
                     variant="ghost"
-                    className="w-full text-primary hover:text-primary-dark text-center mt-4 transition duration-300"
+                    className="w-full text-primary hover:text-white text-center mt-4 transition duration-300"
                     onClick={closeCart}
                   >
                     Continue Shopping
