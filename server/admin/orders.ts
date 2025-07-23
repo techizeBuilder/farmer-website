@@ -1,4 +1,14 @@
 import { Request, Response } from "express";
+
+// Extend Request interface for authenticated user
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
 import { db } from "../db";
 import {
   orders,
@@ -318,7 +328,7 @@ export const getOrderById = async (req: Request, res: Response) => {
         sessionId: orders.sessionId,
         total: orders.total,
         status: orders.status,
-        shippingAddress: orders.shippingAddress,
+        customerInfo: orders.customerInfo,
         paymentMethod: orders.paymentMethod,
         cancellationReason: orders.cancellationReason,
         deliveredAt: orders.deliveredAt,
@@ -454,7 +464,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       date: now,
       ...(status === "shipped" && { location: "Warehouse, Delhi" }),
       ...(status === "delivered" && {
-        location: existingOrder.shippingAddress,
+        location: existingOrder.customerInfo?.address || "Customer Address",
       }),
     };
 
@@ -496,7 +506,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 };
 
 // Customer requests order cancellation
-export const requestOrderCancellation = async (req: Request, res: Response) => {
+export const requestOrderCancellation = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
@@ -521,8 +531,8 @@ export const requestOrderCancellation = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if order can be cancelled
-    const cancellableStatuses = ["pending", "processing"];
+    // Check if order can be cancelled - per requirements: "Confirmed", "Pending", or "Processing"
+    const cancellableStatuses = ["pending", "confirmed", "processing"];
     if (!cancellableStatuses.includes(existingOrder.status)) {
       return res.status(400).json({ 
         message: "Order cannot be cancelled at this stage" 
@@ -572,7 +582,7 @@ export const requestOrderCancellation = async (req: Request, res: Response) => {
 };
 
 // Admin approves/rejects cancellation request
-export const processCancellationRequest = async (req: Request, res: Response) => {
+export const processCancellationRequest = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { action, rejectionReason } = req.body; // action: 'approve' or 'reject'
@@ -671,7 +681,7 @@ export const processCancellationRequest = async (req: Request, res: Response) =>
 };
 
 // Get orders with pending cancellation requests (for admin)
-export const getPendingCancellationRequests = async (req: Request, res: Response) => {
+export const getPendingCancellationRequests = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const pendingRequests = await db.query.orders.findMany({
       where: and(
@@ -680,7 +690,7 @@ export const getPendingCancellationRequests = async (req: Request, res: Response
         isNull(orders.cancellationRejectedAt)
       ),
       with: {
-        orderItems: {
+        items: {
           with: {
             product: true,
           },
@@ -819,7 +829,7 @@ export const exportOrders = async (req: Request, res: Response) => {
         sessionId: orders.sessionId,
         total: orders.total,
         status: orders.status,
-        shippingAddress: orders.shippingAddress,
+        customerInfo: orders.customerInfo,
         paymentMethod: orders.paymentMethod,
         cancellationReason: orders.cancellationReason,
         deliveredAt: orders.deliveredAt,
