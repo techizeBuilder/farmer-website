@@ -42,22 +42,51 @@ app.use((req, res, next) => {
 
   next();
 });
+// Configure CORS for Replit environment
 const allowedOrigins = [
   "http://localhost:5000",
+  "http://0.0.0.0:5000",
   "https://new-farmer-e5cl.onrender.com",
-
-  // "https://new-farmer.onrender.com",
-  // "https://farmfresh.techizebuilder.com",
 ];
+
+// Add Replit domain patterns
+const isReplitDomain = (origin: string) => {
+  return origin && (
+    origin.includes('.replit.dev') || 
+    origin.includes('.repl.co') ||
+    origin.includes('.replit.app') ||
+    origin.includes('replit.com')
+  );
+};
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+    origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) {
         callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+        return;
       }
+
+      // Allow Replit domains
+      if (isReplitDomain(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      // Allow explicitly configured origins
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      // For development, allow localhost with any port
+      if (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:')) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
@@ -105,16 +134,11 @@ app.use(morgan("dev"));
 
   // Run every day at 12:00 AM
   scheduleCouponExpiration();
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen(
-    {
-      port,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    }
-  );
+  // Configure port for Replit environment
+  const port = parseInt(process.env.PORT || '5000', 10);
+  const host = '0.0.0.0'; // Important for Replit
+  
+  server.listen(port, host, () => {
+    log(`Server running on http://${host}:${port}`);
+  });
 })();
