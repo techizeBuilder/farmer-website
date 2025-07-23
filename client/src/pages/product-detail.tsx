@@ -184,13 +184,14 @@ export default function ProductDetail() {
               </div>
 
               {/* Stock Status */}
-              {product?.stockQuantity && product.stockQuantity <= 10 && (
-                <div className="bg-orange-100 border border-orange-300 text-orange-800 px-3 py-2 rounded-md mb-4">
-                  <p className="text-sm font-medium">
-                    Only {product.stockQuantity} left in stock!
-                  </p>
-                </div>
-              )}
+              {Number(product?.stockQuantity) !== 0 &&
+                Number(product.stockQuantity) <= 10 && (
+                  <div className="bg-orange-100 border border-orange-300 text-orange-800 px-3 py-2 rounded-md mb-4">
+                    <p className="text-sm font-medium">
+                      Only {product.stockQuantity} left in stock!
+                    </p>
+                  </div>
+                )}
 
               <div className="flex items-center space-x-4 mb-8">
                 {product?.discountPrice &&
@@ -234,15 +235,21 @@ export default function ProductDetail() {
               </div>
 
               <div className="mb-8">
-                {product && (
-                  <AddToCartButton
-                    product={product}
-                    showIcon={true}
-                    fullWidth
-                    showQuantitySelector={true}
-                    max={product.stockQuantity}
-                  />
-                )}
+                {product ? (
+                  Number(product.stockQuantity) > 0 ? (
+                    <AddToCartButton
+                      product={product}
+                      showIcon={true}
+                      fullWidth
+                      showQuantitySelector={true}
+                      max={product.stockQuantity}
+                    />
+                  ) : (
+                    <span className="text-red-600 font-semibold">
+                      Out of Stock
+                    </span>
+                  )
+                ) : null}
               </div>
 
               {farmer && (
