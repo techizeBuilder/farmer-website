@@ -1,0 +1,53 @@
+==> Running build command 'npm install && npm run build'...
+added 146 packages, and audited 147 packages in 20s
+17 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+> harvest-direct-backend@1.0.0 build
+> esbuild src/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+  dist/index.js  84.8kb
+⚡ Done in 8ms
+==> Uploading build...
+==> Uploaded in 3.6s. Compression took 1.2s
+==> Build successful 🎉
+==> Deploying...
+==> Running 'npm start'
+> harvest-direct-backend@1.0.0 start
+> NODE_ENV=production node dist/index.js
+node:internal/modules/package_json_reader:268
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@shared/schema' imported from /opt/render/project/src/dist/index.js
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:854:18)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+Node.js v22.14.0
+==> Exited with status 1
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+==> Running 'npm start'
+> harvest-direct-backend@1.0.0 start
+> NODE_ENV=production node dist/index.js
+node:internal/modules/package_json_reader:268
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@shared/schema' imported from /opt/render/project/src/dist/index.js
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:854:18)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+Node.js v22.14.0
