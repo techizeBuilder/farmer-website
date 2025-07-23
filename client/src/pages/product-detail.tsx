@@ -15,6 +15,7 @@ import SocialShare from "@/components/SocialShare";
 import { useAnimations } from "@/hooks/use-animations";
 import { useAuth } from "@/context/AuthContext";
 import { formatSnakeCase } from "@/utils/formatSnakeCase";
+import { formatUnit } from "@/utils/formatUnit";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -151,7 +152,7 @@ export default function ProductDetail() {
               <div className="mb-4">
                 <RatingDisplay
                   rating={averageRating}
-                  totalReviews={reviews.length}
+                  totalReviews={Array.isArray(reviews) ? reviews.length : 0}
                   size="md"
                   showCount={true}
                 />
@@ -199,15 +200,11 @@ export default function ProductDetail() {
                   <div className="flex items-center space-x-3">
                     <span className="text-forest text-3xl font-bold">
                       ₹{product.discountPrice.toFixed(2)}/{product.quantity}{" "}
-                      {product.unit === "pcs" && product.quantity === 1
-                        ? "Piece"
-                        : formatSnakeCase(product.unit!)}
+                      {formatUnit(product.unit, product.quantity)}
                     </span>
                     <span className="text-gray-500 line-through text-xl">
                       ₹{product.price.toFixed(2)}/{product.quantity}{" "}
-                      {product.unit === "pcs" && product.quantity === 1
-                        ? "Piece"
-                        : formatSnakeCase(product.unit!)}
+                      {formatUnit(product.unit, product.quantity)}
                     </span>
                     <span className="bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
                       {Math.round(
@@ -224,9 +221,7 @@ export default function ProductDetail() {
                     {product?.price
                       ? (product.price / product.quantity).toFixed(2)
                       : "0.00"}{" "}
-                    {product?.unit === "pcs" && product?.quantity === 1
-                      ? "Piece"
-                      : formatSnakeCase(product?.unit || "")}
+                    {formatUnit(product?.unit, product?.quantity)}
                   </span>
                 )}
                 <div className="text-sm text-olive bg-background/80 px-3 py-1 rounded">
