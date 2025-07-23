@@ -168,11 +168,6 @@ export default function AllProducts() {
   const { setupScrollAnimation } = useAnimations();
 
   useEffect(() => {
-    if (!isAuthenticated && location !== "/login") {
-      console.log("Redirecting to login...");
-      setTimeout(() => navigate("/login"), 0);
-    }
-
     setupScrollAnimation();
     window.scrollTo(0, 0);
   }, [isAuthenticated]);
