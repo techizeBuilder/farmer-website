@@ -31,15 +31,13 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SiteProvider } from "@/context/SiteContext";
 
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+
 import Layout from "@/components/Layout";
 import { AdminRoutes } from "./AdminRoutes";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+    <TooltipProvider>
         <AuthProvider>
           <CartProvider>
             <Switch>
@@ -103,7 +101,6 @@ function App() {
           </CartProvider>
         </AuthProvider>
       </TooltipProvider>
-    </QueryClientProvider>
   );
 }
 

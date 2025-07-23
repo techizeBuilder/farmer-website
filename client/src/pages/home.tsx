@@ -24,7 +24,7 @@ import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAnimations } from "@/hooks/use-animations";
-import { ChevronDown, Leaf, Truck, Sprout, MapPin } from "lucide-react";
+import { ChevronDown, Leaf, Truck, Sprout, MapPin, Loader } from "lucide-react";
 import { motion } from "framer-motion";
 import type {
   Product,
@@ -273,7 +273,7 @@ export default function Home() {
               className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-2xl transform rotate-2 max-w-md mx-auto"
             >
               {product.length === 0 ? (
-                <Loader2 className="animate-spin h-8 w-8 text-forest" />
+                <Loader />
               ) : (
                 <>
                   <div className="flex items-center gap-4 mb-4">
