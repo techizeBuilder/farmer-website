@@ -132,7 +132,7 @@ export default function Footer() {
   const handleCategoryChange = (categoryName: string | null) => {
     setCategory(categoryName);
     updateURL({
-      category: categoryName,
+      category: categoryName || undefined,
       subcategory: null,
       page: "1",
       sortBy: "id",
