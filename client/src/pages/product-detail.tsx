@@ -213,7 +213,7 @@ export default function ProductDetail() {
                       {Math.round(
                         ((product.price - product.discountPrice) /
                           product.price) *
-                          100
+                          100,
                       )}
                       % OFF
                     </span>
