@@ -12,17 +12,31 @@ import { Clock, CheckCircle, XCircle, Eye, MessageSquare } from "lucide-react";
 
 interface CancellationRequest {
   id: number;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  userId: number;
   total: number;
   status: string;
-  cancellationReason: string;
+  cancellationRequestReason: string;
   cancellationRequestedAt: string;
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
   items: {
-    productName: string;
+    id: number;
     quantity: number;
     price: number;
+    product: {
+      id: number;
+      name: string;
+      imageUrl: string;
+    };
   }[];
 }
 
@@ -33,7 +47,7 @@ export default function OrderCancellations() {
   const queryClient = useQueryClient();
 
   // Fetch pending cancellation requests
-  const { data: requests, isLoading } = useQuery<{requests: CancellationRequest[]}>({
+  const { data: requests, isLoading } = useQuery<CancellationRequest[]>({
     queryKey: ["/api/admin/orders/pending/cancellation"],
     enabled: true,
   });
@@ -107,7 +121,7 @@ export default function OrderCancellations() {
     );
   }
 
-  const pendingRequests = requests?.requests || [];
+  const pendingRequests = requests || [];
 
   return (
     <div className="space-y-6">
@@ -150,16 +164,16 @@ export default function OrderCancellations() {
                   <div>
                     <h4 className="font-semibold mb-2">Customer Information</h4>
                     <div className="space-y-1 text-sm">
-                      <p><strong>Name:</strong> {request.customerName}</p>
-                      <p><strong>Email:</strong> {request.customerEmail}</p>
-                      <p><strong>Phone:</strong> {request.customerPhone}</p>
+                      <p><strong>Name:</strong> {request.customerInfo?.name || request.user?.name || 'N/A'}</p>
+                      <p><strong>Email:</strong> {request.customerInfo?.email || request.user?.email || 'N/A'}</p>
+                      <p><strong>Phone:</strong> {request.customerInfo?.phone || 'N/A'}</p>
                     </div>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-2">Request Details</h4>
                     <div className="space-y-1 text-sm">
                       <p><strong>Requested:</strong> {new Date(request.cancellationRequestedAt).toLocaleDateString()} at {new Date(request.cancellationRequestedAt).toLocaleTimeString()}</p>
-                      <p><strong>Reason:</strong> {request.cancellationReason}</p>
+                      <p><strong>Reason:</strong> {request.cancellationRequestReason}</p>
                     </div>
                   </div>
                 </div>
@@ -170,7 +184,7 @@ export default function OrderCancellations() {
                     <ul className="space-y-1 text-sm">
                       {request.items.map((item, index) => (
                         <li key={index} className="flex justify-between">
-                          <span>{item.productName} × {item.quantity}</span>
+                          <span>{item.product.name} × {item.quantity}</span>
                           <span>₹{item.price.toFixed(2)}</span>
                         </li>
                       ))}
@@ -196,7 +210,7 @@ export default function OrderCancellations() {
                       <div className="space-y-4">
                         <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                           <h4 className="font-semibold text-yellow-800 mb-2">Customer's Reason:</h4>
-                          <p className="text-yellow-700">{request.cancellationReason}</p>
+                          <p className="text-yellow-700">{request.cancellationRequestReason}</p>
                         </div>
 
                         <div>
