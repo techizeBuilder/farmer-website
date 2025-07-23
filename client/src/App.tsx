@@ -16,6 +16,7 @@ import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import Account from "@/pages/account";
 import OrderHistory from "@/pages/order-history";
+import OrderCancellation from "@/pages/order-cancellation";
 import Payment from "@/pages/payment";
 import PaymentSuccess from "@/pages/payment-success";
 import FAQs from "@/pages/faqs";
@@ -71,6 +72,7 @@ function App() {
                         />
                         <Route path="/account" component={Account} />
                         <Route path="/order-history" component={OrderHistory} />
+                        <Route path="/cancel-order" component={OrderCancellation} />
                         <Route path="/payment" component={Payment} />
                         <Route
                           path="/payment-success"

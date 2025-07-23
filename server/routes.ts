@@ -1883,6 +1883,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer requests order cancellation
+  app.post(`${apiPrefix}/orders/:id/request-cancellation`, authenticate, async (req, res) => {
+    try {
+      const { requestOrderCancellation } = await import("./admin/orders");
+      await requestOrderCancellation(req, res);
+    } catch (error) {
+      console.error("Order cancellation request error:", error);
+      res.status(500).json({ message: "Failed to request order cancellation" });
+    }
+  });
+
   // Get cancelled orders
   app.get(`${apiPrefix}/orders/cancelled`, authenticate, async (req, res) => {
     try {
@@ -2900,6 +2911,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res
         .status(500)
         .json({ message: `Failed to export table ${req.params.tableName}` });
+    }
+  });
+
+  // Admin routes for order cancellation management
+  app.get(`${apiPrefix}/admin/orders/pending/cancellation`, authenticate, async (req, res) => {
+    try {
+      const { getPendingCancellationRequests } = await import("./admin/orders");
+      await getPendingCancellationRequests(req, res);
+    } catch (error) {
+      console.error("Error fetching pending cancellation requests:", error);
+      res.status(500).json({ message: "Failed to fetch pending cancellation requests" });
+    }
+  });
+
+  app.post(`${apiPrefix}/admin/orders/:id/process-cancellation`, authenticate, async (req, res) => {
+    try {
+      const { processCancellationRequest } = await import("./admin/orders");
+      await processCancellationRequest(req, res);
+    } catch (error) {
+      console.error("Error processing cancellation request:", error);
+      res.status(500).json({ message: "Failed to process cancellation request" });
     }
   });
 

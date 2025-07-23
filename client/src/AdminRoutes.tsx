@@ -14,6 +14,7 @@ import AdminNewsletter from "@/pages/admin/newsletter";
 import AdminMessagesWithLayout from "@/pages/admin/messages";
 import AdminTeamMembers from "@/pages/admin/team-members";
 import AdminCategoryManagement from "@/pages/admin/category-management";
+import AdminOrderCancellations from "@/pages/admin/order-cancellations";
 
 export const AdminRoutes = () => {
   return (
@@ -36,6 +37,10 @@ export const AdminRoutes = () => {
           <Route
             path="/admin/category-management"
             component={AdminCategoryManagement}
+          />
+          <Route
+            path="/admin/order-cancellations"
+            component={AdminOrderCancellations}
           />
           <Route path="/admin/settings" component={AdminSettings} />
         </Switch>

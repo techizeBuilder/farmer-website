@@ -221,6 +221,39 @@ Successfully migrated the project from Replit Agent to the standard Replit envir
 - "₹10.50/3 L" instead of "₹3.50/L"
 - "₹12.50/2 Pcs" instead of "₹6.25/Piece"
 
+### Order Cancellation Request System (July 23, 2025)
+
+Implemented a comprehensive order cancellation request system allowing customers to request order cancellations and admins to process them:
+
+**Database Implementation:**
+- Created database migration (0005_order_cancellation_requests.sql) extending orders table
+- Added cancellation tracking fields: cancellationRequestedAt, cancellationReason, cancellationApprovedAt, cancellationApprovedBy, adminNotes
+- Extended customer information fields: customerName, customerEmail, customerPhone for better tracking
+
+**Backend API Implementation:**
+- Created customer cancellation request endpoint: POST /api/orders/:id/request-cancellation
+- Implemented admin endpoints: GET /api/admin/orders/pending/cancellation and POST /api/admin/orders/:id/process-cancellation
+- Added comprehensive order cancellation handlers in server/admin/orders.ts
+- Integrated proper authentication middleware for secure access
+
+**Frontend Implementation:**
+- Created customer cancellation interface (/cancel-order) showing eligible orders with selection and reason input
+- Built admin management dashboard (/admin/order-cancellations) for processing requests
+- Added admin navigation menu item with XCircle icon for order cancellations
+- Implemented proper error handling and user feedback throughout the workflow
+
+**Security Features:**
+- Only orders with status 'processing', 'confirmed', or 'pending' can be cancelled
+- Comprehensive validation of cancellation requests
+- Admin authentication required for processing requests
+- Detailed audit trail with timestamps and admin notes
+
+**User Experience:**
+- Intuitive customer interface showing order details and cancellation form
+- Clean admin interface with request review and approval/rejection workflow
+- Proper status indicators and user feedback messages
+- Mobile-responsive design consistent with existing application
+
 ### Migration to Replit Environment (July 23, 2025)
 
 Successfully migrated the project from Replit Agent to the standard Replit environment:

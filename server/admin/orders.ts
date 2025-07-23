@@ -9,7 +9,7 @@ import {
   Order,
   OrderItem,
 } from "@shared/schema";
-import { eq, like, desc, asc, and, gte, lte, sql, ne } from "drizzle-orm";
+import { eq, like, desc, asc, and, gte, lte, sql, ne, isNotNull, isNull } from "drizzle-orm";
 
 // abhi
 // Get monthly sales for current year
@@ -490,6 +490,217 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     console.error("Error updating order status:", error);
     res.status(500).json({
       message: "Failed to update order status",
+      error: String(error),
+    });
+  }
+};
+
+// Customer requests order cancellation
+export const requestOrderCancellation = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    if (!reason || reason.trim().length < 10) {
+      return res.status(400).json({ 
+        message: "Cancellation reason must be at least 10 characters long" 
+      });
+    }
+
+    const orderId = parseInt(id);
+    const existingOrder = await db.query.orders.findFirst({
+      where: and(eq(orders.id, orderId), eq(orders.userId, userId)),
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Check if order can be cancelled
+    const cancellableStatuses = ["pending", "processing"];
+    if (!cancellableStatuses.includes(existingOrder.status)) {
+      return res.status(400).json({ 
+        message: "Order cannot be cancelled at this stage" 
+      });
+    }
+
+    // Check if cancellation already requested
+    if (existingOrder.cancellationRequestedAt) {
+      return res.status(400).json({ 
+        message: "Cancellation request already submitted" 
+      });
+    }
+
+    const now = new Date();
+    const newEvent = {
+      status: "cancellation_requested",
+      message: `Customer requested order cancellation: ${reason}`,
+      date: now.toISOString(),
+    };
+
+    const updatedTimeline = Array.isArray(existingOrder.statusTimeline)
+      ? [...existingOrder.statusTimeline, newEvent]
+      : [newEvent];
+
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({
+        cancellationRequestedAt: now,
+        cancellationRequestReason: reason.trim(),
+        statusTimeline: updatedTimeline,
+        updatedAt: now,
+      })
+      .where(eq(orders.id, orderId))
+      .returning();
+
+    res.json({
+      message: "Cancellation request submitted successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error requesting order cancellation:", error);
+    res.status(500).json({
+      message: "Failed to submit cancellation request",
+      error: String(error),
+    });
+  }
+};
+
+// Admin approves/rejects cancellation request
+export const processCancellationRequest = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { action, rejectionReason } = req.body; // action: 'approve' or 'reject'
+    const adminId = req.user?.id;
+
+    if (!adminId) {
+      return res.status(401).json({ message: "Admin authentication required" });
+    }
+
+    if (!["approve", "reject"].includes(action)) {
+      return res.status(400).json({ message: "Invalid action. Use 'approve' or 'reject'" });
+    }
+
+    if (action === "reject" && (!rejectionReason || rejectionReason.trim().length < 5)) {
+      return res.status(400).json({ 
+        message: "Rejection reason must be at least 5 characters long" 
+      });
+    }
+
+    const orderId = parseInt(id);
+    const existingOrder = await db.query.orders.findFirst({
+      where: eq(orders.id, orderId),
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (!existingOrder.cancellationRequestedAt) {
+      return res.status(400).json({ 
+        message: "No cancellation request found for this order" 
+      });
+    }
+
+    if (existingOrder.cancellationApprovedAt || existingOrder.cancellationRejectedAt) {
+      return res.status(400).json({ 
+        message: "Cancellation request already processed" 
+      });
+    }
+
+    const now = new Date();
+    let updateData: Partial<typeof orders.$inferInsert>;
+    let newEvent;
+
+    if (action === "approve") {
+      updateData = {
+        status: "cancelled",
+        cancellationReason: existingOrder.cancellationRequestReason,
+        cancellationApprovedBy: adminId,
+        cancellationApprovedAt: now,
+        updatedAt: now,
+      };
+      
+      newEvent = {
+        status: "cancelled",
+        message: "Order cancelled - Cancellation request approved by admin",
+        date: now.toISOString(),
+      };
+    } else {
+      updateData = {
+        cancellationRejectedAt: now,
+        cancellationRejectionReason: rejectionReason.trim(),
+        updatedAt: now,
+      };
+      
+      newEvent = {
+        status: "cancellation_rejected",
+        message: `Cancellation request rejected: ${rejectionReason}`,
+        date: now.toISOString(),
+      };
+    }
+
+    const updatedTimeline = Array.isArray(existingOrder.statusTimeline)
+      ? [...existingOrder.statusTimeline, newEvent]
+      : [newEvent];
+
+    updateData.statusTimeline = updatedTimeline;
+
+    const [updatedOrder] = await db
+      .update(orders)
+      .set(updateData)
+      .where(eq(orders.id, orderId))
+      .returning();
+
+    res.json({
+      message: `Cancellation request ${action}d successfully`,
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error processing cancellation request:", error);
+    res.status(500).json({
+      message: "Failed to process cancellation request",
+      error: String(error),
+    });
+  }
+};
+
+// Get orders with pending cancellation requests (for admin)
+export const getPendingCancellationRequests = async (req: Request, res: Response) => {
+  try {
+    const pendingRequests = await db.query.orders.findMany({
+      where: and(
+        isNotNull(orders.cancellationRequestedAt),
+        isNull(orders.cancellationApprovedAt),
+        isNull(orders.cancellationRejectedAt)
+      ),
+      with: {
+        orderItems: {
+          with: {
+            product: true,
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: [desc(orders.cancellationRequestedAt)],
+    });
+
+    res.json(pendingRequests);
+  } catch (error) {
+    console.error("Error fetching pending cancellation requests:", error);
+    res.status(500).json({
+      message: "Failed to fetch pending cancellation requests",
       error: String(error),
     });
   }

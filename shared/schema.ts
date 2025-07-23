@@ -233,6 +233,15 @@ export const orders = pgTable("orders", {
     >(),
 
   deliveredAt: timestamp("delivered_at"),
+  
+  // Cancellation request fields
+  cancellationRequestedAt: timestamp("cancellation_requested_at"),
+  cancellationRequestReason: text("cancellation_request_reason"),
+  cancellationApprovedBy: integer("cancellation_approved_by").references(() => users.id),
+  cancellationApprovedAt: timestamp("cancellation_approved_at"),
+  cancellationRejectedAt: timestamp("cancellation_rejected_at"),
+  cancellationRejectionReason: text("cancellation_rejection_reason"),
+  
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

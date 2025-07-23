@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   X,
+  XCircle,
   Mail,
   MessageSquare,
   FolderTree,
@@ -67,6 +68,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: <ShoppingCart className="h-5 w-5" />,
       label: "Orders",
       path: "/admin/orders",
+    },
+    {
+      icon: <XCircle className="h-5 w-5" />,
+      label: "Order Cancellations",
+      path: "/admin/order-cancellations",
     },
     {
       icon: <Users className="h-5 w-5" />,
