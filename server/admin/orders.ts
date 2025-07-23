@@ -318,7 +318,7 @@ export const getOrderById = async (req: Request, res: Response) => {
         sessionId: orders.sessionId,
         total: orders.total,
         status: orders.status,
-        shippingAddress: orders.shippingAddress,
+        customerInfo: orders.customerInfo,
         paymentMethod: orders.paymentMethod,
         cancellationReason: orders.cancellationReason,
         deliveredAt: orders.deliveredAt,
@@ -454,7 +454,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       date: now,
       ...(status === "shipped" && { location: "Warehouse, Delhi" }),
       ...(status === "delivered" && {
-        location: existingOrder.shippingAddress,
+        location: "Customer Address",
       }),
     };
 
@@ -500,7 +500,7 @@ export const requestOrderCancellation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
 
     if (!userId) {
       return res.status(401).json({ message: "Authentication required" });
@@ -576,7 +576,7 @@ export const processCancellationRequest = async (req: Request, res: Response) =>
   try {
     const { id } = req.params;
     const { action, rejectionReason } = req.body; // action: 'approve' or 'reject'
-    const adminId = req.user?.id;
+    const adminId = (req as any).user?.id;
 
     if (!adminId) {
       return res.status(401).json({ message: "Admin authentication required" });

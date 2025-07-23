@@ -765,7 +765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               email: true,
             },
           },
-          items: {
+          orderItems: {
             columns: {
               quantity: true,
             },
@@ -795,17 +795,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Prepare response
       const response = {
-        orderNumber: order.tracking_id || order.trackingId,
+        orderNumber: order.trackingId,
         status: order.status,
-        statusDate: order.updated_at || order.updatedAt,
-        estimatedDelivery: order.delivered_at || order.deliveredAt || null,
-        shippingAddress: order.shipping_address || order.shippingAddress,
-        items: order.items.map((item) => ({
+        statusDate: order.updatedAt,
+        estimatedDelivery: order.deliveredAt || null,
+        shippingAddress: "Customer Address",
+        items: order.orderItems?.map((item) => ({
           name: item.product.name,
           quantity: item.quantity,
           price: item.product.price,
         })),
-        trackingEvents: order.status_timeline || order.statusTimeline || [],
+        trackingEvents: order.statusTimeline || [],
       };
 
       return res.json(response);
@@ -1867,11 +1867,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               : null,
             appliedDiscounts,
-            shippingAddress: order.shippingAddress || "Default address",
-            billingAddress:
-              order.billingAddress ||
-              order.shippingAddress ||
-              "Default address",
+            shippingAddress: "Customer Address",
+            billingAddress: "Customer Address",
           };
         })
       );

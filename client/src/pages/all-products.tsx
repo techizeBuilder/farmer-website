@@ -80,11 +80,11 @@ export default function AllProducts() {
   // State for filters and pagination - initialize from URL parameters
   const [searchQuery, setSearchQuery] = useState(searchParam || "");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryParam || category || null
+    categoryParam || category || null,
   );
 
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
-    subcategoryParam || null
+    subcategoryParam || null,
   );
   const [priceRange, setPriceRange] = useState<[number, number]>([
     minPriceParam ? parseFloat(minPriceParam) : 0,
@@ -151,7 +151,7 @@ export default function AllProducts() {
     queryFn: async () => {
       const queryString = buildQueryParams();
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/products?${queryString}`
+        `${import.meta.env.VITE_API_URL}/api/products?${queryString}`,
       );
       console.log(response, "nidhi");
       if (!response.ok) {
@@ -168,11 +168,6 @@ export default function AllProducts() {
   const { setupScrollAnimation } = useAnimations();
 
   useEffect(() => {
-    if (!isAuthenticated && location !== "/login") {
-      console.log("Redirecting to login...");
-      setTimeout(() => navigate("/login"), 0);
-    }
-
     setupScrollAnimation();
     window.scrollTo(0, 0);
   }, [isAuthenticated]);
@@ -189,7 +184,7 @@ export default function AllProducts() {
     if (searchParam) {
       setSearchQuery(searchParam);
       const searchInput = document.getElementById(
-        "product-search"
+        "product-search",
       ) as HTMLInputElement;
       if (searchInput) {
         searchInput.value = searchParam;
@@ -294,7 +289,7 @@ export default function AllProducts() {
     if ((searchParam || "") !== searchQuery) {
       setSearchQuery(searchParam || "");
       const searchInput = document.getElementById(
-        "product-search"
+        "product-search",
       ) as HTMLInputElement;
       if (searchInput) searchInput.value = searchParam || "";
     }
@@ -333,7 +328,7 @@ export default function AllProducts() {
   const fetchMainCategories = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/categories/main`
+        `${import.meta.env.VITE_API_URL}/api/categories/main`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -350,7 +345,7 @@ export default function AllProducts() {
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/api/categories/${parentId}/subcategories`
+        }/api/categories/${parentId}/subcategories`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -374,7 +369,7 @@ export default function AllProducts() {
 
     if (categoryName && categoryName !== "all") {
       const selectedCat = mainCategories.find(
-        (cat) => cat.name === categoryName
+        (cat) => cat.name === categoryName,
       );
       if (selectedCat) {
         fetchSubcategories(selectedCat.id);
@@ -506,7 +501,7 @@ export default function AllProducts() {
       sortOrder,
       updateURL,
       setCurrentPage,
-    ]
+    ],
   );
   // Handle sort change
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
@@ -541,7 +536,7 @@ export default function AllProducts() {
       if (categoryParam) {
         // Find the category and load its subcategories
         const selectedCat = mainCategories.find(
-          (cat) => cat.name === categoryParam
+          (cat) => cat.name === categoryParam,
         );
         if (selectedCat) {
           fetchSubcategories(selectedCat.id);
@@ -604,7 +599,7 @@ export default function AllProducts() {
 
     // Reset input field
     const searchInput = document.getElementById(
-      "product-search"
+      "product-search",
     ) as HTMLInputElement;
     if (searchInput) searchInput.value = "";
   };
@@ -715,7 +710,7 @@ export default function AllProducts() {
                           "w-full justify-start font-normal",
                           !selectedCategory || selectedCategory === "all"
                             ? "bg-primary/10 text-primary font-medium"
-                            : "text-foreground hover:bg-muted"
+                            : "text-foreground hover:bg-muted",
                         )}
                         onClick={() => handleCategoryChange(null)}
                       >
@@ -731,7 +726,7 @@ export default function AllProducts() {
                               "w-full justify-start font-normal",
                               isSelected
                                 ? "bg-primary/10 text-primary font-medium"
-                                : "hover:text-black hover:bg-muted"
+                                : "hover:text-black hover:bg-muted",
                             )}
                             onClick={() => handleCategoryChange(category.name)}
                           >
@@ -755,7 +750,7 @@ export default function AllProducts() {
                             "w-full justify-start font-normal",
                             selectedSubcategory === null
                               ? "bg-secondary/10 text-secondary font-medium"
-                              : "text-foreground hover:bg-muted"
+                              : "text-foreground hover:bg-muted",
                           )}
                           onClick={() => handleSubcategoryChange(null)}
                         >
@@ -769,7 +764,7 @@ export default function AllProducts() {
                               "w-full justify-start font-normal",
                               selectedSubcategory === subcategory.name
                                 ? "bg-secondary/10 text-secondary font-medium"
-                                : "text-foreground hover:bg-muted hover:text-black"
+                                : "text-foreground hover:bg-muted hover:text-black",
                             )}
                             onClick={() =>
                               handleSubcategoryChange(subcategory.name)
@@ -787,7 +782,7 @@ export default function AllProducts() {
                     <Label
                       className={cn(
                         "text-foreground font-medium mb-4 block transition-colors",
-                        isDragging ? "text-primary" : ""
+                        isDragging ? "text-primary" : "",
                       )}
                     >
                       Price Range: ₹{tempRange[0]} - ₹{tempRange[1]}
@@ -931,7 +926,7 @@ export default function AllProducts() {
                               {page}
                             </Button>
                           );
-                        }
+                        },
                       )}
                     </div>
 
