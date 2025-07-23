@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -9,10 +10,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Package, Calendar, CreditCard, MapPin, ArrowLeft } from "lucide-react";
+import { Package, Calendar, CreditCard, MapPin, ArrowLeft, XCircle } from "lucide-react";
 import placeholderImage from "../../../public/uploads/products/No-Image.png";
 import { formatSnakeCase } from "@/utils/formatSnakeCase";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 interface Product {
   id: number;
   name: string;
@@ -85,6 +91,10 @@ interface OrderHistoryResponse {
 
 export default function OrderHistory() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [cancellationReason, setCancellationReason] = useState("");
 
   const {
     data: orderHistory,
@@ -139,6 +149,47 @@ export default function OrderHistory() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  // Check if order can be cancelled (not dispatched/shipped/delivered/cancelled)
+  const canCancelOrder = (status: string) => {
+    const cancellableStatuses = ["pending", "confirmed", "processing"];
+    return cancellableStatuses.includes(status.toLowerCase());
+  };
+
+  // Mutation for cancelling order
+  const cancelOrderMutation = useMutation({
+    mutationFn: async ({ orderId, reason }: { orderId: number; reason: string }) => {
+      return apiRequest(`/api/orders/${orderId}/request-cancellation`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Cancellation Request Submitted",
+        description: "Your order cancellation request has been submitted for review.",
+      });
+      setSelectedOrderId(null);
+      setCancellationReason("");
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/history"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit cancellation request",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCancelOrder = () => {
+    if (selectedOrderId && cancellationReason.trim()) {
+      cancelOrderMutation.mutate({
+        orderId: selectedOrderId,
+        reason: cancellationReason.trim(),
+      });
+    }
   };
 
   if (!isAuthenticated) {
@@ -245,13 +296,73 @@ export default function OrderHistory() {
                         )}
                       </CardDescription>
                     </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {order.status.toUpperCase()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          order.status
+                        )}`}
+                      >
+                        {order.status.toUpperCase()}
+                      </span>
+                      {canCancelOrder(order.status) && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-red-600 border-red-300 hover:bg-red-50"
+                              onClick={() => setSelectedOrderId(order.id)}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Cancel Order
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Cancel Order #{order.id}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <p className="text-sm text-muted-foreground">
+                                Please provide a reason for cancelling this order. Your request will be reviewed by our team.
+                              </p>
+                              <div>
+                                <Label htmlFor="cancellation-reason">
+                                  Reason for Cancellation
+                                </Label>
+                                <Textarea
+                                  id="cancellation-reason"
+                                  placeholder="Please explain why you want to cancel this order..."
+                                  value={cancellationReason}
+                                  onChange={(e) => setCancellationReason(e.target.value)}
+                                  className="mt-2"
+                                  rows={4}
+                                />
+                              </div>
+                              <div className="flex gap-2 pt-2">
+                                <Button
+                                  onClick={handleCancelOrder}
+                                  disabled={!cancellationReason.trim() || cancelOrderMutation.isPending}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  {cancelOrderMutation.isPending
+                                    ? "Submitting..."
+                                    : "Submit Cancellation Request"}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedOrderId(null);
+                                    setCancellationReason("");
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
 
