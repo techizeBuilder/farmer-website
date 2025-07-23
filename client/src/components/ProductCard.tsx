@@ -114,7 +114,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
           </div>
-
           {/* Product Attributes */}
           <div className="flex flex-wrap gap-1 mb-3">
             {product.naturallyGrown && (
@@ -145,12 +144,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               </Badge>
             )}
           </div>
-
           {/* Description with consistent height */}
           <p className="text-olive text-sm mb-3 line-clamp-2 min-h-[2.5rem]">
             {product.shortDescription || product.description}
           </p>
-
           {/* Rating Display */}
           <div className="mb-3">
             <RatingDisplay
@@ -160,14 +157,13 @@ export default function ProductCard({ product }: ProductCardProps) {
               showCount={reviews.length > 0}
             />
           </div>
-
           {/* Stock Status */}
-          {lowStock && (
+
+          {Boolean(lowStock) && (
             <p className="text-orange-600 text-xs mb-2 font-medium">
               Only {product.stockQuantity} left in stock!
             </p>
           )}
-
           {/* Price and Add to Cart - pushed to bottom */}
           <div className="flex items-center justify-between mt-auto pt-4">
             <div className="flex flex-col space-y-1">
@@ -204,7 +200,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               )}
             </div>
-            <AddToCartButton product={product} />
+            {product.stockQuantity > 0 ? (
+              <AddToCartButton product={product} />
+            ) : (
+              <p className="text-red-600 font-semibold">Out of Stock</p>
+            )}
           </div>
         </CardContent>
       </Card>

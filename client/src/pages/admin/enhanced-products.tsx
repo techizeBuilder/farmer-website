@@ -116,7 +116,7 @@ const enhancedProductFormSchema = z.object({
   quantity: z.number().min(0.01, "Quantity must be greater than 0"),
   // Pricing & Inventory
   price: z.number().min(0.01, "Price must be greater than 0"),
-  discountPrice: z.number().optional(),
+  discountPrice: z.number().nullable().optional(),
   stockQuantity: z.number().int().min(0, "Stock quantity must be 0 or greater"),
   sku: z.string().optional(),
 

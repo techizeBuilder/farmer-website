@@ -4,16 +4,17 @@ import { ParallaxSection } from "@/components/ui/parallax-section";
 import { useAnimations } from "@/hooks/use-animations";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import ContactFormWithStorage from "@/components/ContactFormWithStorage";
+import { useSiteSettings } from "@/context/SiteContext";
 
 export default function Contact() {
   // Set up animations
   const { setupScrollAnimation } = useAnimations();
-
+  const { settings } = useSiteSettings();
   useEffect(() => {
     setupScrollAnimation();
     window.scrollTo(0, 0);
   }, [setupScrollAnimation]);
-
+  console.log("Contact settings:", settings);
   return (
     <>
       {/* Hero Section */}
@@ -82,7 +83,9 @@ export default function Contact() {
                     <h3 className="font-heading text-forest text-xl font-semibold mb-2">
                       Phone Support
                     </h3>
-                    <p className="text-olive mb-1">+1 (800) 555-1234</p>
+                    <p className="text-olive mb-1">
+                      +91 {settings.storeInfo.phone}
+                    </p>
                     <p className="text-olive text-sm">
                       Monday to Friday, 9am to 5pm EST
                     </p>
@@ -100,7 +103,12 @@ export default function Contact() {
                       Email Us
                     </h3>
                     <p className="text-olive mb-1">
-                      customer.service@harvestdirect.com
+                      <a
+                        href={`mailto:${settings.storeInfo.email}`}
+                        className="hover:underline"
+                      >
+                        {settings.storeInfo.email}
+                      </a>
                     </p>
                     <p className="text-olive text-sm">
                       For general inquiries and support
@@ -119,10 +127,15 @@ export default function Contact() {
                       Office Address
                     </h3>
                     <p className="text-olive mb-1">
-                      123 Farm Street, Suite 101
+                      {settings.storeInfo.address}
                     </p>
-                    <p className="text-olive mb-1">Green Valley, CA 94103</p>
-                    <p className="text-olive text-sm">United States</p>
+                    <p className="text-olive mb-1">
+                      {settings.storeInfo.city}, {settings.storeInfo.state}{" "}
+                      {settings.storeInfo.zip}
+                    </p>
+                    <p className="text-olive text-sm">
+                      {settings.storeInfo.country}
+                    </p>
                   </div>
                 </div>
 
@@ -168,10 +181,11 @@ export default function Contact() {
               <div className="text-center">
                 <MapPin className="h-12 w-12 text-secondary mx-auto mb-4" />
                 <h3 className="font-heading text-forest text-xl font-bold mb-2">
-                  Harvest Direct HQ
+                  {settings.siteName} HQ
                 </h3>
                 <p className="text-olive">
-                  123 Farm Street, Green Valley, CA 94103
+                  {settings.storeInfo.address}, {settings.storeInfo.city},{" "}
+                  {settings.storeInfo.state} {settings.storeInfo.zip}
                 </p>
               </div>
             </div>

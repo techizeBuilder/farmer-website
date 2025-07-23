@@ -188,7 +188,7 @@ export default function Home() {
         `${import.meta.env.VITE_API_URL}/api/products`
       );
       console.log("Nidhi:", response.products);
-      setProduct(response.products[9] || []);
+      setProduct(response.products[3] || []);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
