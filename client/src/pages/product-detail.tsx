@@ -199,12 +199,10 @@ export default function ProductDetail() {
                 product.discountPrice < product.price ? (
                   <div className="flex items-center space-x-3">
                     <span className="text-forest text-3xl font-bold">
-                      ₹{product.discountPrice.toFixed(2)}/{product.quantity}{" "}
-                      {formatUnit(product.unit, product.quantity)}
+                      ₹{product.discountPrice.toFixed(2)}/{formatUnit(product.unit, product.quantity)}
                     </span>
                     <span className="text-gray-500 line-through text-xl">
-                      ₹{product.price.toFixed(2)}/{product.quantity}{" "}
-                      {formatUnit(product.unit, product.quantity)}
+                      ₹{product.price.toFixed(2)}/{formatUnit(product.unit, product.quantity)}
                     </span>
                     <span className="bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
                       {Math.round(
@@ -217,11 +215,7 @@ export default function ProductDetail() {
                   </div>
                 ) : (
                   <span className="text-forest text-3xl font-bold">
-                    ₹
-                    {product?.price
-                      ? (product.price / product.quantity).toFixed(2)
-                      : "0.00"}{" "}
-                    {formatUnit(product?.unit, product?.quantity)}
+                    ₹{product?.price ? product.price.toFixed(2) : "0.00"}/{formatUnit(product?.unit, product?.quantity)}
                   </span>
                 )}
                 <div className="text-sm text-olive bg-background/80 px-3 py-1 rounded">

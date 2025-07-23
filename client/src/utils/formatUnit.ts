@@ -18,5 +18,8 @@ export function formatUnit(unit: string | null | undefined, quantity: number = 1
   };
   
   const lowerUnit = unit.toLowerCase().trim();
-  return unitMappings[lowerUnit] || unit.toUpperCase();
+  const formattedUnit = unitMappings[lowerUnit] || unit.toUpperCase();
+  
+  // Include quantity in the unit display
+  return `${quantity} ${formattedUnit}`;
 }

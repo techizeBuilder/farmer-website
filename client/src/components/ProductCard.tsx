@@ -171,18 +171,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               {hasDiscount ? (
                 <>
                   <span className="text-forest font-bold text-lg md:text-xl">
-                    ₹{product.discountPrice!.toFixed(2)}/{product.quantity}{" "}
-                    {formatUnit(product.unit, product.quantity || 1)}
+                    ₹{product.discountPrice!.toFixed(2)}/{formatUnit(product.unit, product.quantity || 1)}
                   </span>
                   <span className="text-gray-500 line-through text-sm">
-                    Original: ₹{product.price.toFixed(2)}/{product.quantity}{" "}
-                    {formatUnit(product.unit, product.quantity || 1)}
+                    Original: ₹{product.price.toFixed(2)}/{formatUnit(product.unit, product.quantity || 1)}
                   </span>
                 </>
               ) : (
                 <span className="text-forest font-bold text-lg md:text-xl">
-                  ₹{product.price.toFixed(2)}/{product.quantity}{" "}
-                  {formatUnit(product.unit, product.quantity || 1)}
+                  ₹{product.price.toFixed(2)}/{formatUnit(product.unit, product.quantity || 1)}
                 </span>
               )}
               {hasDiscount && (

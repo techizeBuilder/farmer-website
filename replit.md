@@ -197,7 +197,29 @@ Successfully migrated the project from Replit Agent to the standard Replit envir
 - Frontend React application loading components
 - API communication working (200 responses from all endpoints)
 - Database operations functional with existing seed data
+- Unit display system working correctly with proper quantity formatting
 - Ready for deployment and further development
+
+### Unit Display Fix (July 23, 2025)
+
+**Issue Resolved:** Product unit display inconsistency where some products weren't showing units properly on detail pages.
+
+**Solution Implemented:**
+- Created centralized `formatUnit` utility function in `client/src/utils/formatUnit.ts`
+- Updated function to include quantity in unit display (e.g., "3 L", "500 Gram", "2 Pcs")
+- Modified ProductCard and ProductDetail components to show complete unit information
+- Removed duplicate quantity display since it's now integrated into the unit
+
+**Unit Formatting Rules:**
+- "l" → "3 L" (shows quantity + formatted unit)
+- "kg" → "1 KG" 
+- "gram" → "500 Gram"
+- "pcs" → "2 Pcs" or "1 Piece" (singular for quantity 1)
+
+**Result:** Products now display prices as stored in database without conversion:
+- "₹6.95/500 Gram" instead of "₹0.01/Gram"  
+- "₹10.50/3 L" instead of "₹3.50/L"
+- "₹12.50/2 Pcs" instead of "₹6.25/Piece"
 
 ### Migration to Replit Environment (July 23, 2025)
 
