@@ -551,7 +551,11 @@ export const ordersRelations = relations(orders, ({ many, one }) => ({
     fields: [orders.userId],
     references: [users.id],
   }),
-  items: many(orderItems),
+  orderItems: many(orderItems),
+  cancellationApprovedBy: one(users, {
+    fields: [orders.cancellationApprovedBy],
+    references: [users.id],
+  }),
 }));
 
 // OrderItem -> Product

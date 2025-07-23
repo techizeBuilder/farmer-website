@@ -522,7 +522,7 @@ export const requestOrderCancellation = async (req: Request, res: Response) => {
     }
 
     // Check if order can be cancelled
-    const cancellableStatuses = ["pending", "processing"];
+    const cancellableStatuses = ["pending", "confirmed", "processing"];
     if (!cancellableStatuses.includes(existingOrder.status)) {
       return res.status(400).json({ 
         message: "Order cannot be cancelled at this stage" 
@@ -673,28 +673,29 @@ export const processCancellationRequest = async (req: Request, res: Response) =>
 // Get orders with pending cancellation requests (for admin)
 export const getPendingCancellationRequests = async (req: Request, res: Response) => {
   try {
-    const pendingRequests = await db.query.orders.findMany({
-      where: and(
-        isNotNull(orders.cancellationRequestedAt),
-        isNull(orders.cancellationApprovedAt),
-        isNull(orders.cancellationRejectedAt)
-      ),
-      with: {
-        orderItems: {
-          with: {
-            product: true,
-          },
-        },
-        user: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: [desc(orders.cancellationRequestedAt)],
-    });
+    const pendingRequests = await db
+      .select({
+        id: orders.id,
+        userId: orders.userId,
+        total: orders.total,
+        status: orders.status,
+        customerInfo: orders.customerInfo,
+        cancellationRequestedAt: orders.cancellationRequestedAt,
+        cancellationRequestReason: orders.cancellationRequestReason,
+        createdAt: orders.createdAt,
+        userName: users.name,
+        userEmail: users.email,
+      })
+      .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id))
+      .where(
+        and(
+          isNotNull(orders.cancellationRequestedAt),
+          isNull(orders.cancellationApprovedAt),
+          isNull(orders.cancellationRejectedAt)
+        )
+      )
+      .orderBy(desc(orders.cancellationRequestedAt));
 
     res.json(pendingRequests);
   } catch (error) {
